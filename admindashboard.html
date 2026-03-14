@@ -279,14 +279,13 @@
       </div>
     </div>
 
-    <!-- Supabase loaded here at the bottom so it is guaranteed to be ready -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script>
+    <!-- Supabase ESM module - guaranteed to load before any code runs -->
+    <script type="module">
+      import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
       const SUPABASE_URL = 'https://ruajjuxabwfqpawpjosl.supabase.co';
       const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ1YWpqdXhhYndmcXBhd3Bqb3NsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0NTg0MjksImV4cCI6MjA4OTAzNDQyOX0.O1ZbG4vC6q4DxQKTq664i3e4xwUYcvgVDOsuNMDNK4I';
-      const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    </script>
-    <script>
+      const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
       let allLogs = [];
       let allUsers = [];
 
@@ -574,6 +573,17 @@
           window.location.href = "index.html";
         }
       }
+
+      // ── Expose functions to window so onclick= attributes work inside a module ──
+      window.changeView = changeView;
+      window.runFilter = runFilter;
+      window.filterByDate = filterByDate;
+      window.triggerResetAll = triggerResetAll;
+      window.toggleBlock = toggleBlock;
+      window.removeUser = removeUser;
+      window.exportCSV = exportCSV;
+      window.exportPDF = exportPDF;
+      window.logout = logout;
 
       // ── Init ──
       loadStats();
