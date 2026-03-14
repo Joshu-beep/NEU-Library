@@ -740,6 +740,11 @@
     </div>
 
     <script>
+      const SUPABASE_URL = "https://ruajjuxabwfqpawpjosl.supabase.co";
+      const SUPABASE_KEY =
+        "YOUR_SUPABASE_ANON_KEYeyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ1YWpqdXhhYndmcXBhd3Bqb3NsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0NTg0MjksImV4cCI6MjA4OTAzNDQyOX0.O1ZbG4vC6q4DxQKTq664i3e4xwUYcvgVDOsuNMDNK4I";
+      const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      loadDashboard();
       function showToast(msg) {
         const x = document.getElementById("toast");
         x.textContent = msg;
