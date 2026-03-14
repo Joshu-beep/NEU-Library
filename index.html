@@ -5,7 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>New Era University Library</title>
     <link rel="icon" type="image/x-icon" href="neulogo.png" />
-
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+      const SUPABASE_URL = "https://ruajjuxabwfqpawpjosl.supabase.co";
+      const SUPABASE_KEY =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ1YWpqdXhhYndmcXBhd3Bqb3NsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0NTg0MjksImV4cCI6MjA4OTAzNDQyOX0.O1ZbG4vC6q4DxQKTq664i3e4xwUYcvgVDOsuNMDNK4I";
+      const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    </script>
     <style>
       :root {
         --primary-blue: #001f54;
@@ -31,7 +37,6 @@
         background-repeat: no-repeat;
         background-attachment: fixed;
         display: flex;
-        /* Changed from justify-content: flex-end to flex-start for left placement */
         justify-content: flex-start;
         align-items: stretch;
         min-height: 100vh;
@@ -45,7 +50,6 @@
         display: flex;
         flex-direction: column;
         background: #ffffff;
-        /* Changed shadow to the right side since panel is on the left */
         box-shadow: 10px 0 30px rgba(0, 0, 0, 0.15);
         z-index: 10;
         min-height: 100vh;
@@ -102,14 +106,12 @@
         object-fit: contain;
         padding: 8px;
       }
-
       .card-header h1 {
         font-size: 22px;
         font-weight: 700;
         margin-bottom: 6px;
         letter-spacing: 0.5px;
       }
-
       .card-header h2 {
         font-size: 12px;
         color: var(--accent-gold);
@@ -129,12 +131,10 @@
       .input-group {
         margin-bottom: 20px;
       }
-
       .input-row {
         display: flex;
         gap: 15px;
       }
-
       .input-row .input-group {
         flex: 1;
       }
@@ -162,11 +162,9 @@
       .text-left label {
         text-align: left;
       }
-
       .text-left input {
         text-align: left;
       }
-
       .input-group input:focus {
         border-color: var(--primary-blue);
       }
@@ -181,9 +179,12 @@
         transition: all 0.2s ease;
         outline: none;
       }
-
       .btn:active {
         transform: scale(0.98);
+      }
+      .btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
       }
 
       .btn-primary {
@@ -192,7 +193,6 @@
         border: none;
         margin-top: 5px;
       }
-
       .btn-admin {
         background-color: var(--admin-red);
         color: #ffffff;
@@ -204,7 +204,6 @@
         margin: 24px 0 20px;
         position: relative;
       }
-
       .divider-container::before {
         content: "";
         position: absolute;
@@ -215,7 +214,6 @@
         background-color: #f1f5f9;
         z-index: 1;
       }
-
       .divider-container p {
         font-size: 13px;
         color: #94a3b8;
@@ -251,11 +249,9 @@
         font-weight: 600;
         cursor: pointer;
       }
-
       .admin-link:hover {
         color: var(--primary-blue);
       }
-
       .admin-link svg {
         width: 16px;
         height: 16px;
@@ -268,7 +264,6 @@
         gap: 15px;
         margin-bottom: 24px;
       }
-
       .role-card {
         flex: 1;
         border: 1px solid var(--light-border);
@@ -281,7 +276,6 @@
         transition: all 0.2s ease;
         color: var(--text-gray);
       }
-
       .role-card.active {
         border-color: var(--primary-blue);
         color: var(--primary-blue);
@@ -323,7 +317,6 @@
 
     <div class="login-wrapper">
       <div class="login-card">
-        <!-- Shared Header Section -->
         <div class="card-header" id="mainHeader">
           <div class="icon-container">
             <img
@@ -358,11 +351,11 @@
                 required
               />
             </div>
-            <button type="submit" class="btn btn-primary">Sign In</button>
+            <button type="submit" class="btn btn-primary" id="loginBtn">
+              Sign In
+            </button>
           </form>
-          <div class="divider-container">
-            <p>Don't have account yet?</p>
-          </div>
+          <div class="divider-container"><p>Don't have account yet?</p></div>
           <button type="button" class="btn btn-secondary" id="showRegisterBtn">
             Register Here
           </button>
@@ -422,7 +415,7 @@
                 />
               </div>
             </div>
-            <button type="submit" class="btn btn-primary">
+            <button type="submit" class="btn btn-primary" id="registerBtn">
               Complete Registration
             </button>
           </form>
@@ -495,30 +488,14 @@
       </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
-
-      const SUPABASE_URL = "https://ruajjuxabwfqpawpjosl.supabase.co";
-      const SUPABASE_KEY =
-        "YOUR_SUPABASE_ANON_KEYeyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ1YWpqdXhhYndmcXBhd3Bqb3NsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0NTg0MjksImV4cCI6MjA4OTAzNDQyOX0.O1ZbG4vC6q4DxQKTq664i3e4xwUYcvgVDOsuNMDNK4I";
-
-      const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
+    <script>
       const loginView = document.getElementById("loginView");
       const registerView = document.getElementById("registerView");
       const adminView = document.getElementById("adminView");
       const mainHeader = document.getElementById("mainHeader");
       const headerSubtitle = document.getElementById("headerSubtitle");
 
-      function showMessage(msg, color = "#001f54") {
-        const msgBox = document.getElementById("msgBox");
-        msgBox.textContent = msg;
-        msgBox.style.backgroundColor = color;
-        msgBox.style.display = "block";
-        setTimeout(() => {
-          msgBox.style.display = "none";
-        }, 3000);
-      }
-
+      // Navigation
       document.getElementById("showRegisterBtn").onclick = () => {
         loginView.style.display = "none";
         registerView.style.display = "flex";
@@ -537,6 +514,7 @@
         adminView.style.display = "flex";
         mainHeader.classList.add("admin-mode");
         headerSubtitle.textContent = "Admin Control Panel";
+        showMessage("Switching to Administrator Mode");
       };
 
       document.getElementById("backFromAdmin").onclick = (e) => {
@@ -547,8 +525,87 @@
         headerSubtitle.textContent = "Visitor Management System";
       };
 
+      function showMessage(msg, color = "#001f54") {
+        const msgBox = document.getElementById("msgBox");
+        msgBox.textContent = msg;
+        msgBox.style.backgroundColor = color;
+        msgBox.style.display = "block";
+        setTimeout(() => {
+          msgBox.style.display = "none";
+        }, 3000);
+      }
+
+      // ── LOGIN with Supabase ──
+      document.getElementById("loginForm").onsubmit = async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById("loginBtn");
+        btn.disabled = true;
+        btn.textContent = "Signing in...";
+
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
+
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+
+        if (error) {
+          const msg = error.message.toLowerCase();
+          if (
+            msg.includes("invalid login credentials") ||
+            msg.includes("user not found") ||
+            msg.includes("no user found")
+          ) {
+            showMessage(
+              "You don't have an account yet. Please register first.",
+              "#991b1b",
+            );
+          } else if (
+            msg.includes("invalid password") ||
+            msg.includes("wrong password")
+          ) {
+            showMessage("Incorrect password. Please try again.", "#991b1b");
+          } else {
+            showMessage(error.message, "#991b1b");
+          }
+          btn.disabled = false;
+          btn.textContent = "Sign In";
+          return;
+        }
+
+        // Fetch user profile from users table
+        const { data: profile, error: profileError } = await supabase
+          .from("users")
+          .select("*")
+          .eq("id", data.user.id)
+          .single();
+
+        if (profileError || !profile) {
+          showMessage("Could not load user profile.", "#991b1b");
+          btn.disabled = false;
+          btn.textContent = "Sign In";
+          return;
+        }
+
+        // Store in localStorage for visitorlog.html
+        localStorage.setItem("userName", profile.name);
+        localStorage.setItem("userEmail", profile.email);
+        localStorage.setItem("userProgram", profile.program);
+        localStorage.setItem("userId", profile.id);
+
+        showMessage("Login successful!");
+        setTimeout(() => {
+          window.location.href = "visitorlog.html";
+        }, 1000);
+      };
+
+      // ── REGISTER with Supabase ──
       document.getElementById("registerForm").onsubmit = async (e) => {
         e.preventDefault();
+        const btn = document.getElementById("registerBtn");
+        btn.disabled = true;
+        btn.textContent = "Creating account...";
 
         const email = document.getElementById("regEmail").value;
         const password = document.getElementById("regPassword").value;
@@ -556,70 +613,73 @@
         const program = document.getElementById("regProgram").value;
         const role = document.querySelector(".role-card.active").dataset.role;
 
-        const { error } = await supabase
-          .from("users")
-          .insert([{ name, email, password, program, role }]);
+        // Create auth user
+        const { data, error } = await supabase.auth.signUp({ email, password });
 
         if (error) {
-          showMessage("Registration failed", "#991b1b");
+          showMessage(error.message, "#991b1b");
+          btn.disabled = false;
+          btn.textContent = "Complete Registration";
+          return;
+        }
+
+        // Insert profile into users table
+        const { error: insertError } = await supabase.from("users").insert({
+          id: data.user.id,
+          email,
+          name,
+          program,
+          role,
+        });
+
+        if (insertError) {
+          showMessage(
+            "Account created but profile save failed: " + insertError.message,
+            "#991b1b",
+          );
+          btn.disabled = false;
+          btn.textContent = "Complete Registration";
           return;
         }
 
         localStorage.setItem("userName", name);
         localStorage.setItem("userEmail", email);
         localStorage.setItem("userProgram", program);
+        localStorage.setItem("userId", data.user.id);
 
-        showMessage("Registration successful", "#16a34a");
-
+        showMessage("Registration successful!");
         setTimeout(() => {
           window.location.href = "visitorlog.html";
         }, 1000);
       };
 
-      document.getElementById("loginForm").onsubmit = async (e) => {
-        e.preventDefault();
-
-        const email = document.getElementById("email").value;
-        const password = document.getElementById("password").value;
-
-        const { data, error } = await supabase
-          .from("users")
-          .select("*")
-          .eq("email", email)
-          .eq("password", password)
-          .single();
-
-        if (error || !data) {
-          showMessage("Invalid credentials", "#991b1b");
-          return;
-        }
-
-        localStorage.setItem("userName", data.name);
-        localStorage.setItem("userEmail", data.email);
-        localStorage.setItem("userProgram", data.program);
-
-        showMessage("Login successful", "#16a34a");
-
-        setTimeout(() => {
-          window.location.href = "visitorlog.html";
-        }, 1000);
-      };
-
+      // ── ADMIN LOGIN (hardcoded credentials — keep as is or move to env) ──
       document.getElementById("adminLoginForm").onsubmit = (e) => {
         e.preventDefault();
-
         const user = document.getElementById("adminUser").value;
         const pass = document.getElementById("adminPass").value;
 
         if (user === "admin" && pass === "admin123") {
-          showMessage("Access granted", "#16a34a");
+          showMessage("Access Granted. Redirecting to Database...", "#16a34a");
           setTimeout(() => {
             window.location.href = "admindashboard.html";
-          }, 1000);
+          }, 1500);
         } else {
-          showMessage("Invalid admin", "#991b1b");
+          showMessage("Invalid Admin Credentials!", "#991b1b");
         }
       };
+
+      // Role Selection
+      document.querySelectorAll(".role-card").forEach((card) => {
+        card.onclick = () => {
+          document
+            .querySelectorAll(".role-card")
+            .forEach((c) => c.classList.remove("active"));
+          card.classList.add("active");
+          document.getElementById("regProgram").placeholder =
+            card.dataset.role === "student" ? "BSIT" : "Faculty Dept";
+        };
+      });
     </script>
   </body>
 </html>
