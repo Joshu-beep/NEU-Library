@@ -322,18 +322,56 @@
 
       // ── Stats ──
       async function loadStats() {
-        const todayISO = todayPHStartISO();
-        const weekISO = new Date(new Date(todayISO).getTime() - 7 * 86400000).toISOString();
-        const { data: liveData } = await supabase.rpc('get_live_occupancy').catch(() => ({ data: 0 }));
-        const [todayRes, weekRes, totalRes] = await Promise.all([
-          supabase.from('visit_logs').select('*', { count: 'exact', head: true }).gte('time_in', todayISO),
-          supabase.from('visit_logs').select('*', { count: 'exact', head: true }).gte('time_in', weekISO),
-          supabase.from('users').select('*', { count: 'exact', head: true })
-        ]);
-        document.getElementById('live-stat').textContent = liveData ?? 0;
-        document.getElementById('today-stat').textContent = todayRes.count ?? 0;
-        document.getElementById('week-stat').textContent = weekRes.count ?? 0;
-        document.getElementById('total-stat').textContent = totalRes.count ?? 0;
+        const PH_OFFSET_MS = 8 * 60 * 60 * 1000;
+
+        // PH midnight today in UTC
+        const nowUTC = new Date();
+        const nowPH  = new Date(nowUTC.getTime() + PH_OFFSET_MS);
+        const midnightPH = new Date(Date.UTC(
+          nowPH.getUTCFullYear(), nowPH.getUTCMonth(), nowPH.getUTCDate(), 0, 0, 0
+        ));
+        const todayISO = new Date(midnightPH.getTime() - PH_OFFSET_MS).toISOString();
+        const weekISO  = new Date(midnightPH.getTime() - PH_OFFSET_MS - 7 * 86400000).toISOString();
+
+        try {
+          // Live occupancy — count distinct users whose latest log is "inside"
+          const { data: insideLogs } = await supabase
+            .from('visit_logs')
+            .select('user_id, status')
+            .eq('status', 'inside');
+
+          const uniqueInside = insideLogs
+            ? new Set(insideLogs.map(r => r.user_id)).size
+            : 0;
+
+          // Visits today
+          const { count: todayCount } = await supabase
+            .from('visit_logs')
+            .select('*', { count: 'exact', head: true })
+            .gte('time_in', todayISO);
+
+          // Visits this week
+          const { count: weekCount } = await supabase
+            .from('visit_logs')
+            .select('*', { count: 'exact', head: true })
+            .gte('time_in', weekISO);
+
+          // Total registered users
+          const { count: totalCount } = await supabase
+            .from('users')
+            .select('*', { count: 'exact', head: true });
+
+          document.getElementById('live-stat').textContent  = uniqueInside ?? 0;
+          document.getElementById('today-stat').textContent = todayCount   ?? 0;
+          document.getElementById('week-stat').textContent  = weekCount    ?? 0;
+          document.getElementById('total-stat').textContent = totalCount   ?? 0;
+
+        } catch (err) {
+          console.error('Stats error:', err);
+          ['live-stat','today-stat','week-stat','total-stat'].forEach(id => {
+            document.getElementById(id).textContent = '—';
+          });
+        }
       }
 
       // ── Currently Inside ──
@@ -541,9 +579,12 @@
       window.triggerResetAll = triggerResetAll; window.toggleBlock = toggleBlock; window.removeUser = removeUser;
       window.exportCSV = exportCSV; window.exportPDF = exportPDF; window.logout = logout;
 
-      // ── Init ──
-      await autoLogoutMidnight();
-      await Promise.all([loadStats(), loadInsideNow(), loadChart(), loadLogs()]);
+      // ── Init — run each independently so one failure doesn't block others ──
+      autoLogoutMidnight().catch(e => console.warn('autoLogout:', e));
+      loadStats().catch(e => console.error('loadStats:', e));
+      loadInsideNow().catch(e => console.error('loadInsideNow:', e));
+      loadChart().catch(e => console.error('loadChart:', e));
+      loadLogs().catch(e => console.error('loadLogs:', e));
     </script>
   </body>
 </html>
