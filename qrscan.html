@@ -176,7 +176,7 @@
           </div>
 
           <span class="reason-label">Reason for visit:</span>
-          <div class="reasons">
+          <div class="reasons" id="reasonSection">
             <button class="rbtn" data-r="Reading">📖 Reading</button>
             <button class="rbtn" data-r="Researching">🔬 Researching</button>
             <button class="rbtn" data-r="Use of Computer">💻 Computer</button>
@@ -343,18 +343,80 @@
 
           // Show user card
           scannedUid = user.id;
-          document.getElementById('uInitial').textContent  = (user.name || '?')[0].toUpperCase();
-          document.getElementById('uName').textContent     = user.name    || '—';
-          document.getElementById('uProgram').textContent  = user.program || '—';
-          document.getElementById('uEmail').textContent    = user.email   || '—';
+          document.getElementById('uInitial').textContent = (user.name || '?')[0].toUpperCase();
+          document.getElementById('uName').textContent    = user.name    || '—';
+          document.getElementById('uProgram').textContent = user.program || '—';
+          document.getElementById('uEmail').textContent   = user.email   || '—';
           document.getElementById('userCard').classList.add('show');
-          setStatus('ok', '✓ ' + user.name + ' identified — select a reason and check in');
-          refreshBtn();
+
+          // ── Check if already inside today ──
+          var todayStart = new Date();
+          todayStart.setHours(0, 0, 0, 0);
+
+          var logResult = await db
+            .from('visit_logs')
+            .select('id, status')
+            .eq('user_id', user.id)
+            .eq('status', 'inside')
+            .gte('time_in', todayStart.toISOString())
+            .order('time_in', { ascending: false })
+            .limit(1)
+            .maybeSingle();
+
+          if (logResult.data) {
+            // Already inside — auto log out immediately
+            var logId = logResult.data.id;
+            setStatus('warning', '👋 ' + user.name + ' is already inside. Logging out now...');
+
+            // Hide reason section and change button to logout style
+            document.getElementById('reasonSection').style.display = 'none';
+            checkinBtn.disabled = false;
+            checkinBtn.textContent = '👋 Confirm Log Out — ' + user.name;
+            checkinBtn.className = 'ready';
+            checkinBtn.style.background = '#dc2626';
+            checkinBtn.dataset.mode = 'logout';
+            checkinBtn.dataset.logId = logId;
+          } else {
+            // Not inside — show normal check-in flow
+            document.getElementById('reasonSection').style.display = 'block';
+            checkinBtn.dataset.mode = 'checkin';
+            checkinBtn.style.background = '';
+            setStatus('ok', '✓ ' + user.name + ' identified — select a reason and check in');
+            refreshBtn();
+          }
         }
 
-        // ── Check-in ──
+        // ── Check-in / Log-out button ──
         checkinBtn.addEventListener('click', async function() {
-          if (!scannedUid || !reason) return;
+          if (!scannedUid) return;
+
+          var mode = checkinBtn.dataset.mode || 'checkin';
+
+          // ── LOGOUT MODE ──
+          if (mode === 'logout') {
+            var logId = checkinBtn.dataset.logId;
+            checkinBtn.disabled = true;
+            checkinBtn.textContent = 'Logging out...';
+
+            var result = await db.from('visit_logs')
+              .update({ status: 'logged_out', time_out: new Date().toISOString() })
+              .eq('id', logId);
+
+            if (result.error) {
+              setStatus('error', '❌ Failed to log out: ' + result.error.message);
+              checkinBtn.disabled = false;
+              checkinBtn.textContent = '👋 Confirm Log Out';
+              return;
+            }
+
+            var name = document.getElementById('uName').textContent;
+            setStatus('ok', '✅ ' + name + ' has been logged out. See you next time!');
+            reset(4000);
+            return;
+          }
+
+          // ── CHECK-IN MODE ──
+          if (!reason) return;
 
           checkinBtn.disabled = true;
           checkinBtn.textContent = 'Logging visit...';
@@ -394,7 +456,11 @@
             scannedUid = null;
             reason = null;
             document.getElementById('userCard').classList.remove('show');
+            document.getElementById('reasonSection').style.display = 'block';
             document.querySelectorAll('.rbtn').forEach(function(b) { b.classList.remove('sel'); });
+            checkinBtn.dataset.mode  = 'checkin';
+            checkinBtn.dataset.logId = '';
+            checkinBtn.style.background = '';
             refreshBtn();
             setStatus('ok', '📷 Ready for next person — hold QR code up to camera');
             scanning = true;
