@@ -299,14 +299,15 @@
 
       // ── Load Stats ──
       async function loadStats() {
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const todayISO = today.toISOString();
+        // PH time is UTC+8 — offset by 8 hours so "today" means PH midnight, not UTC midnight
+        const PH_OFFSET_MS = 8 * 60 * 60 * 1000;
 
-        const weekAgo = new Date();
-        weekAgo.setDate(weekAgo.getDate() - 7);
-        weekAgo.setHours(0, 0, 0, 0);
-        const weekISO = weekAgo.toISOString();
+        const nowPH = new Date(Date.now() + PH_OFFSET_MS);
+        const todayPH = new Date(Date.UTC(nowPH.getUTCFullYear(), nowPH.getUTCMonth(), nowPH.getUTCDate()));
+        const todayISO = new Date(todayPH.getTime() - PH_OFFSET_MS).toISOString();
+
+        const weekAgoPH = new Date(todayPH.getTime() - 7 * 24 * 60 * 60 * 1000);
+        const weekISO = new Date(weekAgoPH.getTime() - PH_OFFSET_MS).toISOString();
 
         const [liveRes, todayRes, weekRes, totalRes] = await Promise.all([
           supabase.from("visit_logs").select("*", { count: "exact", head: true }).eq("status", "inside"),
@@ -347,8 +348,8 @@
 
         tbody.innerHTML = logs.map(log => {
           const dt = new Date(log.time_in);
-          const dateStr = dt.toLocaleDateString("en-PH", { year: "numeric", month: "short", day: "numeric" });
-          const timeStr = dt.toLocaleTimeString("en-PH", { hour: "2-digit", minute: "2-digit" });
+          const dateStr = dt.toLocaleDateString("en-PH", { timeZone: "Asia/Manila", year: "numeric", month: "short", day: "numeric" });
+          const timeStr = dt.toLocaleTimeString("en-PH", { timeZone: "Asia/Manila", hour: "2-digit", minute: "2-digit" });
           const statusClass = log.status === "inside" ? "badge-inside" : "badge-checkout";
           const statusLabel = log.status === "inside" ? "Inside" : "Checked Out";
 
@@ -546,7 +547,7 @@
         const rows = [["Date & Time", "Name", "Email", "Program", "Reason", "Status"]];
         allLogs.forEach(log => {
           rows.push([
-            new Date(log.time_in).toLocaleString("en-PH"),
+            new Date(log.time_in).toLocaleString("en-PH", { timeZone: "Asia/Manila" }),
             log.users?.name || "—",
             log.users?.email || "—",
             log.users?.program || "—",
