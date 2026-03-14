@@ -495,128 +495,130 @@
       </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script>
-      const SUPABASE_URL = "YOUR_SUPABASE_URL"
-const SUPABASE_KEY = "YOUR_SUPABASE_ANON_KEY"
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+      
+      const SUPABASE_URL = "YOUR_SUPABASE_URL";
+      const SUPABASE_KEY = "YOUR_SUPABASE_ANON_KEY";
 
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+      const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-const loginView = document.getElementById("loginView")
-const registerView = document.getElementById("registerView")
-const adminView = document.getElementById("adminView")
-const mainHeader = document.getElementById("mainHeader")
-const headerSubtitle = document.getElementById("headerSubtitle")
+      const loginView = document.getElementById("loginView");
+      const registerView = document.getElementById("registerView");
+      const adminView = document.getElementById("adminView");
+      const mainHeader = document.getElementById("mainHeader");
+      const headerSubtitle = document.getElementById("headerSubtitle");
 
-function showMessage(msg,color="#001f54"){
-const msgBox=document.getElementById("msgBox")
-msgBox.textContent=msg
-msgBox.style.backgroundColor=color
-msgBox.style.display="block"
-setTimeout(()=>{msgBox.style.display="none"},3000)
-}
+      function showMessage(msg, color = "#001f54") {
+        const msgBox = document.getElementById("msgBox");
+        msgBox.textContent = msg;
+        msgBox.style.backgroundColor = color;
+        msgBox.style.display = "block";
+        setTimeout(() => {
+          msgBox.style.display = "none";
+        }, 3000);
+      }
 
-document.getElementById("showRegisterBtn").onclick=()=>{
-loginView.style.display="none"
-registerView.style.display="flex"
-}
+      document.getElementById("showRegisterBtn").onclick = () => {
+        loginView.style.display = "none";
+        registerView.style.display = "flex";
+      };
 
-document.getElementById("showLoginLink").onclick=(e)=>{
-e.preventDefault()
-registerView.style.display="none"
-loginView.style.display="flex"
-}
+      document.getElementById("showLoginLink").onclick = (e) => {
+        e.preventDefault();
+        registerView.style.display = "none";
+        loginView.style.display = "flex";
+      };
 
-document.getElementById("adminBtn").onclick=(e)=>{
-e.preventDefault()
-loginView.style.display="none"
-registerView.style.display="none"
-adminView.style.display="flex"
-mainHeader.classList.add("admin-mode")
-headerSubtitle.textContent="Admin Control Panel"
-}
+      document.getElementById("adminBtn").onclick = (e) => {
+        e.preventDefault();
+        loginView.style.display = "none";
+        registerView.style.display = "none";
+        adminView.style.display = "flex";
+        mainHeader.classList.add("admin-mode");
+        headerSubtitle.textContent = "Admin Control Panel";
+      };
 
-document.getElementById("backFromAdmin").onclick=(e)=>{
-e.preventDefault()
-adminView.style.display="none"
-loginView.style.display="flex"
-mainHeader.classList.remove("admin-mode")
-headerSubtitle.textContent="Visitor Management System"
-}
+      document.getElementById("backFromAdmin").onclick = (e) => {
+        e.preventDefault();
+        adminView.style.display = "none";
+        loginView.style.display = "flex";
+        mainHeader.classList.remove("admin-mode");
+        headerSubtitle.textContent = "Visitor Management System";
+      };
 
-document.getElementById("registerForm").onsubmit=async(e)=>{
-e.preventDefault()
+      document.getElementById("registerForm").onsubmit = async (e) => {
+        e.preventDefault();
 
-const email=document.getElementById("regEmail").value
-const password=document.getElementById("regPassword").value
-const name=document.getElementById("regName").value
-const program=document.getElementById("regProgram").value
-const role=document.querySelector(".role-card.active").dataset.role
+        const email = document.getElementById("regEmail").value;
+        const password = document.getElementById("regPassword").value;
+        const name = document.getElementById("regName").value;
+        const program = document.getElementById("regProgram").value;
+        const role = document.querySelector(".role-card.active").dataset.role;
 
-const {error}=await supabase.from("users").insert([
-{name,email,password,program,role}
-])
+        const { error } = await supabase
+          .from("users")
+          .insert([{ name, email, password, program, role }]);
 
-if(error){
-showMessage("Registration failed","#991b1b")
-return
-}
+        if (error) {
+          showMessage("Registration failed", "#991b1b");
+          return;
+        }
 
-localStorage.setItem("userName",name)
-localStorage.setItem("userEmail",email)
-localStorage.setItem("userProgram",program)
+        localStorage.setItem("userName", name);
+        localStorage.setItem("userEmail", email);
+        localStorage.setItem("userProgram", program);
 
-showMessage("Registration successful","#16a34a")
+        showMessage("Registration successful", "#16a34a");
 
-setTimeout(()=>{
-window.location.href="visitorlog.html"
-},1000)
-}
+        setTimeout(() => {
+          window.location.href = "visitorlog.html";
+        }, 1000);
+      };
 
-document.getElementById("loginForm").onsubmit=async(e)=>{
-e.preventDefault()
+      document.getElementById("loginForm").onsubmit = async (e) => {
+        e.preventDefault();
 
-const email=document.getElementById("email").value
-const password=document.getElementById("password").value
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
 
-const {data,error}=await supabase
-.from("users")
-.select("*")
-.eq("email",email)
-.eq("password",password)
-.single()
+        const { data, error } = await supabase
+          .from("users")
+          .select("*")
+          .eq("email", email)
+          .eq("password", password)
+          .single();
 
-if(error||!data){
-showMessage("Invalid credentials","#991b1b")
-return
-}
+        if (error || !data) {
+          showMessage("Invalid credentials", "#991b1b");
+          return;
+        }
 
-localStorage.setItem("userName",data.name)
-localStorage.setItem("userEmail",data.email)
-localStorage.setItem("userProgram",data.program)
+        localStorage.setItem("userName", data.name);
+        localStorage.setItem("userEmail", data.email);
+        localStorage.setItem("userProgram", data.program);
 
-showMessage("Login successful","#16a34a")
+        showMessage("Login successful", "#16a34a");
 
-setTimeout(()=>{
-window.location.href="visitorlog.html"
-},1000)
-}
+        setTimeout(() => {
+          window.location.href = "visitorlog.html";
+        }, 1000);
+      };
 
-document.getElementById("adminLoginForm").onsubmit=(e)=>{
-e.preventDefault()
+      document.getElementById("adminLoginForm").onsubmit = (e) => {
+        e.preventDefault();
 
-const user=document.getElementById("adminUser").value
-const pass=document.getElementById("adminPass").value
+        const user = document.getElementById("adminUser").value;
+        const pass = document.getElementById("adminPass").value;
 
-if(user==="admin"&&pass==="admin123"){
-showMessage("Access granted","#16a34a")
-setTimeout(()=>{
-window.location.href="admindashboard.html"
-},1000)
-}else{
-showMessage("Invalid admin","#991b1b")
-}
-}
+        if (user === "admin" && pass === "admin123") {
+          showMessage("Access granted", "#16a34a");
+          setTimeout(() => {
+            window.location.href = "admindashboard.html";
+          }, 1000);
+        } else {
+          showMessage("Invalid admin", "#991b1b");
+        }
+      };
     </script>
   </body>
 </html>
