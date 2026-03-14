@@ -7,9 +7,8 @@
     <link rel="icon" type="image/x-icon" href="neulogo.png" />
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-      const SUPABASE_URL = "https://ruajjuxabwfqpawpjosl.supabase.co";
-      const SUPABASE_KEY =
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ1YWpqdXhhYndmcXBhd3Bqb3NsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0NTg0MjksImV4cCI6MjA4OTAzNDQyOX0.O1ZbG4vC6q4DxQKTq664i3e4xwUYcvgVDOsuNMDNK4I";
+      const SUPABASE_URL = 'https://ruajjuxabwfqpawpjosl.supabase.co';
+      const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ1YWpqdXhhYndmcXBhd3Bqb3NsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0NTg0MjksImV4cCI6MjA4OTAzNDQyOX0.O1ZbG4vC6q4DxQKTq664i3e4xwUYcvgVDOsuNMDNK4I';
       const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
     </script>
     <style>
@@ -57,13 +56,8 @@
       }
 
       @media (max-width: 800px) {
-        .login-wrapper {
-          max-width: 100%;
-          box-shadow: none;
-        }
-        body {
-          overflow: auto;
-        }
+        .login-wrapper { max-width: 100%; box-shadow: none; }
+        body { overflow: auto; }
       }
 
       .login-card {
@@ -83,9 +77,7 @@
         transition: background-color 0.3s ease;
       }
 
-      .card-header.admin-mode {
-        background-color: var(--admin-red);
-      }
+      .card-header.admin-mode { background-color: var(--admin-red); }
 
       .icon-container {
         margin-bottom: 12px;
@@ -100,25 +92,9 @@
         background-color: white;
       }
 
-      .logo-img {
-        width: 100%;
-        height: 100%;
-        object-fit: contain;
-        padding: 8px;
-      }
-      .card-header h1 {
-        font-size: 22px;
-        font-weight: 700;
-        margin-bottom: 6px;
-        letter-spacing: 0.5px;
-      }
-      .card-header h2 {
-        font-size: 12px;
-        color: var(--accent-gold);
-        font-weight: 700;
-        letter-spacing: 1px;
-        text-transform: uppercase;
-      }
+      .logo-img { width: 100%; height: 100%; object-fit: contain; padding: 8px; }
+      .card-header h1 { font-size: 22px; font-weight: 700; margin-bottom: 6px; letter-spacing: 0.5px; }
+      .card-header h2 { font-size: 12px; color: var(--accent-gold); font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
 
       .card-body {
         padding: 30px 40px;
@@ -128,16 +104,9 @@
         justify-content: center;
       }
 
-      .input-group {
-        margin-bottom: 20px;
-      }
-      .input-row {
-        display: flex;
-        gap: 15px;
-      }
-      .input-row .input-group {
-        flex: 1;
-      }
+      .input-group { margin-bottom: 20px; }
+      .input-row { display: flex; gap: 15px; }
+      .input-row .input-group { flex: 1; }
 
       .input-group label {
         display: block;
@@ -159,15 +128,9 @@
         text-align: center;
       }
 
-      .text-left label {
-        text-align: left;
-      }
-      .text-left input {
-        text-align: left;
-      }
-      .input-group input:focus {
-        border-color: var(--primary-blue);
-      }
+      .text-left label { text-align: left; }
+      .text-left input { text-align: left; }
+      .input-group input:focus { border-color: var(--primary-blue); }
 
       .btn {
         width: 100%;
@@ -179,25 +142,11 @@
         transition: all 0.2s ease;
         outline: none;
       }
-      .btn:active {
-        transform: scale(0.98);
-      }
-      .btn:disabled {
-        opacity: 0.6;
-        cursor: not-allowed;
-      }
+      .btn:active { transform: scale(0.98); }
+      .btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
-      .btn-primary {
-        background-color: var(--primary-blue);
-        color: #ffffff;
-        border: none;
-        margin-top: 5px;
-      }
-      .btn-admin {
-        background-color: var(--admin-red);
-        color: #ffffff;
-        border: none;
-      }
+      .btn-primary { background-color: var(--primary-blue); color: #ffffff; border: none; margin-top: 5px; }
+      .btn-admin { background-color: var(--admin-red); color: #ffffff; border: none; }
 
       .divider-container {
         text-align: center;
@@ -224,11 +173,7 @@
         z-index: 2;
       }
 
-      .btn-secondary {
-        background-color: #ffffff;
-        color: var(--primary-blue);
-        border: 1.5px solid var(--primary-blue);
-      }
+      .btn-secondary { background-color: #ffffff; color: var(--primary-blue); border: 1.5px solid var(--primary-blue); }
 
       .footer-links {
         text-align: center;
@@ -249,21 +194,10 @@
         font-weight: 600;
         cursor: pointer;
       }
-      .admin-link:hover {
-        color: var(--primary-blue);
-      }
-      .admin-link svg {
-        width: 16px;
-        height: 16px;
-        margin-right: 6px;
-        stroke: currentColor;
-      }
+      .admin-link:hover { color: var(--primary-blue); }
+      .admin-link svg { width: 16px; height: 16px; margin-right: 6px; stroke: currentColor; }
 
-      .role-selector {
-        display: flex;
-        gap: 15px;
-        margin-bottom: 24px;
-      }
+      .role-selector { display: flex; gap: 15px; margin-bottom: 24px; }
       .role-card {
         flex: 1;
         border: 1px solid var(--light-border);
@@ -276,11 +210,7 @@
         transition: all 0.2s ease;
         color: var(--text-gray);
       }
-      .role-card.active {
-        border-color: var(--primary-blue);
-        color: var(--primary-blue);
-        background-color: #f8fafc;
-      }
+      .role-card.active { border-color: var(--primary-blue); color: var(--primary-blue); background-color: #f8fafc; }
 
       #msgBox {
         display: none;
@@ -301,14 +231,8 @@
       }
 
       @keyframes slideDown {
-        from {
-          top: -50px;
-          opacity: 0;
-        }
-        to {
-          top: 24px;
-          opacity: 1;
-        }
+        from { top: -50px; opacity: 0; }
+        to { top: 24px; opacity: 1; }
       }
     </style>
   </head>
@@ -319,12 +243,7 @@
       <div class="login-card">
         <div class="card-header" id="mainHeader">
           <div class="icon-container">
-            <img
-              src="neulogo.png"
-              alt="Library Logo"
-              class="logo-img"
-              onerror="this.src = 'https://via.placeholder.com/64?text=NEU'"
-            />
+            <img src="neulogo.png" alt="Library Logo" class="logo-img" onerror="this.src='https://via.placeholder.com/64?text=NEU'" />
           </div>
           <h1 id="headerTitle">New Era University Library</h1>
           <h2 id="headerSubtitle">Visitor Management System</h2>
@@ -335,150 +254,79 @@
           <form id="loginForm">
             <div class="input-group">
               <label>Institutional Email</label>
-              <input
-                type="email"
-                id="email"
-                placeholder="Enter email..."
-                required
-              />
+              <input type="email" id="email" placeholder="Enter email..." required />
             </div>
             <div class="input-group">
               <label>Password</label>
-              <input
-                type="password"
-                id="password"
-                placeholder="Enter password..."
-                required
-              />
+              <input type="password" id="password" placeholder="Enter password..." required />
             </div>
-            <button type="submit" class="btn btn-primary" id="loginBtn">
-              Sign In
-            </button>
+            <button type="submit" class="btn btn-primary" id="loginBtn">Sign In</button>
           </form>
           <div class="divider-container"><p>Don't have account yet?</p></div>
-          <button type="button" class="btn btn-secondary" id="showRegisterBtn">
-            Register Here
-          </button>
+          <button type="button" class="btn btn-secondary" id="showRegisterBtn">Register Here</button>
         </div>
 
         <!-- REGISTRATION VIEW -->
         <div class="card-body" id="registerView" style="display: none">
           <div style="text-align: center; margin-bottom: 20px">
-            <h3 style="color: var(--primary-blue); font-weight: 700">
-              Create an Account
-            </h3>
+            <h3 style="color: var(--primary-blue); font-weight: 700">Create an Account</h3>
           </div>
           <div class="role-selector">
-            <div class="role-card active" data-role="student">
-              <span>Student</span>
-            </div>
-            <div class="role-card" data-role="faculty">
-              <span>Faculty</span>
-            </div>
+            <div class="role-card active" data-role="student"><span>Student</span></div>
+            <div class="role-card" data-role="faculty"><span>Faculty</span></div>
           </div>
           <form id="registerForm">
             <div class="input-group text-left">
               <label>Institutional Email</label>
-              <input
-                type="email"
-                id="regEmail"
-                placeholder="e.g. j.doe@neu.edu.ph"
-                required
-              />
+              <input type="email" id="regEmail" placeholder="e.g. j.doe@neu.edu.ph" required />
             </div>
             <div class="input-group text-left">
               <label>Password</label>
-              <input
-                type="password"
-                id="regPassword"
-                placeholder="Create a password"
-                required
-              />
+              <input type="password" id="regPassword" placeholder="Create a password" required />
             </div>
             <div class="input-row">
               <div class="input-group text-left">
                 <label>Full Name</label>
-                <input
-                  type="text"
-                  id="regName"
-                  placeholder="Juan Dela Cruz"
-                  required
-                />
+                <input type="text" id="regName" placeholder="Juan Dela Cruz" required />
               </div>
               <div class="input-group text-left">
                 <label>Program</label>
-                <input
-                  type="text"
-                  id="regProgram"
-                  placeholder="BSIT"
-                  required
-                />
+                <input type="text" id="regProgram" placeholder="BSIT" required />
               </div>
             </div>
-            <button type="submit" class="btn btn-primary" id="registerBtn">
-              Complete Registration
-            </button>
+            <button type="submit" class="btn btn-primary" id="registerBtn">Complete Registration</button>
           </form>
           <div style="text-align: center; margin-top: 20px">
-            <a
-              href="#"
-              id="showLoginLink"
-              style="font-size: 14px; color: var(--text-gray)"
-              >Back to Login</a
-            >
+            <a href="#" id="showLoginLink" style="font-size: 14px; color: var(--text-gray)">Back to Login</a>
           </div>
         </div>
 
         <!-- ADMIN LOGIN VIEW -->
         <div class="card-body" id="adminView" style="display: none">
           <div style="text-align: center; margin-bottom: 20px">
-            <h3 style="color: var(--admin-red); font-weight: 700">
-              Admin Authentication
-            </h3>
-            <p style="font-size: 13px; color: var(--text-gray)">
-              Restricted access to database
-            </p>
+            <h3 style="color: var(--admin-red); font-weight: 700">Admin Authentication</h3>
+            <p style="font-size: 13px; color: var(--text-gray)">Restricted access to database</p>
           </div>
           <form id="adminLoginForm">
             <div class="input-group">
               <label>Admin Username</label>
-              <input
-                type="text"
-                id="adminUser"
-                placeholder="Admin username..."
-                required
-              />
+              <input type="text" id="adminUser" placeholder="Admin username..." required />
             </div>
             <div class="input-group">
               <label>Secret Key</label>
-              <input
-                type="password"
-                id="adminPass"
-                placeholder="••••••••"
-                required
-              />
+              <input type="password" id="adminPass" placeholder="••••••••" required />
             </div>
             <button type="submit" class="btn btn-admin">Access Database</button>
           </form>
           <div style="text-align: center; margin-top: 20px">
-            <a
-              href="#"
-              id="backFromAdmin"
-              style="font-size: 14px; color: var(--text-gray)"
-              >Back to Visitor Access</a
-            >
+            <a href="#" id="backFromAdmin" style="font-size: 14px; color: var(--text-gray)">Back to Visitor Access</a>
           </div>
         </div>
       </div>
 
       <div class="footer-links">
         <a class="admin-link" id="adminBtn">
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-          >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <rect x="6" y="11" width="12" height="10" rx="2" ry="2"></rect>
             <path d="M8 11V7a4 4 0 0 1 8 0v4"></path>
           </svg>
@@ -530,9 +378,7 @@
         msgBox.textContent = msg;
         msgBox.style.backgroundColor = color;
         msgBox.style.display = "block";
-        setTimeout(() => {
-          msgBox.style.display = "none";
-        }, 3000);
+        setTimeout(() => { msgBox.style.display = "none"; }, 3000);
       }
 
       // ── LOGIN with Supabase ──
@@ -545,59 +391,68 @@
         const email = document.getElementById("email").value;
         const password = document.getElementById("password").value;
 
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
+        const resetBtn = () => {
+          btn.disabled = false;
+          btn.textContent = "Sign In";
+        };
 
-        if (error) {
-          const msg = error.message.toLowerCase();
-          if (
-            msg.includes("invalid login credentials") ||
-            msg.includes("user not found") ||
-            msg.includes("no user found")
-          ) {
-            showMessage(
-              "You don't have an account yet. Please register first.",
-              "#991b1b",
-            );
-          } else if (
-            msg.includes("invalid password") ||
-            msg.includes("wrong password")
-          ) {
-            showMessage("Incorrect password. Please try again.", "#991b1b");
-          } else {
-            showMessage(error.message, "#991b1b");
+        // Safety timeout — re-enable button after 10s no matter what
+        const safetyTimer = setTimeout(() => {
+          resetBtn();
+          showMessage("Request timed out. Please try again.", "#991b1b");
+        }, 10000);
+
+        try {
+          const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+
+          if (error) {
+            clearTimeout(safetyTimer);
+            const msg = error.message.toLowerCase();
+            if (
+              msg.includes("invalid login credentials") ||
+              msg.includes("user not found") ||
+              msg.includes("no user found") ||
+              msg.includes("email not confirmed")
+            ) {
+              showMessage("You don't have an account yet. Please register first.", "#991b1b");
+            } else if (msg.includes("invalid password") || msg.includes("wrong password")) {
+              showMessage("Incorrect password. Please try again.", "#991b1b");
+            } else {
+              showMessage("Login failed: " + error.message, "#991b1b");
+            }
+            resetBtn();
+            return;
           }
-          btn.disabled = false;
-          btn.textContent = "Sign In";
-          return;
+
+          // Fetch user profile from users table
+          const { data: profile, error: profileError } = await supabase
+            .from("users")
+            .select("*")
+            .eq("id", data.user.id)
+            .single();
+
+          clearTimeout(safetyTimer);
+
+          if (profileError || !profile) {
+            showMessage("Could not load user profile. Please contact support.", "#991b1b");
+            resetBtn();
+            return;
+          }
+
+          // Store in localStorage for visitorlog.html
+          localStorage.setItem("userName", profile.name);
+          localStorage.setItem("userEmail", profile.email);
+          localStorage.setItem("userProgram", profile.program);
+          localStorage.setItem("userId", profile.id);
+
+          showMessage("Login successful!");
+          setTimeout(() => { window.location.href = "visitorlog.html"; }, 1000);
+
+        } catch (err) {
+          clearTimeout(safetyTimer);
+          showMessage("Something went wrong. Please check your connection.", "#991b1b");
+          resetBtn();
         }
-
-        // Fetch user profile from users table
-        const { data: profile, error: profileError } = await supabase
-          .from("users")
-          .select("*")
-          .eq("id", data.user.id)
-          .single();
-
-        if (profileError || !profile) {
-          showMessage("Could not load user profile.", "#991b1b");
-          btn.disabled = false;
-          btn.textContent = "Sign In";
-          return;
-        }
-
-        // Store in localStorage for visitorlog.html
-        localStorage.setItem("userName", profile.name);
-        localStorage.setItem("userEmail", profile.email);
-        localStorage.setItem("userProgram", profile.program);
-        localStorage.setItem("userId", profile.id);
-
-        showMessage("Login successful!");
-        setTimeout(() => {
-          window.location.href = "visitorlog.html";
-        }, 1000);
       };
 
       // ── REGISTER with Supabase ──
@@ -629,14 +484,11 @@
           email,
           name,
           program,
-          role,
+          role
         });
 
         if (insertError) {
-          showMessage(
-            "Account created but profile save failed: " + insertError.message,
-            "#991b1b",
-          );
+          showMessage("Account created but profile save failed: " + insertError.message, "#991b1b");
           btn.disabled = false;
           btn.textContent = "Complete Registration";
           return;
@@ -648,9 +500,7 @@
         localStorage.setItem("userId", data.user.id);
 
         showMessage("Registration successful!");
-        setTimeout(() => {
-          window.location.href = "visitorlog.html";
-        }, 1000);
+        setTimeout(() => { window.location.href = "visitorlog.html"; }, 1000);
       };
 
       // ── ADMIN LOGIN (hardcoded credentials — keep as is or move to env) ──
@@ -661,9 +511,7 @@
 
         if (user === "admin" && pass === "admin123") {
           showMessage("Access Granted. Redirecting to Database...", "#16a34a");
-          setTimeout(() => {
-            window.location.href = "admindashboard.html";
-          }, 1500);
+          setTimeout(() => { window.location.href = "admindashboard.html"; }, 1500);
         } else {
           showMessage("Invalid Admin Credentials!", "#991b1b");
         }
@@ -672,9 +520,7 @@
       // Role Selection
       document.querySelectorAll(".role-card").forEach((card) => {
         card.onclick = () => {
-          document
-            .querySelectorAll(".role-card")
-            .forEach((c) => c.classList.remove("active"));
+          document.querySelectorAll(".role-card").forEach((c) => c.classList.remove("active"));
           card.classList.add("active");
           document.getElementById("regProgram").placeholder =
             card.dataset.role === "student" ? "BSIT" : "Faculty Dept";
