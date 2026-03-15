@@ -15,7 +15,7 @@
 }
 
 body {
-  background-image: url("img/backgroundimg.jpg");
+  background-image: url("/img/backgroundimg.jpg");
   background-color: var(--bg-fallback);
   background-size: cover;
   background-position: center;
