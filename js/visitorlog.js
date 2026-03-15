@@ -364,19 +364,6 @@
         setTimeout(() => { window.location.href = "index.html"; }, 1000);
       });
  
-      // ── Visit count badge ──
-      async function loadVisitBadge() {
-        const { count } = await supabase
-          .from("visit_logs")
-          .select("*", { count: "exact", head: true })
-          .eq("user_id", userId);
-        if (count > 0) {
-          const badge = document.getElementById("visitBadge");
-          badge.textContent = `${count} visit${count !== 1 ? "s" : ""}`;
-          badge.style.display = "inline-block";
-        }
-      }
- 
       // ── Library hours widget ──
       function updateHoursPill() {
         const schedule = {
@@ -417,4 +404,3 @@
       loadVisitHistory();
       loadStreak();
       loadLastReason();
-      loadVisitBadge();
