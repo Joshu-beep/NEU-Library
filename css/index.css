@@ -15,7 +15,7 @@
 }
 
 body {
-  background-image: url("/img/backgroundimg.jpg");
+  background-image: url("img/backgroundimg.jpg");
   background-color: var(--bg-fallback);
   background-size: cover;
   background-position: center;
@@ -291,3 +291,38 @@ select#regProgramFaculty:focus { border-color: var(--primary-blue); }
 .announce-date { font-size: 11px; color: #64748b; margin-top: 2px; }
 
 .announce-empty { padding: 14px; font-size: 13px; color: #94a3b8; text-align: center; }
+
+/* ── Responsive breakpoints ── */
+
+/* Wider on large screens */
+@media (min-width: 1200px) {
+  .login-wrapper { max-width: 560px; }
+}
+
+/* Tablet (768px–899px) */
+@media (max-width: 899px) {
+  .login-wrapper { max-width: 100%; box-shadow: none; }
+  body { overflow: auto; }
+  .announce-panel { width: 260px; top: 12px; right: 12px; }
+}
+
+/* Mobile (below 600px) */
+@media (max-width: 599px) {
+  .login-wrapper { max-width: 100%; }
+  .card-header { padding: 28px 16px 22px; }
+  .card-header h1 { font-size: 20px; }
+  .card-header h2 { font-size: 11px; }
+  .icon-container { width: 60px; height: 60px; }
+  .card-body { padding: 20px 20px; }
+  .announce-panel { width: calc(100vw - 24px); right: 12px; top: 12px; }
+  .btn { padding: 13px; font-size: 14px; }
+  .input-group input { padding: 11px 14px; }
+}
+
+/* Small mobile (below 400px) */
+@media (max-width: 399px) {
+  .card-header h1 { font-size: 17px; }
+  .card-body { padding: 16px; }
+  .role-selector { gap: 8px; }
+  .role-card { padding: 10px 8px; font-size: 12px; }
+}
