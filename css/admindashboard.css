@@ -110,3 +110,51 @@ td { padding: 13px 20px; border-bottom: 1px solid var(--border-color); font-size
 #toast.show { visibility: visible; animation: fadein 0.3s, fadeout 0.3s 2.7s; }
 @keyframes fadein { from { bottom: 0; opacity: 0; } to { bottom: 30px; opacity: 1; } }
 @keyframes fadeout { from { bottom: 30px; opacity: 1; } to { bottom: 0; opacity: 0; } }
+
+/* ── Responsive breakpoints ── */
+
+/* Medium laptop (900px–1199px) */
+@media (max-width: 1199px) {
+  .container { padding: 20px 16px; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+  .dashboard-row { grid-template-columns: 1fr; gap: 16px; }
+  .navbar { padding: 14px 20px; }
+}
+
+/* Tablet landscape (768px–899px) */
+@media (max-width: 899px) {
+  .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 16px; }
+  .dashboard-row { grid-template-columns: 1fr; }
+  .container { padding: 16px 12px; }
+  .toolbar { flex-wrap: wrap; gap: 8px; padding: 12px 16px; }
+  .tab-group { width: 100%; margin-right: 0; }
+  .search-box { width: 100%; }
+  th, td { padding: 10px 12px; font-size: 12px; }
+  .stat-info p { font-size: 20px; }
+}
+
+/* Tablet portrait / large mobile (600px–767px) */
+@media (max-width: 767px) {
+  .navbar { padding: 12px 16px; }
+  .nav-logo { font-size: 16px; gap: 8px; }
+  .welcome-text { display: none; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .stat-card { padding: 14px 16px; gap: 10px; }
+  .stat-icon { width: 38px; height: 38px; }
+  .stat-icon svg { width: 18px; height: 18px; }
+  .stat-info p { font-size: 18px; }
+  .chart-container { height: 180px; }
+  th { padding: 8px 10px; }
+  td { padding: 8px 10px; }
+}
+
+/* Small mobile (below 480px) */
+@media (max-width: 479px) {
+  .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .stat-card { padding: 12px; flex-direction: column; text-align: center; gap: 6px; }
+  .tab { padding: 6px 10px; font-size: 12px; }
+  .btn-action { padding: 6px 10px; font-size: 11px; }
+  .date-filter { flex-wrap: wrap; }
+  th, td { padding: 6px 8px; font-size: 11px; }
+  .badge { font-size: 10px; padding: 3px 6px; }
+}
