@@ -27,16 +27,16 @@ body { display: flex; flex-direction: column; }
 .nav-title { font-size: clamp(14px, 1.4vw, 20px); font-weight: 700; }
 .nav-clock { font-size: clamp(11px, 1vw, 14px); opacity: 0.85; font-variant-numeric: tabular-nums; }
 
-/* ── Workspace — fluid two-column ── */
+/* ── Workspace — fills full remaining height ── */
 .workspace {
   flex: 1;
   display: grid;
   grid-template-columns: clamp(220px, 22vw, 310px) 1fr;
   gap: clamp(10px, 1.5vw, 20px);
-  padding: clamp(10px, 1.5vw, 20px) clamp(12px, 2vw, 28px);
-  overflow: auto;
+  padding: clamp(10px, 1.5vw, 18px) clamp(12px, 2vw, 24px);
+  overflow: hidden;
   min-height: 0;
-  align-items: start;
+  align-items: stretch;
 }
 
 /* ── Left panel ── */
@@ -113,12 +113,12 @@ body { display: flex; flex-direction: column; }
 .h-dur { font-size: clamp(10px, 0.85vw, 12px); color: #94a3b8; background: #f1f5f9; padding: 2px 8px; border-radius: 20px; white-space: nowrap; }
 .history-empty { font-size: clamp(11px, 1vw, 13px); color: #94a3b8; text-align: center; padding: 16px 0; }
 
-/* ── Right panel ── */
+/* ── Right panel — fills full column height ── */
 .right-panel {
   background: white; border-radius: 14px;
   box-shadow: 0 4px 24px rgba(0,0,0,0.07);
   display: flex; flex-direction: column; overflow: hidden;
-  border: 1px solid var(--border); align-self: start;
+  border: 1px solid var(--border); height: 100%;
 }
 
 .right-header {
@@ -129,7 +129,7 @@ body { display: flex; flex-direction: column; }
 .right-header p { font-size: clamp(11px, 1vw, 13px); color: var(--muted); }
 
 .already-banner {
-  display: none; margin: clamp(8px, 1vw, 14px) clamp(16px, 2vw, 28px) 0;
+  display: none; margin: clamp(8px, 1vw, 12px) clamp(16px, 2vw, 24px) 0;
   background: #f0fdf4; border: 1.5px solid #bbf7d0; border-radius: 10px;
   padding: clamp(8px, 0.9vw, 12px) clamp(10px, 1.2vw, 16px); flex-shrink: 0;
 }
@@ -137,19 +137,21 @@ body { display: flex; flex-direction: column; }
 .already-banner p { font-size: clamp(11px, 1vw, 13px); color: #16a34a; font-weight: 600; }
 .already-banner span { font-size: clamp(10px, 0.85vw, 12px); color: #4ade80; display: block; }
 
+/* Reason wrap stretches to fill all remaining height */
 .reason-wrap {
-  padding: clamp(8px, 1vw, 12px) clamp(16px, 2vw, 24px) clamp(8px, 1vw, 12px);
-  display: flex; flex-direction: column;
+  padding: clamp(8px, 1vw, 14px) clamp(16px, 2vw, 24px);
+  flex: 1; display: flex; flex-direction: column; min-height: 0;
 }
 .reason-label { font-size: clamp(11px, 1vw, 13px); font-weight: 600; color: var(--muted); margin-bottom: clamp(8px, 1vw, 12px); flex-shrink: 0; }
 
-/* Reason grid — 4 equal cards, no aspect-ratio conflicts */
+/* 2x2 grid fills all available space — rows stretch equally */
 .reason-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-auto-rows: clamp(100px, 16vh, 160px);
+  grid-template-rows: 1fr 1fr;
   gap: clamp(8px, 1vw, 12px);
-  width: 100%;
+  flex: 1;
+  min-height: 0;
 }
 .reason-option {
   border: 1.5px solid var(--border); border-radius: 14px;
@@ -157,7 +159,7 @@ body { display: flex; flex-direction: column; }
   align-items: center; justify-content: center;
   gap: clamp(5px, 0.7vw, 10px); background: #fff;
   padding: clamp(8px, 1vw, 14px); overflow: hidden;
-  width: 100%; height: 100%;
+  min-height: 0;
 }
 .reason-option:hover { border-color: #94a3b8; background: #f8fafc; transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.08); }
 .reason-option.selected { border-color: var(--blue); background: #eff4ff; box-shadow: 0 4px 16px rgba(0,31,84,0.14); border-width: 2px; }
@@ -171,7 +173,7 @@ body { display: flex; flex-direction: column; }
 .last-used-tag { font-size: 9px; background: #fef3c7; color: #92400e; padding: 2px 7px; border-radius: 10px; font-weight: 700; }
 
 /* Buttons */
-.actions { padding: clamp(6px, 0.8vw, 10px) clamp(16px, 2vw, 24px) clamp(12px, 1.4vw, 18px); display: flex; flex-direction: column; gap: clamp(7px, 0.9vw, 10px); flex-shrink: 0; }
+.actions { padding: clamp(8px, 1vw, 12px) clamp(16px, 2vw, 24px) clamp(10px, 1.2vw, 16px); display: flex; flex-direction: column; gap: clamp(7px, 0.9vw, 10px); flex-shrink: 0; }
 .btn-submit {
   width: 100%; padding: clamp(11px, 1.2vw, 16px); border-radius: 10px; border: none;
   font-size: clamp(13px, 1.2vw, 16px); font-weight: 700; color: #fff;
@@ -254,7 +256,6 @@ body { display: flex; flex-direction: column; }
 
 /* ── Responsive ── */
 
-/* Below 900px: stack vertically, scrollable */
 @media (max-width: 899px) {
   html, body { height: auto; overflow: auto; }
   .workspace {
@@ -267,11 +268,10 @@ body { display: flex; flex-direction: column; }
   .history-card { flex: 1 1 100%; max-height: 200px; }
   .right-panel { height: auto; }
   .reason-wrap { flex: none; }
-  .reason-grid { grid-auto-rows: 110px; }
-  .reason-option { height: auto; max-height: none; }
+  .reason-grid { grid-template-rows: 110px 110px; }
+  .reason-option { min-height: 0; }
 }
 
-/* Below 640px */
 @media (max-width: 639px) {
   .navbar { padding: 0 14px; height: 52px; }
   .nav-title { font-size: 14px; }
@@ -280,26 +280,24 @@ body { display: flex; flex-direction: column; }
   .avatar { width: 40px; height: 40px; font-size: 16px; }
   .profile-name { font-size: 14px; }
   .session-card, .streak-card { flex: 1 1 100%; }
-  .reason-option { height: 90px; }
-  .reason-option svg { width: 22px; height: 22px; }  .reason-option .reason-name { font-size: 12px; }
+  .reason-grid { grid-template-rows: 90px 90px; }
+  .reason-option svg { width: 22px; height: 22px; }
+  .reason-option .reason-name { font-size: 12px; }
   .right-header h2 { font-size: 15px; }
   .right-header { padding: 12px 14px 10px; }
   .reason-wrap { padding: 10px 14px; }
   .actions { padding: 8px 14px 14px; }
 }
 
-/* Below 400px */
 @media (max-width: 399px) {
   .nav-clock { display: none; }
   .nav-title { font-size: 13px; }
   .avatar { width: 36px; height: 36px; font-size: 14px; }
-  .reason-option { height: 76px; }
+  .reason-grid { grid-template-rows: 76px 76px; }
   .btn-submit { padding: 11px; font-size: 13px; }
 }
 
-/* Large screens */
 @media (min-width: 1600px) {
-  .workspace { grid-template-columns: clamp(280px, 18vw, 340px) 1fr; padding: 24px 36px; gap: 24px; }
+  .workspace { grid-template-columns: clamp(280px, 18vw, 340px) 1fr; padding: 20px 32px; gap: 20px; }
   .navbar { padding: 0 3vw; height: 68px; }
-  .reason-option { max-height: 200px; }
 }
