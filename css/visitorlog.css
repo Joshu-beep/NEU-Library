@@ -36,7 +36,7 @@ body { display: flex; flex-direction: column; }
   padding: clamp(10px, 1.5vw, 20px) clamp(12px, 2vw, 28px);
   overflow: hidden;
   min-height: 0;
-  align-items: start;
+  align-items: stretch;
 }
 
 /* ── Left panel ── */
@@ -143,7 +143,7 @@ body { display: flex; flex-direction: column; }
 }
 .reason-label { font-size: clamp(11px, 1vw, 13px); font-weight: 600; color: var(--muted); margin-bottom: clamp(8px, 1vw, 14px); flex-shrink: 0; }
 
-/* Square reason cards using aspect-ratio */
+/* Square reason cards — fixed size, 2x2 grid */
 .reason-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -154,16 +154,16 @@ body { display: flex; flex-direction: column; }
 }
 .reason-option {
   border: 1.5px solid var(--border); border-radius: 14px;
-  aspect-ratio: 1 / 1;
   cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column;
   align-items: center; justify-content: center;
-  gap: clamp(6px, 0.8vw, 12px); background: #fff; padding: clamp(8px, 1vw, 16px);
-  min-height: 0;
+  gap: clamp(6px, 0.8vw, 12px); background: #fff;
+  padding: clamp(8px, 1vw, 16px);
+  overflow: hidden;
 }
 .reason-option:hover { border-color: #94a3b8; background: #f8fafc; transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.08); }
 .reason-option.selected { border-color: var(--blue); background: #eff4ff; box-shadow: 0 4px 16px rgba(0,31,84,0.14); border-width: 2px; }
 .reason-option.last-used { border-color: var(--gold); }
-.reason-option svg { width: clamp(24px, 2.8vw, 40px); height: clamp(24px, 2.8vw, 40px); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+.reason-option svg { width: clamp(22px, 2.4vw, 36px); height: clamp(22px, 2.4vw, 36px); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
 .icon-reading svg { stroke: var(--orange); }
 .icon-researching svg { stroke: var(--indigo); }
 .icon-computer svg { stroke: var(--purple); }
@@ -264,16 +264,17 @@ body { display: flex; flex-direction: column; }
     gap: 14px;
     overflow: visible;
     height: auto;
+    align-items: start;
   }
   .left-panel { flex-direction: row; flex-wrap: wrap; gap: 12px; height: auto; overflow: visible; }
   .profile-card { flex: 1 1 100%; flex-direction: row; text-align: left; align-items: center; }
   .profile-card .profile-info { text-align: left; }
   .session-card, .streak-card { flex: 1 1 calc(50% - 6px); }
   .history-card { flex: 1 1 100%; max-height: 200px; }
-  .right-panel { height: auto; }
+  .right-panel { height: auto; min-height: 520px; }
   .reason-wrap { flex: none; }
-  .reason-grid { grid-template-rows: auto; }
-  .reason-option { aspect-ratio: unset; height: 100px; }
+  .reason-grid { grid-template-rows: 120px 120px; }
+  .reason-option { height: auto; }
 }
 
 /* Below 640px */
