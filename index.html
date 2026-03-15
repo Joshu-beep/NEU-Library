@@ -5,324 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>New Era University Library</title>
     <link rel="icon" type="image/x-icon" href="neulogo.png" />
-    <style>
-      :root {
-        --primary-blue: #001f54;
-        --accent-gold: #f59e0b;
-        --text-gray: #64748b;
-        --light-border: #cbd5e1;
-        --bg-fallback: #f4f6f9;
-        --admin-red: #991b1b;
-      }
-
-      * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-      }
-
-      body {
-        background-image: url("backgroundimg.jpg");
-        background-color: var(--bg-fallback);
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
-        background-attachment: fixed;
-        display: flex;
-        justify-content: flex-start;
-        align-items: stretch;
-        min-height: 100vh;
-        padding: 0;
-        overflow: hidden;
-      }
-
-      .login-wrapper {
-        width: 100%;
-        max-width: 520px;
-        display: flex;
-        flex-direction: column;
-        background: #ffffff;
-        box-shadow: 10px 0 30px rgba(0, 0, 0, 0.15);
-        z-index: 10;
-        min-height: 100vh;
-        overflow-y: auto;
-      }
-
-      @media (max-width: 900px) {
-        .login-wrapper { max-width: 100%; box-shadow: none; }
-        body { overflow: auto; }
-      }
-
-      .login-card {
-        background: transparent;
-        width: 100%;
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-      }
-
-      .card-header {
-        background-color: var(--primary-blue);
-        color: #ffffff;
-        text-align: center;
-        padding: 40px 20px 35px;
-        border-bottom: 6px solid var(--accent-gold);
-        transition: background-color 0.3s ease;
-      }
-
-      .card-header.admin-mode { background-color: var(--admin-red); }
-
-      .icon-container {
-        margin-bottom: 14px;
-        display: inline-flex;
-        justify-content: center;
-        align-items: center;
-        width: 80px;
-        height: 80px;
-        border: 3px solid var(--accent-gold);
-        border-radius: 50%;
-        overflow: hidden;
-        background-color: white;
-      }
-
-      .logo-img { width: 100%; height: 100%; object-fit: contain; padding: 8px; }
-      .card-header h1 { font-size: 26px; font-weight: 700; margin-bottom: 8px; letter-spacing: 0.5px; }
-      .card-header h2 { font-size: 13px; color: var(--accent-gold); font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; }
-
-      .card-body {
-        padding: 30px 40px;
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-      }
-
-      .input-group { margin-bottom: 20px; }
-      .input-row { display: flex; gap: 15px; }
-      .input-row .input-group { flex: 1; }
-
-      .input-group label {
-        display: block;
-        text-align: center;
-        font-size: 14px;
-        color: var(--text-gray);
-        margin-bottom: 8px;
-        font-weight: 600;
-      }
-
-      .input-group input {
-        width: 100%;
-        padding: 12px 16px;
-        border: 1px solid var(--light-border);
-        border-radius: 8px;
-        font-size: 14px;
-        outline: none;
-        transition: border-color 0.2s;
-        text-align: center;
-      }
-
-      .text-left label { text-align: left; }
-      .text-left input { text-align: left; }
-      .input-group input:focus { border-color: var(--primary-blue); }
-
-      .btn {
-        width: 100%;
-        padding: 14px;
-        border-radius: 8px;
-        font-size: 15px;
-        font-weight: 700;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        outline: none;
-      }
-      .btn:active { transform: scale(0.98); }
-      .btn:disabled { opacity: 0.6; cursor: not-allowed; }
-
-      .btn-primary { background-color: var(--primary-blue); color: #ffffff; border: none; margin-top: 5px; }
-      .btn-admin { background-color: var(--admin-red); color: #ffffff; border: none; }
-
-      .divider-container {
-        text-align: center;
-        margin: 24px 0 20px;
-        position: relative;
-      }
-      .divider-container::before {
-        content: "";
-        position: absolute;
-        top: 50%;
-        left: 0;
-        right: 0;
-        height: 1px;
-        background-color: #f1f5f9;
-        z-index: 1;
-      }
-      .divider-container p {
-        font-size: 13px;
-        color: #94a3b8;
-        background-color: #ffffff;
-        padding: 0 10px;
-        display: inline-block;
-        position: relative;
-        z-index: 2;
-      }
-
-      .btn-secondary { background-color: #ffffff; color: var(--primary-blue); border: 1.5px solid var(--primary-blue); }
-
-      .footer-links {
-        text-align: center;
-        color: #94a3b8;
-        font-size: 13px;
-        background-color: #f8fafc;
-        padding: 20px;
-        border-top: 1px solid var(--light-border);
-        margin-top: auto;
-      }
-
-      .admin-link {
-        display: inline-flex;
-        align-items: center;
-        color: #64748b;
-        text-decoration: none;
-        margin-bottom: 8px;
-        font-weight: 600;
-        cursor: pointer;
-      }
-      .admin-link:hover { color: var(--primary-blue); }
-      .admin-link svg { width: 16px; height: 16px; margin-right: 6px; stroke: currentColor; }
-
-      .role-selector { display: flex; gap: 15px; margin-bottom: 24px; }
-      .role-card {
-        flex: 1;
-        border: 1px solid var(--light-border);
-        border-radius: 8px;
-        padding: 12px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        color: var(--text-gray);
-      }
-      .role-card.active { border-color: var(--primary-blue); color: var(--primary-blue); background-color: #f8fafc; }
-
-      select#regProgram,
-      select#regProgramFaculty {
-        width: 100%;
-        padding: 12px 16px;
-        border: 1px solid var(--light-border);
-        border-radius: 8px;
-        font-size: 14px;
-        outline: none;
-        transition: border-color 0.2s;
-        text-align: left;
-        background: #fff;
-        color: #1e293b;
-        appearance: none;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-        background-repeat: no-repeat;
-        background-position: right 14px center;
-        cursor: pointer;
-      }
-      select#regProgram:focus,
-      select#regProgramFaculty:focus { border-color: var(--primary-blue); }
-
-      #msgBox {
-        display: none;
-        position: fixed;
-        top: 24px;
-        left: 50%;
-        transform: translateX(-50%);
-        background-color: var(--primary-blue);
-        color: white;
-        padding: 16px 24px;
-        border-radius: 8px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-        z-index: 1000;
-        font-size: 15px;
-        text-align: center;
-        min-width: 250px;
-        animation: slideDown 0.3s ease-out;
-      }
-
-      @keyframes slideDown {
-        from { top: -50px; opacity: 0; }
-        to { top: 24px; opacity: 1; }
-      }
-
-      /* ── Announcement overlay ── */
-      .announce-panel {
-        position: fixed; top: 20px; right: 20px; z-index: 999;
-        width: 300px; display: flex; flex-direction: column; gap: 0;
-        filter: drop-shadow(0 8px 24px rgba(0,0,0,0.18));
-      }
-
-      .announce-toggle {
-        background: var(--primary-blue); color: white; border: none;
-        padding: 10px 16px; border-radius: 10px; cursor: pointer;
-        font-size: 13px; font-weight: 700; display: flex; align-items: center;
-        justify-content: space-between; gap: 8px; width: 100%;
-        transition: border-radius 0.2s;
-      }
-      .announce-panel.open .announce-toggle {
-        border-radius: 10px 10px 0 0;
-        border-bottom: 2px solid var(--accent-gold);
-      }
-      .announce-toggle span { display: flex; align-items: center; gap: 7px; }
-      .announce-chevron { transition: transform 0.2s; }
-      .announce-panel.open .announce-chevron { transform: rotate(180deg); }
-
-      .announce-body {
-        background: white; border-radius: 0 0 12px 12px;
-        border: 2px solid #f59e0b; border-top: none;
-        max-height: 360px; overflow-y: auto;
-        display: none;
-      }
-      .announce-panel.open .announce-body { display: block; }
-
-      .announce-section-label {
-        font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px;
-        color: #94a3b8; padding: 10px 14px 4px; border-bottom: 1px solid #f1f5f9;
-        display: flex; align-items: center; gap: 5px;
-      }
-
-      .announce-item {
-        padding: 10px 14px; border-bottom: 1px solid #f1f5f9;
-        display: flex; gap: 10px; align-items: flex-start;
-      }
-      .announce-item:last-child { border-bottom: none; }
-
-      .announce-dot-event { width: 8px; height: 8px; border-radius: 50%; background: #3b82f6; flex-shrink: 0; margin-top: 5px; }
-      .announce-dot-reminder { width: 8px; height: 8px; border-radius: 50%; background: #f59e0b; flex-shrink: 0; margin-top: 5px; }
-
-      .announce-msg { font-size: 13px; color: #1e293b; line-height: 1.45; font-weight: 500; }
-      .announce-date { font-size: 11px; color: #64748b; margin-top: 2px; }
-
-      .announce-empty { padding: 14px; font-size: 13px; color: #94a3b8; text-align: center; }
-    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+      const SUPABASE_URL = "https://ruajjuxabwfqpawpjosl.supabase.co";
+      const SUPABASE_KEY =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ1YWpqdXhhYndmcXBhd3Bqb3NsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0NTg0MjksImV4cCI6MjA4OTAzNDQyOX0.O1ZbG4vC6q4DxQKTq664i3e4xwUYcvgVDOsuNMDNK4I";
+      const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    </script>
+    <link rel="Stylesheet" href="css/index.css" />
   </head>
   <body>
     <div id="msgBox"></div>
-
-    <!-- Announcement overlay top-right -->
-    <div class="announce-panel open" id="announcePanel">
-      <button class="announce-toggle" onclick="document.getElementById('announcePanel').classList.toggle('open')">
-        <span>
-          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path></svg>
-          Library Announcements
-        </span>
-        <svg class="announce-chevron" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
-      </button>
-      <div class="announce-body" id="announceBody">
-        <div class="announce-empty">Loading...</div>
-      </div>
-    </div>
 
     <div class="login-wrapper">
       <div class="login-card">
         <div class="card-header" id="mainHeader">
           <div class="icon-container">
-            <img src="neulogo.png" alt="Library Logo" class="logo-img" onerror="this.src='https://via.placeholder.com/64?text=NEU'" />
+            <img
+              src="neulogo.png"
+              alt="Library Logo"
+              class="logo-img"
+              onerror="this.src = 'https://via.placeholder.com/64?text=NEU'"
+            />
           </div>
           <h1 id="headerTitle">New Era University Library</h1>
           <h2 id="headerSubtitle">Visitor Management System</h2>
@@ -333,132 +37,150 @@
           <form id="loginForm">
             <div class="input-group">
               <label>Institutional Email</label>
-              <input type="email" id="email" placeholder="Enter email..." required />
+              <input
+                type="email"
+                id="email"
+                placeholder="Enter email..."
+                required
+              />
             </div>
             <div class="input-group">
               <label>Password</label>
-              <input type="password" id="password" placeholder="Enter password..." required />
+              <input
+                type="password"
+                id="password"
+                placeholder="Enter password..."
+                required
+              />
             </div>
-            <button type="submit" class="btn btn-primary" id="loginBtn">Sign In</button>
+            <button type="submit" class="btn btn-primary" id="loginBtn">
+              Sign In
+            </button>
           </form>
           <div class="divider-container"><p>Don't have account yet?</p></div>
-          <button type="button" class="btn btn-secondary" id="showRegisterBtn">Register Here</button>
+          <button type="button" class="btn btn-secondary" id="showRegisterBtn">
+            Register Here
+          </button>
         </div>
 
         <!-- REGISTRATION VIEW -->
         <div class="card-body" id="registerView" style="display: none">
           <div style="text-align: center; margin-bottom: 20px">
-            <h3 style="color: var(--primary-blue); font-weight: 700">Create an Account</h3>
+            <h3 style="color: var(--primary-blue); font-weight: 700">
+              Create an Account
+            </h3>
           </div>
           <div class="role-selector">
-            <div class="role-card active" data-role="student"><span>Student</span></div>
-            <div class="role-card" data-role="faculty"><span>Faculty</span></div>
+            <div class="role-card active" data-role="student">
+              <span>Student</span>
+            </div>
+            <div class="role-card" data-role="faculty">
+              <span>Faculty</span>
+            </div>
           </div>
           <form id="registerForm">
             <div class="input-group text-left">
               <label>Institutional Email</label>
-              <input type="email" id="regEmail" placeholder="e.g. j.doe@neu.edu.ph" required />
+              <input
+                type="email"
+                id="regEmail"
+                placeholder="e.g. j.doe@neu.edu.ph"
+                required
+              />
             </div>
             <div class="input-group text-left">
               <label>Password</label>
-              <input type="password" id="regPassword" placeholder="Create a password" required />
+              <input
+                type="password"
+                id="regPassword"
+                placeholder="Create a password"
+                required
+              />
             </div>
-            <div class="input-group text-left">
-              <label>Full Name</label>
-              <input type="text" id="regName" placeholder="Juan Dela Cruz" required />
+            <div class="input-row">
+              <div class="input-group text-left">
+                <label>Full Name</label>
+                <input
+                  type="text"
+                  id="regName"
+                  placeholder="Juan Dela Cruz"
+                  required
+                />
+              </div>
+              <div class="input-group text-left">
+                <label>Program</label>
+                <input
+                  type="text"
+                  id="regProgram"
+                  placeholder="BSIT"
+                  required
+                />
+              </div>
             </div>
-            <!-- Student Program Dropdown (shown by default) -->
-            <div class="input-group text-left" id="studentProgramGroup">
-              <label>Program / College</label>
-              <select id="regProgram" required>
-                <option value="" disabled selected>Select your program...</option>
-                <optgroup label="Graduate &amp; Special Programs">
-                  <option>School of Graduate Studies</option>
-                  <option>College of Law</option>
-                  <option>College of Medicine</option>
-                  <option>Expanded Tertiary Education Equivalency &amp; Accreditation Program (ETEEAP)</option>
-                  <option>Alternative Learning System</option>
-                  <option>School of International Relations</option>
-                </optgroup>
-                <optgroup label="Undergraduate Colleges">
-                  <option>College of Accountancy</option>
-                  <option>College of Agriculture</option>
-                  <option>College of Arts and Science</option>
-                  <option>College of Business Administration</option>
-                  <option>College of Communication</option>
-                  <option>College of Informatics and Computing Studies</option>
-                  <option>College of Criminology</option>
-                  <option>College of Education</option>
-                  <option>College of Engineering and Architecture</option>
-                  <option>College of Medical Technology</option>
-                  <option>College of Midwifery</option>
-                  <option>College of Music</option>
-                  <option>College of Nursing</option>
-                  <option>College of Physical Therapy</option>
-                  <option>College of Respiratory Therapy</option>
-                </optgroup>
-                <optgroup label="Basic Education">
-                  <option>Integrated School</option>
-                </optgroup>
-              </select>
-            </div>
-
-            <!-- Faculty Department Dropdown (hidden by default) -->
-            <div class="input-group text-left" id="facultyProgramGroup" style="display:none">
-              <label>Faculty Department</label>
-              <select id="regProgramFaculty">
-                <option value="" disabled selected>Select your department...</option>
-                <option>College of Accountancy Faculty</option>
-                <option>College of Agriculture Faculty</option>
-                <option>College of Arts and Science Faculty</option>
-                <option>College of Business Administration Faculty</option>
-                <option>College of Communication Faculty</option>
-                <option>College of Informatics and Computing Studies Faculty</option>
-                <option>College of Criminology Faculty</option>
-                <option>College of Education Faculty</option>
-                <option>College of Engineering and Architecture Faculty</option>
-                <option>College of Medical Technology Faculty</option>
-                <option>College of Midwifery Faculty</option>
-                <option>College of Music Faculty</option>
-                <option>College of Nursing Faculty</option>
-                <option>College of Physical Therapy Faculty</option>
-                <option>College of Respiratory Therapy Faculty</option>
-                <option>School of International Relations Faculty</option>
-              </select>
-            </div>
-            <button type="submit" class="btn btn-primary" id="registerBtn">Complete Registration</button>
+            <button type="submit" class="btn btn-primary" id="registerBtn">
+              Complete Registration
+            </button>
           </form>
           <div style="text-align: center; margin-top: 20px">
-            <a href="#" id="showLoginLink" style="font-size: 14px; color: var(--text-gray)">Back to Login</a>
+            <a
+              href="#"
+              id="showLoginLink"
+              style="font-size: 14px; color: var(--text-gray)"
+              >Back to Login</a
+            >
           </div>
         </div>
 
         <!-- ADMIN LOGIN VIEW -->
         <div class="card-body" id="adminView" style="display: none">
           <div style="text-align: center; margin-bottom: 20px">
-            <h3 style="color: var(--admin-red); font-weight: 700">Admin Authentication</h3>
-            <p style="font-size: 13px; color: var(--text-gray)">Restricted access to database</p>
+            <h3 style="color: var(--admin-red); font-weight: 700">
+              Admin Authentication
+            </h3>
+            <p style="font-size: 13px; color: var(--text-gray)">
+              Restricted access to database
+            </p>
           </div>
           <form id="adminLoginForm">
             <div class="input-group">
               <label>Admin Username</label>
-              <input type="text" id="adminUser" placeholder="Admin username..." required />
+              <input
+                type="text"
+                id="adminUser"
+                placeholder="Admin username..."
+                required
+              />
             </div>
             <div class="input-group">
               <label>Secret Key</label>
-              <input type="password" id="adminPass" placeholder="••••••••" required />
+              <input
+                type="password"
+                id="adminPass"
+                placeholder="••••••••"
+                required
+              />
             </div>
             <button type="submit" class="btn btn-admin">Access Database</button>
           </form>
           <div style="text-align: center; margin-top: 20px">
-            <a href="#" id="backFromAdmin" style="font-size: 14px; color: var(--text-gray)">Back to Visitor Access</a>
+            <a
+              href="#"
+              id="backFromAdmin"
+              style="font-size: 14px; color: var(--text-gray)"
+              >Back to Visitor Access</a
+            >
           </div>
         </div>
       </div>
 
       <div class="footer-links">
         <a class="admin-link" id="adminBtn">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
             <rect x="6" y="11" width="12" height="10" rx="2" ry="2"></rect>
             <path d="M8 11V7a4 4 0 0 1 8 0v4"></path>
           </svg>
@@ -468,380 +190,6 @@
       </div>
     </div>
 
-    <script type="module">
-      import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
-      const SUPABASE_URL = 'https://ruajjuxabwfqpawpjosl.supabase.co';
-      const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ1YWpqdXhhYndmcXBhd3Bqb3NsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0NTg0MjksImV4cCI6MjA4OTAzNDQyOX0.O1ZbG4vC6q4DxQKTq664i3e4xwUYcvgVDOsuNMDNK4I';
-      const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
-
-      const loginView = document.getElementById("loginView");
-      const registerView = document.getElementById("registerView");
-      const adminView = document.getElementById("adminView");
-      const mainHeader = document.getElementById("mainHeader");
-      const headerSubtitle = document.getElementById("headerSubtitle");
-
-      // ── Navigation ──
-      document.getElementById("showRegisterBtn").onclick = () => {
-        loginView.style.display = "none";
-        registerView.style.display = "flex";
-      };
-      document.getElementById("showLoginLink").onclick = (e) => {
-        e.preventDefault();
-        registerView.style.display = "none";
-        loginView.style.display = "flex";
-      };
-      document.getElementById("adminBtn").onclick = (e) => {
-        e.preventDefault();
-        loginView.style.display = "none";
-        registerView.style.display = "none";
-        adminView.style.display = "flex";
-        mainHeader.classList.add("admin-mode");
-        headerSubtitle.textContent = "Admin Control Panel";
-        showMessage("Switching to Administrator Mode");
-      };
-      document.getElementById("backFromAdmin").onclick = (e) => {
-        e.preventDefault();
-        adminView.style.display = "none";
-        loginView.style.display = "flex";
-        mainHeader.classList.remove("admin-mode");
-        headerSubtitle.textContent = "Visitor Management System";
-      };
-
-      function showMessage(msg, color = "#001f54") {
-        const msgBox = document.getElementById("msgBox");
-        msgBox.textContent = msg;
-        msgBox.style.backgroundColor = color;
-        msgBox.style.display = "block";
-        setTimeout(() => { msgBox.style.display = "none"; }, 4000);
-      }
-
-      // ── LOGIN ──
-      document.getElementById("loginForm").onsubmit = async (e) => {
-        e.preventDefault();
-        const btn = document.getElementById("loginBtn");
-        const email = document.getElementById("email").value.trim().toLowerCase();
-        const password = document.getElementById("password").value;
-
-        const resetBtn = () => { btn.disabled = false; btn.textContent = "Sign In"; };
-        btn.disabled = true;
-        btn.textContent = "Signing in...";
-
-        // 1. Domain restriction
-        if (!email.endsWith("@neu.edu.ph")) {
-          showMessage("Only @neu.edu.ph email addresses are allowed.", "#991b1b");
-          resetBtn();
-          return;
-        }
-
-        const safetyTimer = setTimeout(() => {
-          resetBtn();
-          showMessage("Request timed out. Please try again.", "#991b1b");
-        }, 12000);
-
-        try {
-          // 2. Check if user exists in our users table first
-          const { data: profile, error: profileCheckError } = await supabase
-            .from("users")
-            .select("*")
-            .eq("email", email)
-            .maybeSingle();
-
-          if (profileCheckError) {
-            clearTimeout(safetyTimer);
-            showMessage("Database error: " + profileCheckError.message, "#991b1b");
-            resetBtn();
-            return;
-          }
-
-          // 3. No profile = not registered
-          if (!profile) {
-            clearTimeout(safetyTimer);
-            showMessage("No account found. Please register first.", "#991b1b");
-            resetBtn();
-            return;
-          }
-
-          // 4. Check if blocked
-          if (profile.is_blocked) {
-            clearTimeout(safetyTimer);
-            showMessage("Your account has been blocked. Please contact the library admin.", "#991b1b");
-            resetBtn();
-            return;
-          }
-
-          // 5. Attempt Supabase Auth sign in
-          const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-          clearTimeout(safetyTimer);
-
-          if (error) {
-            const msg = error.message.toLowerCase();
-            if (msg.includes("email not confirmed")) {
-              // Auto-resend confirmation email and show a simple message
-              await supabase.auth.resend({ type: "signup", email });
-              showMessage("A confirmation link was sent to your email. Please check your inbox.", "#b45309");
-            } else if (msg.includes("invalid") || msg.includes("credentials") || msg.includes("password")) {
-              showMessage("Incorrect password. Please try again.", "#991b1b");
-            } else {
-              showMessage("Login failed: " + error.message, "#991b1b");
-            }
-            resetBtn();
-            return;
-          }
-
-          // 6. Success — save to localStorage and redirect
-          localStorage.setItem("userName", profile.name);
-          localStorage.setItem("userEmail", profile.email);
-          localStorage.setItem("userProgram", profile.program);
-          localStorage.setItem("userId", profile.id);
-
-          showMessage("Login successful!", "#16a34a");
-          setTimeout(() => { window.location.href = "visitorlog.html"; }, 1000);
-
-        } catch (err) {
-          clearTimeout(safetyTimer);
-          showMessage("Something went wrong: " + err.message, "#991b1b");
-          resetBtn();
-        }
-      };
-
-      // ── REGISTER ──
-      document.getElementById("registerForm").onsubmit = async (e) => {
-        e.preventDefault();
-        const btn = document.getElementById("registerBtn");
-        const email = document.getElementById("regEmail").value.trim().toLowerCase();
-        const password = document.getElementById("regPassword").value;
-        const name = document.getElementById("regName").value.trim();
-        const role = document.querySelector(".role-card.active").dataset.role;
-        const program = role === "faculty"
-          ? document.getElementById("regProgramFaculty").value
-          : document.getElementById("regProgram").value;
-
-        const resetBtn = () => { btn.disabled = false; btn.textContent = "Complete Registration"; };
-        btn.disabled = true;
-        btn.textContent = "Creating account...";
-
-        // 1. Domain restriction
-        if (!email.endsWith("@neu.edu.ph")) {
-          showMessage("Only @neu.edu.ph email addresses are allowed.", "#991b1b");
-          resetBtn();
-          return;
-        }
-
-        // 2. Password length
-        if (password.length < 6) {
-          showMessage("Password must be at least 6 characters.", "#991b1b");
-          resetBtn();
-          return;
-        }
-
-        // 3. Program selected
-        if (!program) {
-          showMessage("Please select your program / college.", "#991b1b");
-          resetBtn();
-          return;
-        }
-
-        const safetyTimer = setTimeout(() => {
-          resetBtn();
-          showMessage("Request timed out. Please try again.", "#991b1b");
-        }, 15000);
-
-        try {
-          // 4. Check if already registered in users table
-          const { data: existing } = await supabase
-            .from("users")
-            .select("id")
-            .eq("email", email)
-            .maybeSingle();
-
-          if (existing) {
-            clearTimeout(safetyTimer);
-            showMessage("This email is already registered. Please sign in.", "#991b1b");
-            resetBtn();
-            return;
-          }
-
-          btn.textContent = "Step 1/2: Creating auth...";
-
-          // 5. Create Supabase Auth user
-          const { data, error } = await supabase.auth.signUp({ email, password });
-
-          if (error) {
-            clearTimeout(safetyTimer);
-            const msg = error.message.toLowerCase();
-            if (msg.includes("already") || msg.includes("registered")) {
-              showMessage("This email is already registered. Please sign in.", "#991b1b");
-            } else {
-              showMessage("Sign up failed: " + error.message, "#991b1b");
-            }
-            resetBtn();
-            return;
-          }
-
-          if (!data.user) {
-            clearTimeout(safetyTimer);
-            showMessage("Registration failed — please disable email confirmation in Supabase.", "#991b1b");
-            resetBtn();
-            return;
-          }
-
-          btn.textContent = "Step 2/2: Saving profile...";
-
-          // 6. Insert profile
-          const { error: insertError } = await supabase.from("users").insert({
-            id: data.user.id,
-            email,
-            name,
-            program,
-            role,
-            is_blocked: false
-          });
-
-          clearTimeout(safetyTimer);
-
-          if (insertError) {
-            showMessage("Profile save failed: " + insertError.message, "#991b1b");
-            resetBtn();
-            return;
-          }
-
-          // 7. Sign in properly to establish a clean session before redirecting
-          btn.textContent = "Signing in...";
-          const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({ email, password });
-
-          if (signInError) {
-            // Still registered successfully — just send them to login page
-            showMessage("Registered! Please sign in with your new account.", "#16a34a");
-            setTimeout(() => {
-              registerView.style.display = "none";
-              loginView.style.display = "flex";
-            }, 1500);
-            return;
-          }
-
-          // 8. Save to localStorage and redirect
-          localStorage.setItem("userName", name);
-          localStorage.setItem("userEmail", email);
-          localStorage.setItem("userProgram", program);
-          localStorage.setItem("userId", signInData.user.id);
-
-          showMessage("Registration successful!", "#16a34a");
-          setTimeout(() => { window.location.href = "visitorlog.html"; }, 1000);
-
-        } catch (err) {
-          clearTimeout(safetyTimer);
-          showMessage("Unexpected error: " + err.message, "#991b1b");
-          resetBtn();
-        }
-      };
-
-      // ── ADMIN LOGIN ──
-      document.getElementById("adminLoginForm").onsubmit = (e) => {
-        e.preventDefault();
-        const user = document.getElementById("adminUser").value;
-        const pass = document.getElementById("adminPass").value;
-        if (user === "admin" && pass === "admin123") {
-          showMessage("Access Granted. Redirecting...", "#16a34a");
-          setTimeout(() => { window.location.href = "admindashboard.html"; }, 1500);
-        } else {
-          showMessage("Invalid Admin Credentials!", "#991b1b");
-        }
-      };
-
-      // ── Role Selection — swap program dropdowns ──
-      document.querySelectorAll(".role-card").forEach((card) => {
-        card.onclick = () => {
-          document.querySelectorAll(".role-card").forEach((c) => c.classList.remove("active"));
-          card.classList.add("active");
-
-          const isFaculty = card.dataset.role === "faculty";
-          const studentGroup = document.getElementById("studentProgramGroup");
-          const facultyGroup = document.getElementById("facultyProgramGroup");
-          const studentSelect = document.getElementById("regProgram");
-          const facultySelect = document.getElementById("regProgramFaculty");
-
-          if (isFaculty) {
-            studentGroup.style.display = "none";
-            facultyGroup.style.display = "block";
-            studentSelect.removeAttribute("required");
-            facultySelect.setAttribute("required", "");
-          } else {
-            studentGroup.style.display = "block";
-            facultyGroup.style.display = "none";
-            studentSelect.setAttribute("required", "");
-            facultySelect.removeAttribute("required");
-          }
-        };
-      });
-
-      // ── Load announcements into top-right overlay ──
-      (async () => {
-        try {
-          // Fetch active notices - order by created_at (safe fallback if event_date column doesn't exist yet)
-          const { data, error } = await supabase
-            .from("notices")
-            .select("*")
-            .eq("active", true)
-            .order("created_at", { ascending: false });
-
-          const panel = document.getElementById("announcePanel");
-          const body  = document.getElementById("announceBody");
-
-          if (error || !data || !data.length) {
-            body.innerHTML = `<div class="announce-empty">No announcements at this time.</div>`;
-            return;
-          }
-
-          // Sort client-side: events with dates first (sorted by date), then reminders
-          const events    = data.filter(n => n.type === "event" || n.event_date)
-                                .sort((a, b) => new Date(a.event_date || 0) - new Date(b.event_date || 0));
-          const reminders = data.filter(n => n.type !== "event" && !n.event_date);
-
-          let html = "";
-
-          if (events.length) {
-            html += `<div class="announce-section-label">
-              <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-              Upcoming Events
-            </div>`;
-            html += events.map(n => {
-              const dateStr = n.event_date
-                ? new Date(n.event_date + "T00:00:00").toLocaleDateString("en-PH", { month: "long", day: "numeric", year: "numeric" })
-                : "";
-              return `<div class="announce-item">
-                <div class="announce-dot-event"></div>
-                <div>
-                  <div class="announce-msg">${n.message}</div>
-                  ${dateStr ? `<div class="announce-date">${dateStr}</div>` : ""}
-                </div>
-              </div>`;
-            }).join("");
-          }
-
-          if (reminders.length) {
-            html += `<div class="announce-section-label">
-              <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
-              Reminders
-            </div>`;
-            html += reminders.map(n => `
-              <div class="announce-item">
-                <div class="announce-dot-reminder"></div>
-                <div><div class="announce-msg">${n.message}</div></div>
-              </div>`).join("");
-          }
-
-          if (!html) {
-            body.innerHTML = `<div class="announce-empty">No announcements at this time.</div>`;
-            return;
-          }
-
-          body.innerHTML = html;
-          // Panel already starts open (class set in HTML)
-
-        } catch(e) {
-          console.warn("Announcements unavailable:", e);
-        }
-      })();
-    </script>
+    <script src="js/index.js"></script>
   </body>
 </html>
