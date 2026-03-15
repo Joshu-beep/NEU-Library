@@ -286,25 +286,60 @@
 
         <!-- Notices Management View -->
         <div id="notices-view" class="hidden" style="padding:24px;">
-          <div style="max-width:600px;">
-            <h3 style="font-size:15px;font-weight:700;color:var(--text-dark);margin-bottom:6px;">Library Announcements</h3>
-            <p style="font-size:13px;color:var(--text-muted);margin-bottom:20px;">Notices appear on the login page so students see them before signing in.</p>
+          <h3 style="font-size:15px;font-weight:700;color:var(--text-dark);margin-bottom:4px;">Library Announcements &amp; Reminders</h3>
+          <p style="font-size:13px;color:var(--text-muted);margin-bottom:20px;">These appear on the login page. Events are sorted by date.</p>
 
-            <!-- Add notice form -->
-            <div style="background:#f8fafc;border:1px solid var(--border-color);border-radius:10px;padding:18px;margin-bottom:20px;">
-              <label style="font-size:13px;font-weight:600;color:var(--text-dark);display:block;margin-bottom:8px;">New Notice</label>
-              <textarea id="noticeInput" placeholder="Announcement..." rows="3"
-                style="width:100%;padding:10px 14px;border:1px solid var(--border-color);border-radius:8px;font-size:13px;resize:vertical;outline:none;font-family:inherit;"></textarea>
-              <button onclick="addNotice()" style="margin-top:10px;padding:10px 20px;background:var(--primary-blue);color:white;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;">
-                Post Notice
-              </button>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start;">
+
+            <!-- Announcements (Events with date) -->
+            <div>
+              <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#3b82f6;margin-bottom:10px;display:flex;align-items:center;gap:6px;">
+                <span style="width:8px;height:8px;border-radius:50%;background:#3b82f6;display:inline-block;"></span>
+                Announcements / Events
+              </div>
+              <div style="background:#f8fafc;border:1px solid var(--border-color);border-radius:10px;padding:16px;margin-bottom:12px;">
+                <div style="display:flex;flex-direction:column;gap:10px;">
+                  <div>
+                    <label style="font-size:12px;font-weight:600;color:var(--text-dark);display:block;margin-bottom:4px;">Message</label>
+                    <textarea id="eventInput" placeholder="e.g. Book Fair 2026 — Visit our collection..." rows="2"
+                      style="width:100%;padding:8px 12px;border:1px solid var(--border-color);border-radius:8px;font-size:13px;resize:none;outline:none;font-family:inherit;"></textarea>
+                  </div>
+                  <div>
+                    <label style="font-size:12px;font-weight:600;color:var(--text-dark);display:block;margin-bottom:4px;">Event Date</label>
+                    <input type="date" id="eventDateInput"
+                      style="width:100%;padding:8px 12px;border:1px solid var(--border-color);border-radius:8px;font-size:13px;outline:none;" />
+                  </div>
+                  <button onclick="addAnnouncement()"
+                    style="padding:9px 16px;background:#3b82f6;color:white;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;width:100%;">
+                    Post Announcement
+                  </button>
+                </div>
+              </div>
+              <div id="eventsAdminList"><div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px;">Loading...</div></div>
             </div>
 
-            <!-- Active notices list -->
-            <div style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;">Active Notices</div>
-            <div id="noticesAdminList">
-              <div style="text-align:center;padding:30px;color:var(--text-muted);font-size:13px;">Loading notices...</div>
+            <!-- Reminders (no date) -->
+            <div>
+              <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#f59e0b;margin-bottom:10px;display:flex;align-items:center;gap:6px;">
+                <span style="width:8px;height:8px;border-radius:50%;background:#f59e0b;display:inline-block;"></span>
+                Reminders
+              </div>
+              <div style="background:#f8fafc;border:1px solid var(--border-color);border-radius:10px;padding:16px;margin-bottom:12px;">
+                <div style="display:flex;flex-direction:column;gap:10px;">
+                  <div>
+                    <label style="font-size:12px;font-weight:600;color:var(--text-dark);display:block;margin-bottom:4px;">Message</label>
+                    <textarea id="reminderInput" placeholder="e.g. Please observe silence in reading areas..." rows="2"
+                      style="width:100%;padding:8px 12px;border:1px solid var(--border-color);border-radius:8px;font-size:13px;resize:none;outline:none;font-family:inherit;"></textarea>
+                  </div>
+                  <button onclick="addReminder()"
+                    style="padding:9px 16px;background:#f59e0b;color:#001f54;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;width:100%;">
+                    Post Reminder
+                  </button>
+                </div>
+              </div>
+              <div id="remindersAdminList"><div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px;">Loading...</div></div>
             </div>
+
           </div>
         </div>
       </div>
@@ -607,14 +642,71 @@
       }
 
       // ── Add notice ──
-      async function addNotice() {
-        const input = document.getElementById('noticeInput');
-        const msg = input.value.trim();
-        if (!msg) { showToast('Please enter a notice message.'); return; }
-        const { error } = await supabase.from('notices').insert({ message: msg, active: true });
+      // ── Load notices for admin ──
+      async function loadNoticesAdmin() {
+        const { data } = await supabase
+          .from('notices').select('*').order('event_date', { ascending: true, nullsFirst: false });
+
+        const events    = (data || []).filter(n => n.type === 'event' || n.event_date);
+        const reminders = (data || []).filter(n => n.type === 'reminder' && !n.event_date);
+
+        renderNoticeList('eventsAdminList', events, true);
+        renderNoticeList('remindersAdminList', reminders, false);
+      }
+
+      function renderNoticeList(containerId, items, showDate) {
+        const el = document.getElementById(containerId);
+        if (!items.length) {
+          el.innerHTML = `<div style="text-align:center;padding:16px;color:var(--text-muted);font-size:13px;">None yet.</div>`;
+          return;
+        }
+        el.innerHTML = items.map(n => {
+          const dateStr = n.event_date
+            ? new Date(n.event_date).toLocaleDateString('en-PH', { month: 'short', day: 'numeric', year: 'numeric' })
+            : '';
+          return `<div style="background:${n.active ? 'white' : '#f8fafc'};border:1px solid ${n.active ? 'var(--border-color)' : '#e2e8f0'};border-radius:8px;padding:10px 12px;margin-bottom:8px;opacity:${n.active ? 1 : 0.6};">
+            <div style="font-size:13px;color:var(--text-dark);margin-bottom:${dateStr ? '3px' : '6px'};line-height:1.4;">${n.message}</div>
+            ${dateStr ? `<div style="font-size:11px;color:#3b82f6;font-weight:600;margin-bottom:6px;">📅 ${dateStr}</div>` : ''}
+            <div style="display:flex;gap:6px;">
+              <button onclick="toggleNotice('${n.id}',${n.active})"
+                style="padding:4px 10px;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid;${n.active ? 'background:#f1f5f9;color:#64748b;border-color:#e2e8f0' : 'background:#f0fdf4;color:#16a34a;border-color:#bbf7d0'}">
+                ${n.active ? 'Hide' : 'Show'}
+              </button>
+              <button onclick="deleteNotice('${n.id}')"
+                style="padding:4px 10px;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;background:#fef2f2;color:#ef4444;border:1px solid #fecaca;">
+                Delete
+              </button>
+            </div>
+          </div>`;
+        }).join('');
+      }
+
+      // ── Add announcement (event with date) ──
+      async function addAnnouncement() {
+        const msg  = document.getElementById('eventInput').value.trim();
+        const date = document.getElementById('eventDateInput').value;
+        if (!msg) { showToast('Please enter an announcement message.'); return; }
+        const { error } = await supabase.from('notices').insert({
+          message: msg, active: true, type: 'event',
+          event_date: date || null
+        });
         if (error) { showToast('Error: ' + error.message); return; }
-        input.value = '';
-        showToast('Notice posted successfully.');
+        document.getElementById('eventInput').value = '';
+        document.getElementById('eventDateInput').value = '';
+        showToast('Announcement posted!');
+        loadNoticesAdmin();
+      }
+
+      // ── Add reminder (no date) ──
+      async function addReminder() {
+        const msg = document.getElementById('reminderInput').value.trim();
+        if (!msg) { showToast('Please enter a reminder message.'); return; }
+        const { error } = await supabase.from('notices').insert({
+          message: msg, active: true, type: 'reminder', event_date: null
+        });
+        if (error) { showToast('Error: ' + error.message); return; }
+        document.getElementById('reminderInput').value = '';
+        showToast('Reminder posted!');
         loadNoticesAdmin();
       }
 
@@ -628,7 +720,7 @@
       async function deleteNotice(id) {
         if (!confirm('Delete this notice?')) return;
         await supabase.from('notices').delete().eq('id', id);
-        showToast('Notice deleted.');
+        showToast('Deleted.');
         loadNoticesAdmin();
       }
 
@@ -668,7 +760,8 @@
       window.changeView = changeView; window.runFilter = runFilter; window.filterByDate = filterByDate;
       window.triggerResetAll = triggerResetAll; window.toggleBlock = toggleBlock; window.removeUser = removeUser;
       window.exportCSV = exportCSV; window.exportPDF = exportPDF; window.logout = logout;
-      window.addNotice = addNotice; window.toggleNotice = toggleNotice; window.deleteNotice = deleteNotice;
+      window.addAnnouncement = addAnnouncement; window.addReminder = addReminder;
+      window.toggleNotice = toggleNotice; window.deleteNotice = deleteNotice;
 
       // ── Init ──
       autoLogoutMidnight().catch(e => console.warn('autoLogout:', e));
