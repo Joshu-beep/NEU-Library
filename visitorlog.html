@@ -10,19 +10,43 @@
   <body>
     <div id="msgBox"></div>
  
-    <!-- Welcome Modal -->
+    <!-- Animated Check-in Modal -->
     <div id="welcomeModal" class="modal-overlay">
-      <div class="modal-content">
-        <div class="modal-icon">
-          <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+      <div class="modal-content checkin-modal">
+        <div class="checkin-anim" id="checkinAnim">
+          <svg class="checkmark-svg" viewBox="0 0 80 80" fill="none">
+            <circle class="checkmark-circle" cx="40" cy="40" r="36" stroke="#16a34a" stroke-width="4" fill="none"/>
+            <polyline class="checkmark-tick" points="24,40 35,52 56,28" stroke="#16a34a" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          </svg>
         </div>
-        <h2 class="modal-title">Welcome to NEU Library</h2>
-        <p class="modal-text">Your visit has been logged. Save your QR code for faster check-in next time!</p>
+        <h2 class="modal-title" style="margin-top:16px;">Checked In!</h2>
+        <p class="modal-text">Welcome to NEU Library. Have a productive visit!</p>
         <div id="qrContainer" style="margin:0 auto 10px;width:140px;height:140px;"></div>
         <p style="font-size:11px;color:#94a3b8;margin-bottom:12px;">Screenshot to use at the entrance next time</p>
         <p class="modal-text" style="font-size:13px;margin-bottom:0;">
           Closing in <span id="countdown" class="countdown-text">3</span> seconds...
         </p>
+      </div>
+    </div>
+ 
+    <!-- Confirm Check-in Modal -->
+    <div id="confirmModal" class="modal-overlay">
+      <div class="modal-content" style="max-width:340px;">
+        <div class="modal-icon" style="background:#eff4ff;color:#3b82f6;">
+          <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        </div>
+        <h2 class="modal-title" style="font-size:18px;">Confirm Check-in</h2>
+        <p class="modal-text" style="margin-bottom:8px;">You are logging in for:</p>
+        <div id="confirmDetails" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:14px 18px;margin-bottom:20px;text-align:left;">
+          <div style="font-size:13px;color:#64748b;margin-bottom:4px;">Reason</div>
+          <div id="confirmReason" style="font-size:16px;font-weight:700;color:#001f54;margin-bottom:10px;">—</div>
+          <div style="font-size:13px;color:#64748b;margin-bottom:4px;">Time</div>
+          <div id="confirmTime" style="font-size:15px;font-weight:600;color:#1e293b;">—</div>
+        </div>
+        <div style="display:flex;gap:10px;">
+          <button id="confirmCancelBtn" style="flex:1;padding:13px;border-radius:9px;border:1.5px solid #e2e8f0;background:white;color:#64748b;font-size:14px;font-weight:700;cursor:pointer;">Cancel</button>
+          <button id="confirmOkBtn" style="flex:1;padding:13px;border-radius:9px;border:none;background:#001f54;color:white;font-size:14px;font-weight:700;cursor:pointer;">Confirm</button>
+        </div>
       </div>
     </div>
  
@@ -66,7 +90,11 @@
             <div class="profile-greeting" id="userGreeting"></div>
             <div class="profile-name" id="displayUserName">Loading...</div>
             <div class="profile-email" id="displayUserEmail">—</div>
-            <span class="profile-badge" id="displayUserProgram">—</span>
+            <div style="display:flex;align-items:center;gap:6px;margin-top:5px;flex-wrap:wrap;">
+              <span class="profile-badge" id="displayUserProgram">—</span>
+              <span class="visit-badge" id="visitBadge" style="display:none;"></span>
+            </div>
+            <div class="hours-pill" id="hoursPill">—</div>
           </div>
         </div>
  
