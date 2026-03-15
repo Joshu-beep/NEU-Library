@@ -771,22 +771,25 @@
       // ── Load announcements into top-right overlay ──
       (async () => {
         try {
-          const { data } = await supabase
+          // Fetch active notices - order by created_at (safe fallback if event_date column doesn't exist yet)
+          const { data, error } = await supabase
             .from("notices")
             .select("*")
             .eq("active", true)
-            .order("event_date", { ascending: true, nullsFirst: false });
+            .order("created_at", { ascending: false });
 
-          const body = document.getElementById("announceBody");
+          const panel = document.getElementById("announcePanel");
+          const body  = document.getElementById("announceBody");
 
-          if (!data || !data.length) {
+          if (error || !data || !data.length) {
             body.innerHTML = `<div class="announce-empty">No announcements at this time.</div>`;
             return;
           }
 
-          // Separate events (have event_date) from reminders (no event_date)
-          const events    = data.filter(n => n.type === "event" || n.event_date);
-          const reminders = data.filter(n => n.type === "reminder" && !n.event_date);
+          // Sort client-side: events with dates first (sorted by date), then reminders
+          const events    = data.filter(n => n.type === "event" || n.event_date)
+                                .sort((a, b) => new Date(a.event_date || 0) - new Date(b.event_date || 0));
+          const reminders = data.filter(n => n.type !== "event" && !n.event_date);
 
           let html = "";
 
@@ -794,7 +797,7 @@
             html += `<div class="announce-section-label">📅 Upcoming Events</div>`;
             html += events.map(n => {
               const dateStr = n.event_date
-                ? new Date(n.event_date).toLocaleDateString("en-PH", { month: "long", day: "numeric", year: "numeric" })
+                ? new Date(n.event_date + "T00:00:00").toLocaleDateString("en-PH", { month: "long", day: "numeric", year: "numeric" })
                 : "";
               return `<div class="announce-item">
                 <div class="announce-dot-event"></div>
@@ -815,12 +818,18 @@
               </div>`).join("");
           }
 
+          if (!html) {
+            body.innerHTML = `<div class="announce-empty">No announcements at this time.</div>`;
+            return;
+          }
+
           body.innerHTML = html;
+          // Auto-show
+          panel.classList.add("show");
 
-          // Auto-show if there's content
-          document.getElementById("announcePanel").classList.add("show");
-
-        } catch(e) { /* silently skip */ }
+        } catch(e) {
+          console.warn("Announcements unavailable:", e);
+        }
       })();
     </script>
   </body>
