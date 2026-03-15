@@ -171,22 +171,43 @@
         backdrop-filter: blur(4px); z-index: 3000; align-items: center; justify-content: center;
       }
       .qr-modal-box {
-        background: white; border-radius: 16px; padding: 28px; text-align: center;
-        max-width: 300px; width: 90%; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        background: white; border-radius: 20px; padding: 32px 28px 24px;
+        text-align: center; max-width: 320px; width: 92%;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.25);
       }
-      .qr-modal-box h3 { color: var(--primary-blue); font-size: 17px; font-weight: 700; margin-bottom: 4px; }
-      .qr-modal-box p { font-size: 12px; color: var(--text-gray); margin-bottom: 16px; }
+      .qr-modal-box h3 {
+        color: var(--text-dark); font-size: 20px; font-weight: 700;
+        margin-bottom: 6px; letter-spacing: -0.2px;
+      }
+      .qr-modal-box .qr-subtitle {
+        font-size: 13px; color: var(--text-gray); margin-bottom: 22px;
+      }
+      .qr-code-wrapper {
+        background: white; border: 2px solid #e2e8f0; border-radius: 16px;
+        padding: 16px; display: inline-block; margin-bottom: 20px;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+      }
+      .qr-user-name {
+        font-size: 17px; font-weight: 700; color: var(--text-dark);
+        margin-bottom: 3px;
+      }
+      .qr-user-program {
+        font-size: 13px; color: var(--text-gray); margin-bottom: 22px;
+      }
       .btn-download {
-        width: 100%; padding: 11px; background: #16a34a; color: white; border: none;
-        border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; margin-bottom: 8px;
-        display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.2s;
+        width: 100%; padding: 14px; background: var(--primary-blue); color: white; border: none;
+        border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; margin-bottom: 10px;
+        display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s;
+        letter-spacing: 0.2px;
       }
-      .btn-download:hover { background: #15803d; }
+      .btn-download:hover { background: #00153a; }
       .btn-close-qr {
-        width: 100%; padding: 11px; background: white; color: var(--primary-blue);
-        border: 1.5px solid var(--primary-blue); border-radius: 8px; font-size: 13px;
+        width: 100%; padding: 14px; background: #f1f5f9; color: #475569;
+        border: none; border-radius: 10px; font-size: 14px;
         font-weight: 700; cursor: pointer; transition: all 0.2s;
+        letter-spacing: 0.2px;
       }
+      .btn-close-qr:hover { background: #e2e8f0; }
 
       @media (max-width: 500px) {
         .reason-grid { grid-template-columns: 1fr; }
@@ -218,13 +239,15 @@
     <div id="qrModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);z-index:3000;align-items:center;justify-content:center;">
       <div class="qr-modal-box">
         <h3>Your Library QR Code</h3>
-        <p>Show this at the entrance for instant check-in</p>
-        <div id="qrModalCanvas" style="margin:0 auto 12px;width:180px;height:180px;"></div>
-        <p id="qrModalName" style="font-weight:700;color:var(--primary-blue);font-size:14px;margin-bottom:2px;"></p>
-        <p id="qrModalProgram" style="font-size:11px;color:var(--text-gray);margin-bottom:16px;"></p>
+        <p class="qr-subtitle">Show this at the library entrance for instant check-in</p>
+        <div class="qr-code-wrapper">
+          <div id="qrModalCanvas" style="width:200px;height:200px;"></div>
+        </div>
+        <p class="qr-user-name" id="qrModalName"></p>
+        <p class="qr-user-program" id="qrModalProgram"></p>
         <button class="btn-download" id="downloadQrBtn">
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-          Download QR as Image
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+          Save QR Code
         </button>
         <button class="btn-close-qr" onclick="document.getElementById('qrModal').style.display='none'">Close</button>
       </div>
@@ -522,7 +545,7 @@
       }
 
       document.getElementById("showQrBtn").addEventListener("click", () => {
-        generateQR("qrModalCanvas", 180);
+        generateQR("qrModalCanvas", 200);
         document.getElementById("qrModalName").textContent    = userName;
         document.getElementById("qrModalProgram").textContent = userProgram;
         document.getElementById("qrModal").style.display = "flex";
