@@ -45,7 +45,10 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
       };
 
       async function autoLogoutMidnight() {
-        // 1. Clear any records from previous days (still uses midnight cutoff)
+        const nowPH = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Manila' }));
+        const hrs = LIBRARY_SCHEDULE[nowPH.getDay()];
+
+        // Always close records from PREVIOUS days — set time_out to start of today PH
         const todayStart = todayPHStartISO();
         await supabase
           .from('visit_logs')
@@ -53,20 +56,22 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
           .eq('status', 'inside')
           .lt('time_in', todayStart);
 
-        // 2. Close out records past today's closing time
-        const nowPH = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Manila' }));
-        const hrs = LIBRARY_SCHEDULE[nowPH.getDay()];
+        // If we're past today's closing time, also close today's records
         if (hrs && nowPH.getHours() >= hrs.close) {
-          // Build closing time ISO for today
-          const closing = new Date(nowPH);
-          closing.setHours(hrs.close, 0, 0, 0);
-          // Convert PH local time to UTC ISO
-          const closingUTC = new Date(closing.getTime() - (8 * 60 * 60 * 1000)).toISOString();
+          // Closing time as UTC ISO string (PH close hour - 8h offset)
+          const closingUTC = new Date(
+            Date.UTC(nowPH.getFullYear(), nowPH.getMonth(), nowPH.getDate(), hrs.close - 8, 0, 0)
+          ).toISOString();
           await supabase
             .from('visit_logs')
             .update({ status: 'logged_out', time_out: closingUTC })
-            .eq('status', 'inside')
-            .lt('time_in', closingUTC);
+            .eq('status', 'inside');
+        } else if (!hrs) {
+          // Sunday — library closed all day, close anything still inside
+          await supabase
+            .from('visit_logs')
+            .update({ status: 'logged_out', time_out: todayStart })
+            .eq('status', 'inside');
         }
       }
 
@@ -171,9 +176,10 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
       async function loadChart() {
         const days = [], labels = [];
         for (let i = 6; i >= 0; i--) {
-          const d = new Date(Date.now() + PH_OFFSET_MS - i * 86400000);
-          const y = d.getUTCFullYear(), m = String(d.getUTCMonth()+1).padStart(2,'0'), day = String(d.getUTCDate()).padStart(2,'0');
-          days.push(`${y}-${m}-${day}`);
+          // Get the PH date string for each of the last 7 days correctly
+          const d = new Date(Date.now() - i * 86400000);
+          const phDateStr = d.toLocaleDateString('en-CA', { timeZone: PH }); // YYYY-MM-DD in PH time
+          days.push(phDateStr);
           labels.push(d.toLocaleDateString('en-PH', { timeZone: PH, weekday: 'short', month: 'short', day: 'numeric' }));
         }
         const counts = await Promise.all(days.map(async d => {
