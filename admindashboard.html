@@ -10,7 +10,7 @@
   </head>
   <body>
     <div id="toast">Message</div>
- 
+
     <nav class="navbar">
       <div class="nav-logo">
         <img src="img/neulogo.png" alt="NEU Logo" style="width:32px;height:32px;object-fit:contain;border-radius:50%;background:white;padding:2px;" onerror="this.style.display='none'" />
@@ -36,9 +36,9 @@
         </button>
       </div>
     </nav>
- 
+
     <div class="container">
- 
+
       <div class="stats-grid">
         <div class="stat-card">
           <div class="stat-icon icon-red">
@@ -74,7 +74,7 @@
           <div class="stat-info"><h3>Total Registered</h3><p id="total-stat">—</p></div>
         </div>
       </div>
- 
+
       <div class="dashboard-row">
         <div class="panel">
           <div class="panel-header">
@@ -85,7 +85,7 @@
             <div class="chart-container"><canvas id="visitChart"></canvas></div>
           </div>
         </div>
- 
+
         <div class="panel">
           <div class="panel-header">
             <h3>Currently Inside</h3>
@@ -103,7 +103,7 @@
           </div>
         </div>
       </div>
- 
+
       <div class="content-card">
         <div class="toolbar">
           <div class="tab-group">
@@ -145,7 +145,7 @@
             Export PDF
           </button>
         </div>
- 
+
         <div id="log-view">
           <table id="logTable">
             <thead>
@@ -163,7 +163,7 @@
             </tbody>
           </table>
         </div>
- 
+
         <div id="users-view" class="hidden">
           <table id="usersTable">
             <thead>
@@ -174,14 +174,14 @@
             </tbody>
           </table>
         </div>
- 
+
         <!-- Notices Management View -->
         <div id="notices-view" class="hidden" style="padding:24px;">
           <h3 style="font-size:15px;font-weight:700;color:var(--text-dark);margin-bottom:4px;">Library Announcements &amp; Reminders</h3>
           <p style="font-size:13px;color:var(--text-muted);margin-bottom:20px;">These appear on the login page. Events are sorted by date.</p>
- 
+
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start;">
- 
+
             <!-- Announcements (Events with date) -->
             <div>
               <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#3b82f6;margin-bottom:10px;display:flex;align-items:center;gap:6px;">
@@ -207,7 +207,7 @@
               </div>
               <div id="eventsAdminList"><div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px;">Loading...</div></div>
             </div>
- 
+
             <!-- Reminders (no date) -->
             <div>
               <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#f59e0b;margin-bottom:10px;display:flex;align-items:center;gap:6px;">
@@ -229,15 +229,15 @@
               </div>
               <div id="remindersAdminList"><div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px;">Loading...</div></div>
             </div>
- 
+
           </div>
         </div>
- 
+
         <!-- Manage Admins View (owner only) -->
         <div id="admins-view" class="hidden" style="padding:24px;">
           <h3 style="font-size:15px;font-weight:700;color:var(--text-dark);margin-bottom:4px;">Manage Admins</h3>
           <p style="font-size:13px;color:var(--text-muted);margin-bottom:20px;">Assign or remove admin access. Users must have a registered <strong>@neu.edu.ph</strong> account.</p>
- 
+
           <div style="background:#f8fafc;border:1px solid var(--border-color);border-radius:10px;padding:18px;margin-bottom:20px;max-width:520px;">
             <label style="font-size:12px;font-weight:700;color:var(--text-dark);display:block;margin-bottom:6px;">Assign Admin by Email</label>
             <div style="display:flex;gap:10px;">
@@ -250,16 +250,16 @@
             </div>
             <p id="assignMsg" style="font-size:12px;margin-top:8px;display:none;"></p>
           </div>
- 
+
           <div style="max-width:520px;">
             <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;margin-bottom:10px;">Current Admins</div>
             <div id="adminsList"><div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px;">Loading...</div></div>
           </div>
         </div>
- 
+
       </div>
     </div>
 
     <script src="js/admindashboard.js" type="module"></script>
-</body>
+  </body>
 </html>
