@@ -3,694 +3,509 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
       const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ1YWpqdXhhYndmcXBhd3Bqb3NsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0NTg0MjksImV4cCI6MjA4OTAzNDQyOX0.O1ZbG4vC6q4DxQKTq664i3e4xwUYcvgVDOsuNMDNK4I';
       const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-      const PH = 'Asia/Manila';
-      const PH_OFFSET_MS = 8 * 60 * 60 * 1000;
-      let allLogs = [], allUsers = [], visitChart = null;
+      const userId      = localStorage.getItem("userId");
+      const userName    = localStorage.getItem("userName")    || "Guest";
+      const userEmail   = localStorage.getItem("userEmail")   || "—";
+      const userProgram = localStorage.getItem("userProgram") || "—";
+      if (!userId) { window.location.href = "index.html"; }
 
-      // ── Set welcome message ──
-      const adminName = localStorage.getItem('adminName') || 'Admin';
-      const adminRole = (localStorage.getItem('adminRole') || 'admin').toLowerCase();
-      const roleLabel = adminRole === 'owner' ? 'Owner' : 'Admin';
-      document.getElementById('adminWelcome').textContent = `Welcome, ${adminName} — ${roleLabel}`;
+      const reasonOptions = document.querySelectorAll(".reason-option");
+      const submitLogBtn  = document.getElementById("submitLogBtn");
+      let selectedReason  = null;
+      let alreadyLoggedId = null;
 
-      function phDate(iso) { return new Date(iso).toLocaleDateString('en-PH', { timeZone: PH, year: 'numeric', month: 'short', day: 'numeric' }); }
-      function phTime(iso) { return new Date(iso).toLocaleTimeString('en-PH', { timeZone: PH, hour: '2-digit', minute: '2-digit' }); }
+      // ── User details ──
+      document.getElementById("displayUserName").textContent    = userName;
+      document.getElementById("displayUserEmail").textContent   = userEmail;
+      document.getElementById("displayUserProgram").textContent = userProgram;
+      document.getElementById("userAvatar").textContent = userName.charAt(0).toUpperCase();
 
-      function calcDuration(timeIn, timeOut) {
-        if (!timeOut) return '—';
-        const diff = new Date(timeOut) - new Date(timeIn);
-        if (diff < 0) return '—';
-        const m = Math.floor(diff / 60000);
+      // ── Greeting ──
+      const hr = parseInt(new Date().toLocaleString("en-PH", { timeZone: "Asia/Manila", hour: "numeric", hour12: false }));
+      const firstName = userName.split(" ")[0];
+      document.getElementById("userGreeting").textContent = (hr < 12 ? "Good morning," : hr < 17 ? "Good afternoon," : "Good evening,") + " " + firstName;
+
+      // ── Clock ──
+      function updateClock() {
+        document.getElementById("navClock").textContent = new Date().toLocaleString("en-PH", {
+          timeZone: "Asia/Manila", weekday: "short", month: "short", day: "numeric",
+          hour: "2-digit", minute: "2-digit", second: "2-digit"
+        });
+      }
+      updateClock(); setInterval(updateClock, 1000);
+
+      // ── Session timer ──
+      function startSessionTimer(fromISO) {
+        const start = new Date(fromISO);
+        function tick() {
+          const s = Math.max(0, Math.floor((Date.now() - start) / 1000));
+          const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60;
+          document.getElementById("sessionTimer").textContent =
+            h > 0 ? `${h}h ${m}m ${sec}s` : `${m}m ${sec}s`;
+        }
+        tick(); setInterval(tick, 1000);
+      }
+
+      // ── Duration helper ──
+      function calcDuration(a, b) {
+        if (!b) return "—";
+        const m = Math.floor((new Date(b) - new Date(a)) / 60000);
         const h = Math.floor(m / 60);
         return h > 0 ? `${h}h ${m % 60}m` : `${m}m`;
       }
 
-      function todayPHStartISO() {
-        const n = new Date(Date.now() + PH_OFFSET_MS);
-        return new Date(Date.UTC(n.getUTCFullYear(), n.getUTCMonth(), n.getUTCDate()) - PH_OFFSET_MS).toISOString();
+      // ── Check if already inside ──
+      async function checkAlreadyInside() {
+        const { data } = await supabase
+          .from("visit_logs").select("id, time_in, reason")
+          .eq("user_id", userId).eq("status", "inside")
+          .order("time_in", { ascending: false }).limit(1).maybeSingle();
+
+        if (data) {
+          alreadyLoggedId = data.id;
+          localStorage.setItem("currentLogId", data.id);
+
+          const timeIn = new Date(data.time_in).toLocaleTimeString("en-PH", {
+            timeZone: "Asia/Manila", hour: "2-digit", minute: "2-digit"
+          });
+
+          // Session timer on left panel
+          document.getElementById("sessionCard").classList.add("show");
+          document.getElementById("sessionSince").textContent = `Checked in at ${timeIn} for "${data.reason}"`;
+          startSessionTimer(data.time_in);
+
+          // Inside overlay on check-in card
+          const overlay = document.getElementById("insideOverlay");
+          overlay.classList.add("show");
+          document.getElementById("insideOverlaySub").textContent = `Checked in at ${timeIn} · "${data.reason}"`;
+
+          // Lock the reason grid with frosted overlay
+          document.getElementById("reasonGrid").classList.add("locked");
+
+          // Change submit button to a clear indicator
+          submitLogBtn.disabled = true;
+          submitLogBtn.textContent = "✓ You are already checked in";
+          submitLogBtn.style.background = "#15803d";
+          submitLogBtn.style.opacity = "1";
+          submitLogBtn.style.cursor = "default";
+
+          // Prevent any reason clicks
+          reasonOptions.forEach(o => { o.style.pointerEvents = "none"; });
+        }
       }
 
-      function showToast(msg) {
-        const x = document.getElementById('toast');
-        x.textContent = msg; x.className = 'show';
-        setTimeout(() => { x.className = x.className.replace('show', ''); }, 3000);
+      // ── Visit history ──
+      async function loadVisitHistory() {
+        const { data } = await supabase
+          .from("visit_logs").select("reason, time_in, time_out")
+          .eq("user_id", userId).eq("status", "logged_out")
+          .order("time_in", { ascending: false }).limit(5);
+
+        const list = document.getElementById("visitHistoryList");
+        if (!data?.length) return;
+        list.innerHTML = data.map(v => {
+          const date = new Date(v.time_in).toLocaleDateString("en-PH", {
+            timeZone: "Asia/Manila", month: "short", day: "numeric"
+          });
+          return `<div class="history-item">
+            <div><div class="h-reason">${v.reason}</div><div class="h-date">${date}</div></div>
+            <span class="h-dur">${calcDuration(v.time_in, v.time_out)}</span>
+          </div>`;
+        }).join("");
       }
 
-      // ── Auto-logout stale inside records from previous days ──
-      const LIBRARY_SCHEDULE = {
+      // ── Visit analytics chart ──
+      async function loadAnalyticsChart() {
+        const monthStart = new Date(new Date().getFullYear(), new Date().getMonth() - 2, 1).toISOString();
+        const { data } = await supabase
+          .from("visit_logs").select("time_in")
+          .eq("user_id", userId).gte("time_in", monthStart);
+        if (!data?.length) return;
+
+        const counts = {};
+        data.forEach(v => {
+          const week = getWeekLabel(new Date(v.time_in));
+          counts[week] = (counts[week] || 0) + 1;
+        });
+
+        const labels = Object.keys(counts).sort();
+        const values = labels.map(l => counts[l]);
+
+        const ctx = document.getElementById("analyticsChart")?.getContext("2d");
+        if (!ctx) return;
+
+        // Load Chart.js dynamically
+        if (!window.Chart) {
+          await new Promise(res => {
+            const s = document.createElement("script");
+            s.src = "https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js";
+            s.onload = res; document.head.appendChild(s);
+          });
+        }
+
+        new window.Chart(ctx, {
+          type: "bar",
+          data: {
+            labels,
+            datasets: [{ data: values, backgroundColor: "#001f54", borderRadius: 6 }]
+          },
+          options: {
+            plugins: { legend: { display: false } },
+            scales: {
+              y: { beginAtZero: true, ticks: { stepSize: 1, font: { size: 10 } } },
+              x: { ticks: { font: { size: 10 } } }
+            }
+          }
+        });
+      }
+
+      function getWeekLabel(date) {
+        const d = new Date(date);
+        d.setHours(0,0,0,0);
+        d.setDate(d.getDate() - d.getDay());
+        return d.toLocaleDateString("en-PH", { timeZone: "Asia/Manila", month: "short", day: "numeric" });
+      }
+
+      // ── Streak ──
+      async function loadStreak() {
+        const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString();
+        const { data } = await supabase
+          .from("visit_logs").select("time_in").eq("user_id", userId).gte("time_in", monthStart);
+        if (!data?.length) return;
+        const days = new Set(data.map(v =>
+          new Date(v.time_in).toLocaleDateString("en-PH", { timeZone: "Asia/Manila" })
+        )).size;
+        document.getElementById("streakCard").classList.add("show");
+        document.getElementById("streakCount").textContent = `${days} day${days !== 1 ? "s" : ""} visited this month`;
+        document.getElementById("streakSub").textContent =
+          days >= 10 ? "Amazing dedication! 🎉" : days >= 5 ? "Great consistency!" : days >= 2 ? "Keep coming back!" : "Welcome! See you again soon.";
+      }
+
+      // ── Last used reason — auto-select ──
+      async function loadLastReason() {
+        const { data } = await supabase
+          .from("visit_logs").select("reason").eq("user_id", userId)
+          .order("time_in", { ascending: false }).limit(1).maybeSingle();
+        if (data?.reason) {
+          const match = [...reasonOptions].find(o => o.dataset.reason === data.reason);
+          if (match) {
+            const tag = document.createElement("span");
+            tag.className = "last-used-tag"; tag.textContent = "Last used";
+            match.appendChild(tag); match.classList.add("last-used");
+            // Auto-select it
+            if (!alreadyLoggedId) {
+              match.classList.add("selected");
+              selectedReason = data.reason;
+              submitLogBtn.disabled = false;
+            }
+          }
+        }
+      }
+
+      // ── QR Code ──
+      function generateQR(id, size) {
+        const el = document.getElementById(id);
+        el.innerHTML = "";
+        new QRCode(el, {
+          text: JSON.stringify({ uid: userId, name: userName, email: userEmail }),
+          width: size, height: size, colorDark: "#001f54", colorLight: "#ffffff",
+          correctLevel: QRCode.CorrectLevel.M
+        });
+      }
+
+      document.getElementById("showQrBtn").addEventListener("click", () => {
+        generateQR("qrModalCanvas", 190);
+        document.getElementById("qrModalName").textContent    = userName;
+        document.getElementById("qrModalProgram").textContent = userProgram;
+        document.getElementById("qrModal").style.display = "flex";
+      });
+
+      document.getElementById("downloadQrBtn").addEventListener("click", () => {
+        const qrCanvas = document.querySelector("#qrModalCanvas canvas");
+        const qrImg    = document.querySelector("#qrModalCanvas img");
+        const qrSrc    = qrCanvas ? qrCanvas.toDataURL("image/png") : qrImg?.src;
+        if (!qrSrc) return;
+        const W = 400, H = 520;
+        const offscreen = document.createElement("canvas");
+        offscreen.width = W * 2; offscreen.height = H * 2;
+        const ctx = offscreen.getContext("2d");
+        ctx.scale(2, 2);
+        ctx.fillStyle = "#ffffff"; ctx.beginPath(); ctx.roundRect(0,0,W,H,20); ctx.fill();
+        ctx.fillStyle = "#001f54"; ctx.beginPath(); ctx.roundRect(0,0,W,70,[20,20,0,0]); ctx.fill();
+        ctx.fillStyle = "#f59e0b"; ctx.fillRect(0,68,W,4);
+        ctx.fillStyle = "#ffffff"; ctx.font = "bold 18px 'Segoe UI',sans-serif"; ctx.textAlign = "center";
+        ctx.fillText("Your Library QR Code", W/2, 32);
+        ctx.font = "13px 'Segoe UI',sans-serif"; ctx.fillStyle = "rgba(255,255,255,0.75)";
+        ctx.fillText("NEU Library Visitor Management System", W/2, 54);
+        const qrSize=220, qrX=(W-qrSize)/2, qrY=90, pad=14;
+        ctx.fillStyle="#f8fafc"; ctx.strokeStyle="#e2e8f0"; ctx.lineWidth=1.5;
+        ctx.beginPath(); ctx.roundRect(qrX-pad,qrY-pad,qrSize+pad*2,qrSize+pad*2,14); ctx.fill(); ctx.stroke();
+        const img = new Image();
+        img.onload = () => {
+          ctx.drawImage(img,qrX,qrY,qrSize,qrSize);
+          ctx.strokeStyle="#e2e8f0"; ctx.lineWidth=1; ctx.beginPath();
+          ctx.moveTo(40,qrY+qrSize+pad+20); ctx.lineTo(W-40,qrY+qrSize+pad+20); ctx.stroke();
+          ctx.fillStyle="#001f54"; ctx.font="bold 20px 'Segoe UI',sans-serif"; ctx.textAlign="center";
+          ctx.fillText(userName,W/2,qrY+qrSize+pad+48);
+          ctx.fillStyle="#64748b"; ctx.font="14px 'Segoe UI',sans-serif";
+          ctx.fillText(userProgram,W/2,qrY+qrSize+pad+70);
+          ctx.fillStyle="#001f54"; ctx.beginPath(); ctx.roundRect(30,H-66,W-60,42,10); ctx.fill();
+          ctx.fillStyle="#ffffff"; ctx.font="bold 14px 'Segoe UI',sans-serif";
+          ctx.fillText("New Era University Library",W/2,H-40);
+          const a=document.createElement("a");
+          a.href=offscreen.toDataURL("image/png");
+          a.download=`NEU_QR_${userName.replace(/\s+/g,"_")}.png`; a.click();
+        };
+        img.src = qrSrc;
+      });
+
+      // ── Reason selection ──
+      reasonOptions.forEach(option => {
+        option.addEventListener("click", () => {
+          if (alreadyLoggedId) return;
+          reasonOptions.forEach(o => o.classList.remove("selected"));
+          option.classList.add("selected");
+          selectedReason = option.dataset.reason;
+          submitLogBtn.disabled = false;
+        });
+      });
+
+      function showMessage(msg) {
+        const box = document.getElementById("msgBox");
+        box.textContent = msg; box.style.display = "block";
+        setTimeout(() => { box.style.display = "none"; }, 3000);
+      }
+
+      // ── Submit ──
+      submitLogBtn.addEventListener("click", async () => {
+        if (!selectedReason || alreadyLoggedId) return;
+        submitLogBtn.disabled = true;
+        submitLogBtn.textContent = "Checking...";
+        reasonOptions.forEach(o => { o.style.pointerEvents = "none"; });
+
+        // Server-side guard — check for any active inside record before inserting
+        const { data: existing } = await supabase
+          .from("visit_logs").select("id, time_in, reason")
+          .eq("user_id", userId).eq("status", "inside")
+          .order("time_in", { ascending: false }).limit(1).maybeSingle();
+
+        if (existing) {
+          // Someone (or another tab) already logged them in
+          alreadyLoggedId = existing.id;
+          const timeIn = new Date(existing.time_in).toLocaleTimeString("en-PH", {
+            timeZone: "Asia/Manila", hour: "2-digit", minute: "2-digit"
+          });
+          const overlay = document.getElementById("insideOverlay");
+          overlay.classList.add("show");
+          document.getElementById("insideOverlaySub").textContent = `Checked in at ${timeIn} · "${existing.reason}"`;
+          document.getElementById("reasonGrid").classList.add("locked");
+          submitLogBtn.textContent = "✓ You are already checked in";
+          submitLogBtn.style.background = "#15803d";
+          submitLogBtn.style.opacity = "1";
+          submitLogBtn.style.cursor = "default";
+          showMessage("You are already checked in to the library.");
+          return;
+        }
+
+        const { data: logData, error } = await supabase
+          .from("visit_logs")
+          .insert({ user_id: userId, reason: selectedReason, status: "inside" })
+          .select("id").single();
+
+        if (error) {
+          showMessage("Failed: " + error.message);
+          submitLogBtn.disabled = false; submitLogBtn.textContent = "Log Visit";
+          reasonOptions.forEach(o => { o.style.pointerEvents = ""; });
+          return;
+        }
+        if (logData?.id) localStorage.setItem("currentLogId", logData.id);
+        showWelcomePopup();
+      });
+
+      // ── Log out (account logout) ──
+      document.getElementById("logoutBtn").addEventListener("click", async () => {
+        const logId = localStorage.getItem("currentLogId");
+        const payload = { status: "logged_out", time_out: new Date().toISOString() };
+        if (logId) {
+          await supabase.from("visit_logs").update(payload).eq("id", logId);
+        } else {
+          const { data } = await supabase
+            .from("visit_logs").select("id").eq("user_id", userId).eq("status", "inside")
+            .order("time_in", { ascending: false }).limit(1).maybeSingle();
+          if (data) await supabase.from("visit_logs").update(payload).eq("id", data.id);
+        }
+        await supabase.auth.signOut();
+        localStorage.clear();
+        window.location.href = "index.html";
+      });
+
+      // ── Library hours ──
+      const SCHEDULE = {
         0: null,
         1: { open: 7, close: 21 }, 2: { open: 7, close: 21 },
         3: { open: 7, close: 21 }, 4: { open: 7, close: 21 },
         5: { open: 7, close: 21 }, 6: { open: 8, close: 17 },
       };
 
-      async function autoLogoutMidnight() {
-        const nowPH = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Manila' }));
-        const hrs = LIBRARY_SCHEDULE[nowPH.getDay()];
-
-        // Always close records from PREVIOUS days — set time_out to start of today PH
-        const todayStart = todayPHStartISO();
-        await supabase
-          .from('visit_logs')
-          .update({ status: 'logged_out', time_out: todayStart })
-          .eq('status', 'inside')
-          .lt('time_in', todayStart);
-
-        // If we're past today's closing time, also close today's records
-        if (hrs && nowPH.getHours() >= hrs.close) {
-          // Closing time as UTC ISO string (PH close hour - 8h offset)
-          const closingUTC = new Date(
-            Date.UTC(nowPH.getFullYear(), nowPH.getMonth(), nowPH.getDate(), hrs.close - 8, 0, 0)
-          ).toISOString();
-          await supabase
-            .from('visit_logs')
-            .update({ status: 'logged_out', time_out: closingUTC })
-            .eq('status', 'inside');
-        } else if (!hrs) {
-          // Sunday — library closed all day, close anything still inside
-          await supabase
-            .from('visit_logs')
-            .update({ status: 'logged_out', time_out: todayStart })
-            .eq('status', 'inside');
-        }
+      function getNowPH() {
+        return new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Manila" }));
       }
 
-      // ── Stats ──
-      async function loadStats() {
-        const PH_OFFSET_MS = 8 * 60 * 60 * 1000;
-
-        // PH midnight today in UTC
-        const nowUTC = new Date();
-        const nowPH  = new Date(nowUTC.getTime() + PH_OFFSET_MS);
-        const midnightPH = new Date(Date.UTC(
-          nowPH.getUTCFullYear(), nowPH.getUTCMonth(), nowPH.getUTCDate(), 0, 0, 0
-        ));
-        const todayISO = new Date(midnightPH.getTime() - PH_OFFSET_MS).toISOString();
-        const weekISO  = new Date(midnightPH.getTime() - PH_OFFSET_MS - 7 * 86400000).toISOString();
-
-        try {
-          // Live occupancy — count distinct users whose latest log is "inside"
-          const { data: insideLogs } = await supabase
-            .from('visit_logs')
-            .select('user_id, status')
-            .eq('status', 'inside');
-
-          const uniqueInside = insideLogs
-            ? new Set(insideLogs.map(r => r.user_id)).size
-            : 0;
-
-          // Visits today
-          const { count: todayCount } = await supabase
-            .from('visit_logs')
-            .select('*', { count: 'exact', head: true })
-            .gte('time_in', todayISO);
-
-          // Visits this week
-          const { count: weekCount } = await supabase
-            .from('visit_logs')
-            .select('*', { count: 'exact', head: true })
-            .gte('time_in', weekISO);
-
-          // Total registered users
-          const { count: totalCount } = await supabase
-            .from('users')
-            .select('*', { count: 'exact', head: true });
-
-          document.getElementById('live-stat').textContent  = uniqueInside ?? 0;
-          document.getElementById('today-stat').textContent = todayCount   ?? 0;
-          document.getElementById('week-stat').textContent  = weekCount    ?? 0;
-          document.getElementById('total-stat').textContent = totalCount   ?? 0;
-        } catch (err) {
-          console.error('Stats error:', err);
-          ['live-stat','today-stat','week-stat','total-stat'].forEach(id => {
-            document.getElementById(id).textContent = '—';
-          });
-        }
-      }
-
-      // ── Currently Inside ──
-      async function loadInsideNow() {
-        const { data } = await supabase
-          .from('visit_logs')
-          .select('*, users(name, program)')
-          .eq('status', 'inside')
-          .order('time_in', { ascending: false });
-
-        const tbody = document.getElementById('insideTableBody');
-        if (!data?.length) {
-          document.getElementById('inside-count').textContent = '0 people';
-          tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:30px;color:var(--text-muted)">No one inside yet.</td></tr>`;
-          return;
-        }
-        const seen = new Set();
-        const unique = data.filter(r => { if (seen.has(r.user_id)) return false; seen.add(r.user_id); return true; });
-        document.getElementById('inside-count').textContent = `${unique.length} ${unique.length === 1 ? 'person' : 'people'}`;
-        tbody.innerHTML = unique.map(r => `
-          <tr>
-            <td><span class="pulse"></span>${r.users?.name || '—'}</td>
-            <td><span class="badge badge-program" style="font-size:10px">${(r.users?.program || '—').substring(0,30)}</span></td>
-            <td>${phTime(r.time_in)}</td>
-            <td>
-              <button class="btn-force-logout" onclick="forceLogoutUser('${r.id}', '${(r.users?.name || 'User').replace(/'/g, '\\'')}')">Force Logout</button>
-            </td>
-          </tr>`).join('');
-      }
-
-      // ── Force logout a user from admin ──
-      async function forceLogoutUser(logId, userName) {
-        if (!confirm(`Force log out ${userName} from the library?`)) return;
-        const { error } = await supabase.from('visit_logs').update({
-          status: 'logged_out',
-          time_out: new Date().toISOString()
-        }).eq('id', logId);
-        if (error) { showToast('Error: ' + error.message); return; }
-        showToast(`${userName} has been logged out.`);
-        loadInsideNow();
-        loadStats();
-      }
-
-      // ── Chart ──
-      async function loadChart() {
-        const days = [], labels = [];
-        for (let i = 6; i >= 0; i--) {
-          const d = new Date(Date.now() - i * 86400000);
-          // Use PH timezone for BOTH the date key and the display label
-          const phDateStr = d.toLocaleDateString('en-CA', { timeZone: PH }); // YYYY-MM-DD
-          const label = new Date(phDateStr + 'T12:00:00').toLocaleDateString('en-PH', {
-            weekday: 'short', month: 'short', day: 'numeric'
-          });
-          days.push(phDateStr);
-          labels.push(label);
-        }
-        const counts = await Promise.all(days.map(async d => {
-          const start = new Date(d + 'T00:00:00+08:00').toISOString();
-          const end   = new Date(d + 'T23:59:59+08:00').toISOString();
-          const { count } = await supabase.from('visit_logs')
-            .select('*', { count: 'exact', head: true })
-            .gte('time_in', start).lte('time_in', end);
-          return count ?? 0;
-        }));
-        const total = counts.reduce((a,b) => a+b, 0);
-        document.getElementById('chart-subtitle').textContent = `${total} total visits`;
-        const ctx = document.getElementById('visitChart').getContext('2d');
-        if (visitChart) visitChart.destroy();
-        visitChart = new Chart(ctx, {
-          type: 'bar',
-          data: {
-            labels,
-            datasets: [{ label: 'Visits', data: counts, backgroundColor: 'rgba(0,31,84,0.75)', borderColor: '#001f54', borderWidth: 1, borderRadius: 6 }]
-          },
-          options: {
-            responsive: true, maintainAspectRatio: false,
-            plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => ` ${c.parsed.y} visit${c.parsed.y !== 1 ? 's' : ''}` } } },
-            scales: { y: { beginAtZero: true, ticks: { stepSize: 1, precision: 0 }, grid: { color: '#f1f5f9' } }, x: { grid: { display: false } } }
+      // ── Auto-logout at closing time ──
+      function startClosingTimeWatcher() {
+        async function checkClosingTime() {
+          if (!alreadyLoggedId) return;
+          const now = getNowPH();
+          const hrs = SCHEDULE[now.getDay()];
+          if (!hrs || now.getHours() >= hrs.close) {
+            const logId = alreadyLoggedId || localStorage.getItem("currentLogId");
+            if (logId) {
+              // Compute exact closing time as UTC ISO (PH close hour = UTC close hour - 8)
+              const closeHour = hrs ? hrs.close : now.getHours();
+              const closingUTC = new Date(
+                Date.UTC(now.getFullYear(), now.getMonth(), now.getDate(), closeHour - 8, 0, 0)
+              ).toISOString();
+              await supabase.from("visit_logs").update({
+                status: "logged_out",
+                time_out: closingUTC
+              }).eq("id", logId);
+            }
+            await supabase.auth.signOut();
+            localStorage.clear();
+            showMessage("Library is now closed. You have been automatically logged out.");
+            setTimeout(() => { window.location.href = "index.html"; }, 2500);
           }
-        });
-      }
-
-      // ── Logs ──
-      async function loadLogs() {
-        const { data, error } = await supabase
-          .from('visit_logs')
-          .select('*, users(name, program, email)')
-          .order('time_in', { ascending: false });
-        if (error) { document.getElementById('logTableBody').innerHTML = `<tr class="loading-row"><td colspan="6">Error: ${error.message}</td></tr>`; return; }
-        allLogs = data || [];
-        renderLogs(allLogs);
-      }
-
-      function renderLogs(logs) {
-        const tbody = document.getElementById('logTableBody');
-        if (!logs.length) { tbody.innerHTML = `<tr class="loading-row"><td colspan="6">No visit records found.</td></tr>`; return; }
-        tbody.innerHTML = logs.map(log => {
-          const sc = log.status === 'inside' ? 'badge-inside' : log.status === 'logged_out' ? 'badge-logged-out' : 'badge-checkout';
-          const sl = log.status === 'inside' ? 'Inside' : log.status === 'logged_out' ? 'Logged Out' : 'Checked Out';
-          return `
-            <tr class="clickable-row" onclick="showLogDetail(${JSON.stringify(log).replace(/"/g,'&quot;')})">
-              <td><div class="name-stack"><span class="name">${phDate(log.time_in)}</span><span class="sub-text">${phTime(log.time_in)}</span></div></td>
-              <td><div class="name-stack"><span class="name">${log.users?.name || 'Unknown'}</span><span class="sub-text">${log.users?.email || '—'}</span></div></td>
-              <td><span class="badge badge-program">${log.users?.program || '—'}</span></td>
-              <td>${log.reason}</td>
-              <td><span class="duration-chip">${calcDuration(log.time_in, log.time_out)}</span></td>
-              <td><span class="badge ${sc}">${sl}</span></td>
-            </tr>`;
-        }).join('');
-      }
-
-      // ── Users ──
-      async function loadUsers() {
-        const { data, error } = await supabase.from('users').select('*').order('created_at', { ascending: false });
-        if (error) { document.getElementById('usersTableBody').innerHTML = `<tr class="loading-row"><td colspan="6">Error: ${error.message}</td></tr>`; return; }
-        allUsers = data || [];
-        renderUsers(allUsers);
-      }
-
-      function renderUsers(users) {
-        const tbody = document.getElementById('usersTableBody');
-        if (!users.length) { tbody.innerHTML = `<tr class="loading-row"><td colspan="6">No user records found.</td></tr>`; return; }
-        tbody.innerHTML = users.map(u => {
-          const rc = u.role === 'faculty' ? 'badge-faculty' : u.role === 'admin' ? 'badge-admin' : u.role === 'owner' ? 'badge-owner' : 'badge-student';
-          const rl = u.role ? u.role.charAt(0).toUpperCase() + u.role.slice(1) : 'Student';
-          return `
-            <tr class="clickable-row" onclick="showUserDetail(${JSON.stringify(u).replace(/"/g,'&quot;')})">
-              <td><div class="name-stack"><span class="name">${u.name || '—'}</span></div></td>
-              <td>${u.email}</td>
-              <td><span class="badge badge-program">${u.program || '—'}</span></td>
-              <td><span class="badge ${rc}">${rl}</span></td>
-              <td style="color:${u.is_blocked ? 'var(--danger)' : '#16a34a'};font-weight:600;">${u.is_blocked ? 'Blocked' : 'Active'}</td>
-              <td>
-                <div class="action-flex" onclick="event.stopPropagation()">
-                  <button class="action-text-btn" id="block-btn-${u.id}" style="color:${u.is_blocked ? '#16a34a' : 'var(--danger)'}" onclick="toggleBlock('${u.id}', this)">${u.is_blocked ? 'Unblock' : 'Block'}</button>
-                  <button class="action-icon-btn" onclick="removeUser('${u.id}')">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <polyline points="3 6 5 6 21 6"/>
-                      <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
-                      <path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/>
-                    </svg>
-                  </button>
-                </div>
-              </td>
-            </tr>`;
-        }).join('');
-      }
-
-      async function toggleBlock(userId, btn) {
-        const blocking = btn.textContent.trim() === 'Block';
-        const { error } = await supabase.from('users').update({ is_blocked: blocking }).eq('id', userId);
-        if (error) { showToast('Error: ' + error.message); return; }
-        const el = document.getElementById(`status-${userId}`);
-        if (blocking) { el.textContent = 'Blocked'; el.style.color = 'var(--danger-red)'; btn.textContent = 'Unblock'; btn.style.color = '#16a34a'; showToast('User blocked.'); }
-        else { el.textContent = 'Active'; el.style.color = '#16a34a'; btn.textContent = 'Block'; btn.style.color = 'var(--danger-red)'; showToast('User unblocked.'); }
-      }
-
-      async function removeUser(userId) {
-        if (!confirm('Delete this user and all their visit logs?')) return;
-        const { error } = await supabase.from('users').delete().eq('id', userId);
-        if (error) { showToast('Error: ' + error.message); return; }
-        document.querySelector(`tr[data-user-id="${userId}"]`)?.remove();
-        const el = document.getElementById('total-stat');
-        el.textContent = Math.max(0, parseInt(el.textContent) - 1);
-        showToast('User removed.');
-      }
-
-      async function triggerResetAll() {
-        if (!confirm('DANGER: Erase ALL visit logs and users? Cannot be undone.')) return;
-        const [l, u] = await Promise.all([
-          supabase.from('visit_logs').delete().neq('id', '00000000-0000-0000-0000-000000000000'),
-          supabase.from('users').delete().neq('id', '00000000-0000-0000-0000-000000000000')
-        ]);
-        if (l.error || u.error) { showToast('Reset failed.'); return; }
-        document.getElementById('logTableBody').innerHTML = `<tr class="loading-row"><td colspan="6">No records.</td></tr>`;
-        document.getElementById('usersTableBody').innerHTML = `<tr class="loading-row"><td colspan="6">No records.</td></tr>`;
-        ['live-stat','today-stat','week-stat','total-stat'].forEach(id => document.getElementById(id).textContent = '0');
-        showToast('Reset complete. Logging out...');
-        setTimeout(() => { window.location.href = 'index.html'; }, 1500);
-      }
-
-      function changeView(view, btn) {
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        btn.classList.add('active');
-        document.getElementById('log-view').classList.toggle('hidden', view !== 'log');
-        document.getElementById('users-view').classList.toggle('hidden', view !== 'users');
-        document.getElementById('notices-view').classList.toggle('hidden', view !== 'notices');
-        document.getElementById('admins-view').classList.toggle('hidden', view !== 'admins');
-        document.getElementById('dateFilterSection').classList.toggle('hidden', view !== 'log');
-        document.querySelector('.search-box').classList.toggle('hidden', view === 'notices' || view === 'admins');
-        document.getElementById('filterInput').value = '';
-        if (view !== 'notices' && view !== 'admins') runFilter();
-        if (view === 'users') loadUsers();
-        if (view === 'notices') loadNoticesAdmin();
-        if (view === 'admins') loadAdminsList();
-      }
-
-      // ── Admin Management (owner only) ──
-      // Check role both from localStorage AND from Supabase to be reliable
-      async function checkOwnerAccess() {
-        const storedRole = (localStorage.getItem('adminRole') || '').toLowerCase();
-        if (storedRole === 'owner') {
-          const tab = document.getElementById('adminsTabBtn');
-          if (tab) tab.style.display = '';
-          return;
         }
-        const adminEmail = localStorage.getItem('adminEmail');
-        if (!adminEmail) return;
-        const { data } = await supabase
-          .from('users').select('role').eq('email', adminEmail).maybeSingle();
-        if (data?.role?.toLowerCase() === 'owner') {
-          localStorage.setItem('adminRole', 'owner');
-          const tab = document.getElementById('adminsTabBtn');
-          if (tab) tab.style.display = '';
-        }
-      }
-      checkOwnerAccess();
-
-      async function loadAdminsList() {
-        const list = document.getElementById('adminsList');
-        list.innerHTML = `<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px;">Loading...</div>`;
-        const { data, error } = await supabase
-          .from('users').select('id, name, email, role')
-          .in('role', ['admin', 'owner', 'Admin', 'Owner'])
-          .order('role');
-        if (error || !data?.length) {
-          list.innerHTML = `<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px;">No admins assigned yet.</div>`;
-          return;
-        }
-        list.innerHTML = data.map(u => `
-          <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:white;border:1px solid var(--border-color);border-radius:10px;margin-bottom:8px;">
-            <div>
-              <div style="font-size:13px;font-weight:700;color:var(--text-dark);">${u.name || '—'}</div>
-              <div style="font-size:12px;color:var(--text-muted);">${u.email}</div>
-            </div>
-            <div style="display:flex;align-items:center;gap:10px;">
-              <span style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;${u.role?.toLowerCase() === 'owner' ? 'background:#fef3c7;color:#92400e;' : 'background:#eff6ff;color:#1d4ed8;'}">
-                ${u.role?.toLowerCase() === 'owner' ? '👑 Owner' : 'Admin'}
-              </span>
-              ${u.role?.toLowerCase() !== 'owner' ? `<button onclick="removeAdmin('${u.id}','${u.email}')"
-                style="padding:4px 12px;background:#fef2f2;color:#ef4444;border:1px solid #fecaca;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;">
-                Remove
-              </button>` : ''}
-            </div>
-          </div>`).join('');
+        checkClosingTime();
+        setInterval(checkClosingTime, 60 * 1000);
       }
 
-      async function assignAdmin() {
-        const email = document.getElementById('assignAdminEmail').value.trim().toLowerCase();
-        const msg = document.getElementById('assignMsg');
-        msg.style.display = 'block';
-        if (!email.endsWith('@neu.edu.ph')) {
-          msg.textContent = 'Only @neu.edu.ph emails allowed.'; msg.style.color = '#ef4444'; return;
-        }
-        const { data, error } = await supabase.from('users').select('id, role').eq('email', email).maybeSingle();
-        if (error || !data) { msg.textContent = 'Account not found. They must register first.'; msg.style.color = '#ef4444'; return; }
-        if (data.role?.toLowerCase() === 'owner') { msg.textContent = 'Cannot change the owner role.'; msg.style.color = '#ef4444'; return; }
-        if (data.role?.toLowerCase() === 'admin') { msg.textContent = 'This user is already an admin.'; msg.style.color = '#f59e0b'; return; }
-        const { error: upErr } = await supabase.from('users').update({ role: 'admin' }).eq('id', data.id);
-        if (upErr) { msg.textContent = 'Error: ' + upErr.message; msg.style.color = '#ef4444'; return; }
-        msg.textContent = '✓ Admin assigned successfully!'; msg.style.color = '#16a34a';
-        document.getElementById('assignAdminEmail').value = '';
-        loadAdminsList();
-        setTimeout(() => { msg.style.display = 'none'; }, 3000);
+      function updateHoursPill() {
+        const now = getNowPH();
+        const day = now.getDay(), h = now.getHours();
+        const pill = document.getElementById("hoursPill");
+        const hrs = SCHEDULE[day];
+        if (!hrs) { pill.textContent = "Closed today"; pill.className = "hours-pill closed"; }
+        else if (h >= hrs.open && h < hrs.close) {
+          const c = hrs.close > 12 ? `${hrs.close-12}:00 PM` : `${hrs.close}:00 AM`;
+          pill.textContent = `Open · Closes ${c}`; pill.className = "hours-pill open";
+        } else if (h < hrs.open) {
+          const o = hrs.open >= 12 ? `${hrs.open>12?hrs.open-12:hrs.open}:00 PM` : `${hrs.open}:00 AM`;
+          pill.textContent = `Opens at ${o}`; pill.className = "hours-pill soon";
+        } else { pill.textContent = "Closed now"; pill.className = "hours-pill closed"; }
       }
-      window.assignAdmin = assignAdmin;
+      updateHoursPill();
 
-      async function removeAdmin(userId, email) {
-        if (!confirm(`Remove admin access from ${email}?`)) return;
-        const { error } = await supabase.from('users').update({ role: 'student' }).eq('id', userId);
-        if (error) { showToast('Error: ' + error.message); return; }
-        showToast(`Admin access removed from ${email}.`);
-        loadAdminsList();
-      }
-      window.removeAdmin = removeAdmin;
-
-      // ── Load notices for admin ──
-      async function loadNoticesAdmin() {
-        const { data } = await supabase
-          .from('notices').select('*').order('created_at', { ascending: false });
-
-        const events    = (data || []).filter(n => n.type === 'event' || n.event_date);
-        const reminders = (data || []).filter(n => n.type === 'reminder' && !n.event_date);
-
-        renderNoticeList('eventsAdminList', events, true);
-        renderNoticeList('remindersAdminList', reminders, false);
+      // ── Profile photo ──
+      async function loadProfilePhoto() {
+        try {
+          const { data } = supabase.storage.from("avatars").getPublicUrl(`${userId}/avatar`);
+          if (data?.publicUrl) {
+            // Add cache-buster to force reload after upload
+            const url = data.publicUrl + "?t=" + Date.now();
+            const img = new Image();
+            img.onload = () => {
+              const av = document.getElementById("userAvatar");
+              av.style.backgroundImage = `url(${url})`;
+              av.style.backgroundSize = "cover";
+              av.style.backgroundPosition = "center";
+              av.textContent = "";
+            };
+            img.onerror = () => {}; // silently ignore if no photo yet
+            img.src = url;
+          }
+        } catch(e) { /* no photo yet */ }
       }
 
-      function renderNoticeList(containerId, items, showDate) {
-        const el = document.getElementById(containerId);
-        if (!items.length) {
-          el.innerHTML = `<div style="text-align:center;padding:16px;color:var(--text-muted);font-size:13px;">None yet.</div>`;
-          return;
-        }
-        el.innerHTML = items.map(n => {
-          const dateStr = n.event_date
-            ? new Date(n.event_date).toLocaleDateString('en-PH', { month: 'short', day: 'numeric', year: 'numeric' })
-            : '';
-          const startStr = n.start_date
-            ? new Date(n.start_date).toLocaleDateString('en-PH', { month: 'short', day: 'numeric', year: 'numeric' })
-            : '';
-          const isScheduled = n.start_date && new Date(n.start_date) > new Date();
-          return `<div style="background:${n.active ? 'white' : '#f8fafc'};border:1px solid ${n.active ? 'var(--border-color)' : '#e2e8f0'};border-radius:8px;padding:10px 12px;margin-bottom:8px;opacity:${n.active ? 1 : 0.6};">
-            <div style="font-size:13px;color:var(--text-dark);margin-bottom:${dateStr ? '3px' : '6px'};line-height:1.4;">${n.message}</div>
-            ${dateStr ? `<div style="font-size:11px;color:#3b82f6;font-weight:600;margin-bottom:4px;">📅 ${dateStr}</div>` : ''}
-            ${isScheduled ? `<div style="font-size:11px;color:#f59e0b;font-weight:600;margin-bottom:4px;">⏰ Scheduled: shows from ${startStr}</div>` : ''}
-            <div style="display:flex;gap:6px;flex-wrap:wrap;">
-              <button onclick="toggleNotice('${n.id}',${n.active})"
-                style="padding:4px 10px;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid;${n.active ? 'background:#f1f5f9;color:#64748b;border-color:#e2e8f0' : 'background:#f0fdf4;color:#16a34a;border-color:#bbf7d0'}">
-                ${n.active ? 'Hide' : 'Show'}
-              </button>
-              <button onclick="deleteNotice('${n.id}')"
-                style="padding:4px 10px;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;background:#fef2f2;color:#ef4444;border:1px solid #fecaca;">
-                Delete
-              </button>
-            </div>
-          </div>`;
-        }).join('');
-      }
-
-      // ── Add announcement (event with date) ──
-      async function addAnnouncement() {
-        const msg       = document.getElementById('eventInput').value.trim();
-        const date      = document.getElementById('eventDateInput').value;
-        const startDate = document.getElementById('eventStartInput').value;
-        if (!msg) { showToast('Please enter an announcement message.'); return; }
-        // If start date is set and in future, post as inactive
-        const isActive = !startDate || new Date(startDate) <= new Date();
-        const { error } = await supabase.from('notices').insert({
-          message: msg, active: isActive, type: 'event',
-          event_date: date || null, start_date: startDate || null
-        });
-        if (error) { showToast('Error: ' + error.message); return; }
-        document.getElementById('eventInput').value = '';
-        document.getElementById('eventDateInput').value = '';
-        document.getElementById('eventStartInput').value = '';
-        showToast(isActive ? 'Announcement posted!' : 'Announcement scheduled — will show from ' + startDate);
-        loadNoticesAdmin();
-      }
-
-      // ── Add reminder ──
-      async function addReminder() {
-        const msg       = document.getElementById('reminderInput').value.trim();
-        const startDate = document.getElementById('reminderStartInput').value;
-        if (!msg) { showToast('Please enter a reminder message.'); return; }
-        const isActive = !startDate || new Date(startDate) <= new Date();
-        const { error } = await supabase.from('notices').insert({
-          message: msg, active: isActive, type: 'reminder',
-          event_date: null, start_date: startDate || null
-        });
-        if (error) { showToast('Error: ' + error.message); return; }
-        document.getElementById('reminderInput').value = '';
-        document.getElementById('reminderStartInput').value = '';
-        showToast(isActive ? 'Reminder posted!' : 'Reminder scheduled — will show from ' + startDate);
-        loadNoticesAdmin();
-      }
-
-      // ── Toggle notice visibility ──
-      async function toggleNotice(id, currentActive) {
-        await supabase.from('notices').update({ active: !currentActive }).eq('id', id);
-        loadNoticesAdmin();
-      }
-
-      // ── Delete notice ──
-      async function deleteNotice(id) {
-        if (!confirm('Delete this notice?')) return;
-        await supabase.from('notices').delete().eq('id', id);
-        showToast('Deleted.');
-        loadNoticesAdmin();
-      }
-
-      function runFilter() {
-        const f = document.getElementById('filterInput').value.toUpperCase();
-        const isUsers = !document.getElementById('users-view').classList.contains('hidden');
-        if (isUsers) {
-          // Live user search — filter allUsers
-          const filtered = allUsers.filter(u =>
-            (u.name || '').toUpperCase().includes(f) ||
-            (u.email || '').toUpperCase().includes(f) ||
-            (u.program || '').toUpperCase().includes(f)
-          );
-          renderUsers(filtered);
-        } else {
-          const tbl = 'logTable';
-          Array.from(document.getElementById(tbl).getElementsByTagName('tr')).slice(1).forEach(r => {
-            r.style.display = r.textContent.toUpperCase().includes(f) ? '' : 'none';
-          });
-        }
-      }
-
-      function filterByDate() {
-        const from = document.getElementById('dateFrom').value;
-        const to   = document.getElementById('dateTo').value;
-        if (!from && !to) { renderLogs(allLogs); return; }
-        renderLogs(allLogs.filter(l => {
-          const d = new Date(l.time_in).toLocaleDateString('en-CA', { timeZone: 'Asia/Manila' });
-          return (!from || d >= from) && (!to || d <= to);
-        }));
-      }
-
-      function getFilteredLogs() {
-        const from = document.getElementById('dateFrom').value;
-        const to   = document.getElementById('dateTo').value;
-        if (!from && !to) return allLogs;
-        return allLogs.filter(l => {
-          // Convert UTC time_in to PH date string for accurate comparison
-          const d = new Date(l.time_in).toLocaleDateString('en-CA', { timeZone: 'Asia/Manila' }); // en-CA = YYYY-MM-DD
-          return (!from || d >= from) && (!to || d <= to);
-        });
-      }
-
-      function exportCSV() {
-        const logs = getFilteredLogs();
-        const rows = [['Date & Time In','Time Out','Duration','Name','Email','Program','Reason','Status']];
-        logs.forEach(l => rows.push([
-          `${phDate(l.time_in)} ${phTime(l.time_in)}`,
-          l.time_out ? `${phDate(l.time_out)} ${phTime(l.time_out)}` : '—',
-          calcDuration(l.time_in, l.time_out),
-          l.users?.name || '—', l.users?.email || '—', l.users?.program || '—', l.reason, l.status
-        ]));
-        const csv = rows.map(r => r.map(v => `"${v}"`).join(',')).join('\n');
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
-        const from = document.getElementById('dateFrom').value;
-        const to   = document.getElementById('dateTo').value;
-        const suffix = from && to ? `_${from}_to_${to}` : '';
-        a.download = `NEU_Visits${suffix}_${new Date().toISOString().split('T')[0]}.csv`;
-        a.click();
-      }
-      function exportPDF() { window.print(); }
-      function logout() { if (confirm('End administrator session?')) window.location.href = 'index.html'; }
-
-      // ── Detail modal ──
-      function closeDetailModal() {
-        document.getElementById('detailModal').classList.remove('show');
-      }
-
-      // Close on overlay click
-      document.getElementById('detailModal').addEventListener('click', (e) => {
-        if (e.target === document.getElementById('detailModal')) closeDetailModal();
+      document.getElementById("avatarUploadBtn")?.addEventListener("click", () => {
+        document.getElementById("avatarInput").click();
       });
 
-      function showLogDetail(log) {
-        const isInside = log.status === 'inside';
-        document.getElementById('modalName').textContent = log.users?.name || 'Unknown';
-        document.getElementById('modalEmail').textContent = log.users?.email || '—';
-
-        document.getElementById('modalBody').innerHTML = `
-          <div class="detail-row"><span class="detail-label">Program</span><span class="detail-value">${log.users?.program || '—'}</span></div>
-          <div class="detail-row"><span class="detail-label">Reason</span><span class="detail-value">${log.reason}</span></div>
-          <div class="detail-row"><span class="detail-label">Date</span><span class="detail-value">${phDate(log.time_in)}</span></div>
-          <div class="detail-row"><span class="detail-label">Time In</span><span class="detail-value">${phTime(log.time_in)}</span></div>
-          <div class="detail-row"><span class="detail-label">Time Out</span><span class="detail-value">${log.time_out ? phTime(log.time_out) : '—'}</span></div>
-          <div class="detail-row"><span class="detail-label">Duration</span><span class="detail-value">${calcDuration(log.time_in, log.time_out)}</span></div>
-          <div class="detail-row"><span class="detail-label">Status</span><span class="detail-value"><span class="badge ${isInside ? 'badge-inside' : 'badge-logged-out'}">${isInside ? 'Inside' : 'Logged Out'}</span></span></div>
-        `;
-
-        const actions = document.getElementById('modalActions');
-        if (isInside) {
-          actions.innerHTML = `
-            <button class="btn-modal-force" onclick="forceLogoutUser('${log.id}','${(log.users?.name||'User').replace(/'/g,"\\'")}');closeDetailModal()">
-              Force Logout
-            </button>
-            <button class="btn-modal-close" onclick="closeDetailModal()">Close</button>
-          `;
-        } else {
-          actions.innerHTML = `<button class="btn-modal-close" style="width:100%" onclick="closeDetailModal()">Close</button>`;
-        }
-
-        document.getElementById('detailModal').classList.add('show');
-      }
-
-      async function showUserDetail(user) {
-        document.getElementById('modalName').textContent = user.name || '—';
-        document.getElementById('modalEmail').textContent = user.email;
-
-        // Fetch latest visit log for this user
-        const { data: lastVisit } = await supabase
-          .from('visit_logs').select('time_in, reason, status')
-          .eq('user_id', user.id)
-          .order('time_in', { ascending: false }).limit(1).maybeSingle();
-
-        const { count: totalVisits } = await supabase
-          .from('visit_logs').select('*', { count: 'exact', head: true })
-          .eq('user_id', user.id);
-
-        const isInside = lastVisit?.status === 'inside';
-        const rl = user.role ? user.role.charAt(0).toUpperCase() + user.role.slice(1) : 'Student';
-        const rc = user.role === 'faculty' ? 'badge-faculty' : user.role === 'admin' ? 'badge-admin' : user.role === 'owner' ? 'badge-owner' : 'badge-student';
-
-        document.getElementById('modalBody').innerHTML = `
-          <div class="detail-row"><span class="detail-label">Program</span><span class="detail-value">${user.program || '—'}</span></div>
-          <div class="detail-row"><span class="detail-label">Role</span><span class="detail-value"><span class="badge ${rc}">${rl}</span></span></div>
-          <div class="detail-row"><span class="detail-label">Status</span><span class="detail-value" style="color:${user.is_blocked ? 'var(--danger)' : '#16a34a'};font-weight:700;">${user.is_blocked ? 'Blocked' : 'Active'}</span></div>
-          <div class="detail-row"><span class="detail-label">Total Visits</span><span class="detail-value">${totalVisits ?? 0}</span></div>
-          <div class="detail-row"><span class="detail-label">Currently</span><span class="detail-value"><span class="badge ${isInside ? 'badge-inside' : 'badge-logged-out'}">${isInside ? '● Inside' : 'Outside'}</span></span></div>
-          ${lastVisit ? `<div class="detail-row"><span class="detail-label">Last Visit</span><span class="detail-value">${phDate(lastVisit.time_in)} · ${lastVisit.reason}</span></div>` : ''}
-          <div class="detail-row"><span class="detail-label">Registered</span><span class="detail-value">${phDate(user.created_at)}</span></div>
-        `;
-
-        const actions = document.getElementById('modalActions');
-        let btns = '';
-        if (isInside && lastVisit) {
-          const { data: activeLog } = await supabase
-            .from('visit_logs').select('id').eq('user_id', user.id).eq('status', 'inside')
-            .order('time_in', { ascending: false }).limit(1).maybeSingle();
-          if (activeLog) {
-            btns += `<button class="btn-modal-force" onclick="forceLogoutUser('${activeLog.id}','${(user.name||'User').replace(/'/g,"\\'")}');closeDetailModal()">Force Logout</button>`;
-          }
-        }
-        btns += `<button class="btn-modal-close" onclick="closeDetailModal()">Close</button>`;
-        actions.innerHTML = btns;
-
-        document.getElementById('detailModal').classList.add('show');
-      }
-
-      window.showLogDetail = showLogDetail;
-      window.showUserDetail = showUserDetail;
-      window.closeDetailModal = closeDetailModal; window.runFilter = runFilter; window.filterByDate = filterByDate;
-      window.triggerResetAll = triggerResetAll; window.toggleBlock = toggleBlock; window.removeUser = removeUser;
-      window.exportCSV = exportCSV; window.exportPDF = exportPDF; window.logout = logout;
-      window.addAnnouncement = addAnnouncement; window.addReminder = addReminder;
-      window.toggleNotice = toggleNotice; window.deleteNotice = deleteNotice;
-      window.forceLogoutUser = forceLogoutUser;
+      document.getElementById("avatarInput")?.addEventListener("change", async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const { error } = await supabase.storage.from("avatars").upload(`${userId}/avatar`, file, { upsert: true });
+        if (!error) { await loadProfilePhoto(); showMessage("Photo updated!"); }
+        else showMessage("Upload failed: " + error.message);
+      });
 
       // ── Init ──
-      autoLogoutMidnight().catch(e => console.warn('autoLogout:', e));
-      loadStats().catch(e => console.error('loadStats:', e));
-      loadInsideNow().catch(e => console.error('loadInsideNow:', e));
-      loadChart().catch(e => console.error('loadChart:', e));
-      loadLogs().catch(e => console.error('loadLogs:', e));
+      checkAlreadyInside();
+      loadVisitHistory();
+      loadStreak();
+      loadLastReason();
+      loadProfilePhoto();
+      loadAnalyticsChart();
+      loadVisitCount();
+      loadUpcomingNotices();
+      initKeyboardShortcuts();
+      startClosingTimeWatcher();
 
-      // ── Real-time auto-update ──
-      // Subscribe to visit_logs changes — fires instantly when anyone checks in or out
-      supabase
-        .channel('visit_logs_changes')
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'visit_logs' }, () => {
-          loadStats().catch(() => {});
-          loadInsideNow().catch(() => {});
-          loadLogs().catch(() => {});
-          loadChart().catch(() => {});
-        })
-        .subscribe();
+      // ── Visit count badge ──
+      async function loadVisitCount() {
+        const { count } = await supabase
+          .from("visit_logs").select("*", { count: "exact", head: true })
+          .eq("user_id", userId);
+        if (count > 0) {
+          const badge = document.getElementById("visitCountBadge");
+          badge.textContent = `${count} visit${count !== 1 ? "s" : ""}`;
+          badge.style.display = "inline-block";
+        }
+      }
 
-      // Subscribe to users table changes — fires when a new user registers or is blocked/deleted
-      supabase
-        .channel('users_changes')
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'users' }, () => {
-          loadStats().catch(() => {});
-          // If Manage Users tab is active, reload it too
-          if (document.getElementById('users-view') && !document.getElementById('users-view').classList.contains('hidden')) {
-            loadUsers().catch(() => {});
+      // ── Upcoming notices ──
+      async function loadUpcomingNotices() {
+        const { data } = await supabase
+          .from("notices").select("message, type, event_date")
+          .eq("active", true)
+          .order("created_at", { ascending: false })
+          .limit(3);
+        if (!data?.length) return;
+        const card = document.getElementById("noticesCard");
+        const list = document.getElementById("noticesList");
+        list.innerHTML = data.map(n => {
+          const color = n.type === "event" ? "#3b82f6" : "#f59e0b";
+          const dateStr = n.event_date
+            ? ` · ${new Date(n.event_date + "T00:00:00").toLocaleDateString("en-PH", { month: "short", day: "numeric" })}`
+            : "";
+          return `<div class="notices-item">
+            <div class="notices-dot" style="background:${color};"></div>
+            <span style="color:#1e293b;font-weight:500;">${n.message}${dateStr}</span>
+          </div>`;
+        }).join("");
+        card.style.display = "block";
+      }
+// ── Keyboard shortcuts ──
+      function initKeyboardShortcuts() {
+        const reasons = ["Reading", "Researching", "Use of Computer", "Meeting"];
+        document.addEventListener("keydown", (e) => {
+          if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
+          if (alreadyLoggedId) return;
+          const n = parseInt(e.key);
+          if (n >= 1 && n <= 4) {
+            const opt = [...reasonOptions].find(o => o.dataset.reason === reasons[n - 1]);
+            if (opt) { opt.click(); }
           }
-        })
-        .subscribe();
+          if (e.key === "Enter" && !submitLogBtn.disabled) {
+            submitLogBtn.click();
+          }
+        });
+      }
 
-      // ── Fallback polling every 30 seconds ──
-      // Catches any changes that Realtime might miss (e.g. if websocket drops)
-      setInterval(() => {
-        loadStats().catch(() => {});
-        loadInsideNow().catch(() => {});
-      }, 30000);
-
-      // Poll logs and chart every 2 minutes
-      setInterval(() => {
-        loadLogs().catch(() => {});
-        loadChart().catch(() => {});
-      }, 120000);
+      function showWelcomePopup() {
+        const popup = document.getElementById("welcomePopup");
+        const bar   = document.getElementById("welcomeBar");
+        const count = document.getElementById("welcomeCount");
+        popup.style.display = "flex";
+        setTimeout(() => { bar.style.width = "0%"; }, 50);
+        let t = 3;
+        const tick = setInterval(() => {
+          t--; count.textContent = t;
+          if (t <= 0) {
+            clearInterval(tick);
+            localStorage.removeItem("currentLogId");
+            localStorage.clear();
+            window.location.href = "index.html";
+          }
+        }, 1000);
+      }
