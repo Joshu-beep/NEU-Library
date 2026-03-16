@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0" />
     <title>NEU Admin Dashboard</title>
     <link rel="icon" type="image/x-icon" href="img/neulogo.png" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -110,6 +110,7 @@
             <button class="tab active" onclick="changeView('log', this)">Visits Log</button>
             <button class="tab" onclick="changeView('users', this)">Manage Users</button>
             <button class="tab" onclick="changeView('notices', this)">Notices</button>
+            <button class="tab" id="adminsTabBtn" onclick="changeView('admins', this)" style="display:none;">Manage Admins</button>
           </div>
           <button class="btn-action btn-reset" onclick="triggerResetAll()">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -231,8 +232,30 @@
  
           </div>
         </div>
+ 
+        <!-- Manage Admins View (owner only) -->
+        <div id="admins-view" class="hidden" style="padding:24px;">
+          <h3 style="font-size:15px;font-weight:700;color:var(--text-dark);margin-bottom:4px;">Manage Admins</h3>
+          <p style="font-size:13px;color:var(--text-muted);margin-bottom:20px;">Assign or remove admin access. Users must have a registered <strong>@neu.edu.ph</strong> account.</p>
+ 
+          <div style="background:#f8fafc;border:1px solid var(--border-color);border-radius:10px;padding:18px;margin-bottom:20px;max-width:520px;">
+            <label style="font-size:12px;font-weight:700;color:var(--text-dark);display:block;margin-bottom:6px;">Assign Admin by Email</label>
+            <div style="display:flex;gap:10px;">
+              <input type="email" id="assignAdminEmail" placeholder="username@neu.edu.ph"
+                style="flex:1;padding:9px 14px;border:1px solid var(--border-color);border-radius:8px;font-size:13px;outline:none;" />
+              <button onclick="assignAdmin()"
+                style="padding:9px 20px;background:#001f54;color:white;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;">
+                + Assign
+              </button>
+            </div>
+            <p id="assignMsg" style="font-size:12px;margin-top:8px;display:none;"></p>
+          </div>
+ 
+          <div style="max-width:520px;">
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;margin-bottom:10px;">Current Admins</div>
+            <div id="adminsList"><div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px;">Loading...</div></div>
+          </div>
+        </div>
+ 
       </div>
     </div>
-    <script src="js/admindashboard.js" type="module"></script>
-  </body>
-</html>
