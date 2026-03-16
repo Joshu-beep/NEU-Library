@@ -239,9 +239,9 @@ select#regProgramFaculty:focus { border-color: var(--primary-blue); }
 
 /* ── Announcement overlay ── */
 .announce-panel {
-  position: fixed; top: 20px; right: 20px; z-index: 999;
-  width: 300px; display: flex; flex-direction: column; gap: 0;
-  filter: drop-shadow(0 8px 24px rgba(0,0,0,0.18));
+  position: fixed; top: 20px; right: 20px; z-index: 500;
+  width: 300px; display: flex; flex-direction: column;
+  pointer-events: auto;
 }
 
 .announce-toggle {
