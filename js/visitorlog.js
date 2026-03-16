@@ -56,33 +56,41 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 
       // ── Check if already inside ──
       async function checkAlreadyInside() {
-        const todayStart = new Date(); todayStart.setHours(0,0,0,0);
         const { data } = await supabase
           .from("visit_logs").select("id, time_in, reason")
           .eq("user_id", userId).eq("status", "inside")
-          .gte("time_in", todayStart.toISOString())
           .order("time_in", { ascending: false }).limit(1).maybeSingle();
 
         if (data) {
           alreadyLoggedId = data.id;
           localStorage.setItem("currentLogId", data.id);
 
-          document.getElementById("sessionCard").classList.add("show");
           const timeIn = new Date(data.time_in).toLocaleTimeString("en-PH", {
             timeZone: "Asia/Manila", hour: "2-digit", minute: "2-digit"
           });
+
+          // Session timer on left panel
+          document.getElementById("sessionCard").classList.add("show");
           document.getElementById("sessionSince").textContent = `Checked in at ${timeIn} for "${data.reason}"`;
           startSessionTimer(data.time_in);
 
-          const banner = document.getElementById("alreadyBanner");
-          banner.classList.add("show");
-          document.getElementById("alreadySince").textContent = `Checked in at ${timeIn} for "${data.reason}"`;
+          // Inside overlay on check-in card
+          const overlay = document.getElementById("insideOverlay");
+          overlay.classList.add("show");
+          document.getElementById("insideOverlaySub").textContent = `Checked in at ${timeIn} · "${data.reason}"`;
 
-          // Disable form when already inside
+          // Lock the reason grid with frosted overlay
+          document.getElementById("reasonGrid").classList.add("locked");
+
+          // Change submit button to a clear indicator
           submitLogBtn.disabled = true;
-          submitLogBtn.textContent = "Already checked in";
-          submitLogBtn.style.background = "#94a3b8";
-          reasonOptions.forEach(o => { o.style.pointerEvents = "none"; o.style.opacity = "0.45"; });
+          submitLogBtn.textContent = "✓ You are already checked in";
+          submitLogBtn.style.background = "#15803d";
+          submitLogBtn.style.opacity = "1";
+          submitLogBtn.style.cursor = "default";
+
+          // Prevent any reason clicks
+          reasonOptions.forEach(o => { o.style.pointerEvents = "none"; });
         }
       }
 
@@ -272,8 +280,32 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
       submitLogBtn.addEventListener("click", async () => {
         if (!selectedReason || alreadyLoggedId) return;
         submitLogBtn.disabled = true;
-        submitLogBtn.textContent = "Logging visit...";
+        submitLogBtn.textContent = "Checking...";
         reasonOptions.forEach(o => { o.style.pointerEvents = "none"; });
+
+        // Server-side guard — check for any active inside record before inserting
+        const { data: existing } = await supabase
+          .from("visit_logs").select("id, time_in, reason")
+          .eq("user_id", userId).eq("status", "inside")
+          .order("time_in", { ascending: false }).limit(1).maybeSingle();
+
+        if (existing) {
+          // Someone (or another tab) already logged them in
+          alreadyLoggedId = existing.id;
+          const timeIn = new Date(existing.time_in).toLocaleTimeString("en-PH", {
+            timeZone: "Asia/Manila", hour: "2-digit", minute: "2-digit"
+          });
+          const overlay = document.getElementById("insideOverlay");
+          overlay.classList.add("show");
+          document.getElementById("insideOverlaySub").textContent = `Checked in at ${timeIn} · "${existing.reason}"`;
+          document.getElementById("reasonGrid").classList.add("locked");
+          submitLogBtn.textContent = "✓ You are already checked in";
+          submitLogBtn.style.background = "#15803d";
+          submitLogBtn.style.opacity = "1";
+          submitLogBtn.style.cursor = "default";
+          showMessage("You are already checked in to the library.");
+          return;
+        }
 
         const { data: logData, error } = await supabase
           .from("visit_logs")
