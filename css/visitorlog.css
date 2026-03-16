@@ -16,7 +16,7 @@
 html, body { height: 100%; overflow: hidden; }
 body {
   background-color: var(--bg);
-  background-image: url("/img/library.png");
+  background-image: url("../img/visitorlog-bg.jpg");
   background-size: cover; background-position: center;
   background-repeat: no-repeat; background-attachment: fixed;
   display: flex; flex-direction: column;
@@ -31,20 +31,22 @@ body::before {
 /* ── Navbar ── */
 .navbar {
   background: var(--blue); border-bottom: 4px solid var(--gold);
-  padding: 0 clamp(12px, 2vw, 28px); height: 48px;
-  display: flex; justify-content: space-between; align-items: center;
-  color: #fff; flex-shrink: 0; z-index: 10;
+  padding: 0 clamp(12px, 2vw, 28px); height: 52px;
+  display: grid; grid-template-columns: 1fr auto 1fr;
+  align-items: center; color: #fff; flex-shrink: 0; z-index: 10;
 }
-.nav-left { display: flex; align-items: center; gap: 8px; }
+.nav-left { display: flex; align-items: center; gap: 10px; }
 .nav-logo { width: 34px; height: 34px; object-fit: contain; border-radius: 4px; }
 .nav-title { font-size: clamp(13px, 1.2vw, 17px); font-weight: 700; }
-.nav-clock { font-size: clamp(11px, 0.9vw, 13px); opacity: 0.85; font-variant-numeric: tabular-nums; }
+.nav-center { display: flex; justify-content: center; }
+.nav-clock { font-size: clamp(12px, 1vw, 15px); font-weight: 600; opacity: 0.95; font-variant-numeric: tabular-nums; background: rgba(255,255,255,0.1); padding: 4px 14px; border-radius: 20px; white-space: nowrap; }
+.nav-right-controls { display: flex; justify-content: flex-end; align-items: center; gap: 8px; }
 
-/* ── Workspace — centered both axes ── */
+/* ── Workspace — 3 columns ── */
 .workspace {
   flex: 1;
-  display: flex;
-  flex-direction: row;
+  display: grid;
+  grid-template-columns: clamp(180px, 17vw, 240px) clamp(320px, 38vw, 500px) clamp(180px, 17vw, 240px);
   gap: clamp(10px, 1.2vw, 18px);
   padding: clamp(10px, 1.2vw, 18px) clamp(12px, 1.5vw, 24px);
   overflow: auto;
@@ -52,12 +54,21 @@ body::before {
   justify-content: center;
 }
 
-/* ── Left panel — fixed narrow width, sized to content ── */
+/* ── Left panel ── */
 .left-panel {
   display: flex; flex-direction: column;
   gap: clamp(6px, 0.7vw, 10px);
-  width: clamp(180px, 17vw, 240px);
-  flex-shrink: 0;
+}
+
+/* ── Center panel wrapper ── */
+.center-panel {
+  display: flex; flex-direction: column;
+}
+
+/* ── Right side panel (history + chart) ── */
+.right-side-panel {
+  display: flex; flex-direction: column;
+  gap: clamp(6px, 0.7vw, 10px);
 }
 
 /* Profile card */
@@ -299,28 +310,32 @@ body::before {
 .checkmark-tick.animate { stroke-dashoffset: 0; }
 
 /* ── Responsive ── */
+@media (max-width: 1100px) {
+  .workspace { grid-template-columns: clamp(170px, 16vw, 220px) 1fr clamp(170px, 16vw, 220px); }
+}
+
 @media (max-width: 899px) {
   html, body { height: auto; overflow: auto; }
   .workspace {
-    flex-direction: column; align-items: center;
-    padding: 12px 14px; gap: 12px; overflow: visible; height: auto;
+    grid-template-columns: 1fr; padding: 12px 14px;
+    gap: 12px; overflow: visible; height: auto;
   }
-  .left-panel { width: 100%; flex-direction: row; flex-wrap: wrap; gap: 10px; height: auto; overflow: visible; }
-  .profile-card { flex: 1 1 100%; }
-  .session-card, .streak-card { flex: 1 1 calc(50% - 5px); }
-  .history-card { flex: 1 1 100%; max-height: 180px; }
-  .right-panel { max-width: 100%; width: 100%; }
+  .left-panel, .right-side-panel { flex-direction: row; flex-wrap: wrap; gap: 10px; }
+  .left-panel .profile-card { flex: 1 1 100%; }
+  .left-panel .session-card, .left-panel .streak-card, .left-panel .notices-card { flex: 1 1 calc(50% - 5px); }
+  .right-side-panel .history-card, .right-side-panel .analytics-card { flex: 1 1 100%; }
+  .history-card { max-height: 200px; }
   .reason-grid { grid-auto-rows: 100px; }
 }
 
 @media (max-width: 639px) {
-  .navbar { padding: 0 12px; height: 46px; }
+  .navbar { padding: 0 12px; height: 48px; }
+  .nav-clock { font-size: 11px; padding: 3px 10px; }
   .workspace { padding: 10px 10px; gap: 10px; }
   .profile-card { padding: 9px 11px; gap: 8px; }
   .avatar { width: 34px; height: 34px; font-size: 14px; }
-  .session-card, .streak-card { flex: 1 1 100%; }
+  .left-panel .session-card, .left-panel .streak-card, .left-panel .notices-card { flex: 1 1 100%; }
   .reason-grid { grid-auto-rows: 82px; }
-  .right-panel { max-width: 100%; }
 }
 
 @media (max-width: 399px) {
@@ -329,99 +344,8 @@ body::before {
   .btn-submit { padding: 9px; font-size: 12px; }
 }
 
-@media (min-width: 1400px) {
-  .right-panel { max-width: 600px; }
+@media (min-width: 1600px) {
+  .workspace { grid-template-columns: clamp(200px, 15vw, 260px) clamp(380px, 40vw, 560px) clamp(200px, 15vw, 260px); padding: 20px 32px; gap: 20px; }
+  .navbar { padding: 0 3vw; height: 58px; }
   .reason-grid { grid-auto-rows: clamp(100px, 9vw, 140px); }
-}
-
-/* ── Analytics card ── */
-.analytics-card {
-  background: rgba(255,255,255,0.93); border-radius: 10px;
-  padding: clamp(8px, 1vw, 12px) clamp(10px, 1.1vw, 14px);
-  border: 1px solid var(--border); box-shadow: 0 1px 4px rgba(0,0,0,0.04);
-}
-
-/* ── Profile badge wrapping ── */
-.profile-badge {
-  display: inline-block; background: var(--gold); color: #001f54;
-  font-size: 9px; font-weight: 700; padding: 2px 8px; border-radius: 20px;
-  white-space: normal; word-break: break-word; line-height: 1.4;
-}
-
-/* ── Dark mode ── */
-body.dark-mode {
-  --blue: #0f2d6b;
-  --text: #f1f5f9;
-  --muted: #94a3b8;
-  --border: #334155;
-  --bg: #0f172a;
-}
-body.dark-mode::before { background: rgba(0,0,0,0.55); }
-body.dark-mode .right-panel,
-body.dark-mode .history-card,
-body.dark-mode .session-card,
-body.dark-mode .streak-card,
-body.dark-mode .analytics-card { background: rgba(15,23,42,0.95); color: var(--text); border-color: var(--border); }
-body.dark-mode .right-header h2 { color: #f1f5f9; }
-body.dark-mode .right-header p,
-body.dark-mode .reason-label { color: #94a3b8; }
-body.dark-mode .history-item { background: #1e293b; border-color: #334155; }
-body.dark-mode .h-reason { color: #f1f5f9; }
-body.dark-mode .h-dur { background: #1e293b; color: #94a3b8; }
-body.dark-mode .icon-reading   { background: #431407; border-color: #9a3412; }
-body.dark-mode .icon-researching { background: #1e3a5f; border-color: #1d4ed8; }
-body.dark-mode .icon-computer  { background: #2e1065; border-color: #7c3aed; }
-body.dark-mode .icon-meeting   { background: #052e16; border-color: #166534; }
-body.dark-mode .reason-option .reason-name { color: #f1f5f9; }
-body.dark-mode .btn-qr { background: #1e293b; color: #fbbf24; border-color: #f59e0b; }
-body.dark-mode .btn-logout { background: #1e293b; color: #93c5fd; border-color: #3b82f6; }
-body.dark-mode .btn-submit:disabled { background: #334155; }
-
-/* Dark mode toggle button */
-.dark-toggle {
-  background: none; border: none; color: white; cursor: pointer;
-  opacity: 0.75; padding: 4px; display: flex; align-items: center;
-  transition: opacity 0.2s;
-}
-.dark-toggle:hover { opacity: 1; }
-
-/* ── Already-inside overlay on reason cards ── */
-.reason-grid.locked .reason-option {
-  pointer-events: none; position: relative;
-}
-.reason-grid.locked .reason-option::after {
-  content: ""; position: absolute; inset: 0;
-  background: rgba(255,255,255,0.65); border-radius: 11px;
-  backdrop-filter: blur(1px);
-}
-.inside-overlay {
-  display: none; margin: clamp(8px, 1vw, 12px) clamp(14px, 1.6vw, 20px);
-  background: linear-gradient(135deg, #f0fdf4, #dcfce7);
-  border: 2px solid #22c55e; border-radius: 10px;
-  padding: clamp(10px, 1.2vw, 14px) clamp(12px, 1.4vw, 16px);
-  text-align: center; flex-shrink: 0;
-}
-.inside-overlay.show { display: block; }
-.inside-overlay-title { font-size: 14px; font-weight: 700; color: #15803d; margin-bottom: 4px; }
-.inside-overlay-sub { font-size: 12px; color: #16a34a; }
-
-/* ── Upcoming notices on visitorlog ── */
-.notices-card {
-  background: rgba(255,255,255,0.93); border-radius: 10px;
-  padding: clamp(8px, 1vw, 12px) clamp(10px, 1.1vw, 14px);
-  border: 1px solid var(--border); box-shadow: 0 1px 4px rgba(0,0,0,0.04);
-}
-.notices-item {
-  display: flex; gap: 8px; align-items: flex-start;
-  padding: 5px 0; border-bottom: 1px solid var(--border); font-size: 11px;
-}
-.notices-item:last-child { border-bottom: none; }
-.notices-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; margin-top: 3px; }
-
-/* ── Visit count badge ── */
-.visit-count-badge {
-  display: inline-block; font-size: 9px; font-weight: 700;
-  background: rgba(255,255,255,0.18); color: rgba(255,255,255,0.9);
-  padding: 1px 7px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.25);
-  margin-top: 4px;
 }
