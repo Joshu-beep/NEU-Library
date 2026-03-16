@@ -92,6 +92,24 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
           document.getElementById('week-stat').textContent  = weekCount    ?? 0;
           document.getElementById('total-stat').textContent = totalCount   ?? 0;
 
+          // Avg visit duration (last 30 days, completed visits only)
+          const monthAgo = new Date(Date.now() - 30 * 86400000).toISOString();
+          const { data: completedLogs } = await supabase
+            .from('visit_logs').select('time_in, time_out')
+            .eq('status', 'logged_out').gte('time_in', monthAgo).not('time_out', 'is', null);
+          if (completedLogs?.length) {
+            const avgMs = completedLogs.reduce((s, v) =>
+              s + (new Date(v.time_out) - new Date(v.time_in)), 0) / completedLogs.length;
+            const avgMin = Math.round(avgMs / 60000);
+            const avgEl = document.getElementById('avg-stat');
+            if (avgEl) avgEl.textContent = avgMin >= 60
+              ? `${Math.floor(avgMin/60)}h ${avgMin%60}m`
+              : `${avgMin}m`;
+          } else {
+            const avgEl = document.getElementById('avg-stat');
+            if (avgEl) avgEl.textContent = '—';
+          }
+
         } catch (err) {
           console.error('Stats error:', err);
           ['live-stat','today-stat','week-stat','total-stat'].forEach(id => {
@@ -374,10 +392,15 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
           const dateStr = n.event_date
             ? new Date(n.event_date).toLocaleDateString('en-PH', { month: 'short', day: 'numeric', year: 'numeric' })
             : '';
+          const startStr = n.start_date
+            ? new Date(n.start_date).toLocaleDateString('en-PH', { month: 'short', day: 'numeric', year: 'numeric' })
+            : '';
+          const isScheduled = n.start_date && new Date(n.start_date) > new Date();
           return `<div style="background:${n.active ? 'white' : '#f8fafc'};border:1px solid ${n.active ? 'var(--border-color)' : '#e2e8f0'};border-radius:8px;padding:10px 12px;margin-bottom:8px;opacity:${n.active ? 1 : 0.6};">
             <div style="font-size:13px;color:var(--text-dark);margin-bottom:${dateStr ? '3px' : '6px'};line-height:1.4;">${n.message}</div>
-            ${dateStr ? `<div style="font-size:11px;color:#3b82f6;font-weight:600;margin-bottom:6px;">📅 ${dateStr}</div>` : ''}
-            <div style="display:flex;gap:6px;">
+            ${dateStr ? `<div style="font-size:11px;color:#3b82f6;font-weight:600;margin-bottom:4px;">📅 ${dateStr}</div>` : ''}
+            ${isScheduled ? `<div style="font-size:11px;color:#f59e0b;font-weight:600;margin-bottom:4px;">⏰ Scheduled: shows from ${startStr}</div>` : ''}
+            <div style="display:flex;gap:6px;flex-wrap:wrap;">
               <button onclick="toggleNotice('${n.id}',${n.active})"
                 style="padding:4px 10px;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid;${n.active ? 'background:#f1f5f9;color:#64748b;border-color:#e2e8f0' : 'background:#f0fdf4;color:#16a34a;border-color:#bbf7d0'}">
                 ${n.active ? 'Hide' : 'Show'}
@@ -393,30 +416,38 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 
       // ── Add announcement (event with date) ──
       async function addAnnouncement() {
-        const msg  = document.getElementById('eventInput').value.trim();
-        const date = document.getElementById('eventDateInput').value;
+        const msg       = document.getElementById('eventInput').value.trim();
+        const date      = document.getElementById('eventDateInput').value;
+        const startDate = document.getElementById('eventStartInput').value;
         if (!msg) { showToast('Please enter an announcement message.'); return; }
+        // If start date is set and in future, post as inactive
+        const isActive = !startDate || new Date(startDate) <= new Date();
         const { error } = await supabase.from('notices').insert({
-          message: msg, active: true, type: 'event',
-          event_date: date || null
+          message: msg, active: isActive, type: 'event',
+          event_date: date || null, start_date: startDate || null
         });
         if (error) { showToast('Error: ' + error.message); return; }
         document.getElementById('eventInput').value = '';
         document.getElementById('eventDateInput').value = '';
-        showToast('Announcement posted!');
+        document.getElementById('eventStartInput').value = '';
+        showToast(isActive ? 'Announcement posted!' : 'Announcement scheduled — will show from ' + startDate);
         loadNoticesAdmin();
       }
 
-      // ── Add reminder (no date) ──
+      // ── Add reminder ──
       async function addReminder() {
-        const msg = document.getElementById('reminderInput').value.trim();
+        const msg       = document.getElementById('reminderInput').value.trim();
+        const startDate = document.getElementById('reminderStartInput').value;
         if (!msg) { showToast('Please enter a reminder message.'); return; }
+        const isActive = !startDate || new Date(startDate) <= new Date();
         const { error } = await supabase.from('notices').insert({
-          message: msg, active: true, type: 'reminder', event_date: null
+          message: msg, active: isActive, type: 'reminder',
+          event_date: null, start_date: startDate || null
         });
         if (error) { showToast('Error: ' + error.message); return; }
         document.getElementById('reminderInput').value = '';
-        showToast('Reminder posted!');
+        document.getElementById('reminderStartInput').value = '';
+        showToast(isActive ? 'Reminder posted!' : 'Reminder scheduled — will show from ' + startDate);
         loadNoticesAdmin();
       }
 
@@ -436,10 +467,21 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 
       function runFilter() {
         const f = document.getElementById('filterInput').value.toUpperCase();
-        const tbl = document.getElementById('log-view').classList.contains('hidden') ? 'usersTable' : 'logTable';
-        Array.from(document.getElementById(tbl).getElementsByTagName('tr')).slice(1).forEach(r => {
-          r.style.display = r.textContent.toUpperCase().includes(f) ? '' : 'none';
-        });
+        const isUsers = !document.getElementById('users-view').classList.contains('hidden');
+        if (isUsers) {
+          // Live user search — filter allUsers
+          const filtered = allUsers.filter(u =>
+            (u.name || '').toUpperCase().includes(f) ||
+            (u.email || '').toUpperCase().includes(f) ||
+            (u.program || '').toUpperCase().includes(f)
+          );
+          renderUsers(filtered);
+        } else {
+          const tbl = 'logTable';
+          Array.from(document.getElementById(tbl).getElementsByTagName('tr')).slice(1).forEach(r => {
+            r.style.display = r.textContent.toUpperCase().includes(f) ? '' : 'none';
+          });
+        }
       }
 
       function filterByDate() {
@@ -449,9 +491,17 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
         renderLogs(allLogs.filter(l => { const d = l.time_in.split('T')[0]; return (!from || d >= from) && (!to || d <= to); }));
       }
 
+      function getFilteredLogs() {
+        const from = document.getElementById('dateFrom').value;
+        const to   = document.getElementById('dateTo').value;
+        if (!from && !to) return allLogs;
+        return allLogs.filter(l => { const d = l.time_in.split('T')[0]; return (!from || d >= from) && (!to || d <= to); });
+      }
+
       function exportCSV() {
+        const logs = getFilteredLogs();
         const rows = [['Date & Time In','Time Out','Duration','Name','Email','Program','Reason','Status']];
-        allLogs.forEach(l => rows.push([
+        logs.forEach(l => rows.push([
           `${phDate(l.time_in)} ${phTime(l.time_in)}`,
           l.time_out ? `${phDate(l.time_out)} ${phTime(l.time_out)}` : '—',
           calcDuration(l.time_in, l.time_out),
@@ -460,10 +510,12 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
         const csv = rows.map(r => r.map(v => `"${v}"`).join(',')).join('\n');
         const a = document.createElement('a');
         a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
-        a.download = `NEU_Visits_${new Date().toISOString().split('T')[0]}.csv`;
+        const from = document.getElementById('dateFrom').value;
+        const to   = document.getElementById('dateTo').value;
+        const suffix = from && to ? `_${from}_to_${to}` : '';
+        a.download = `NEU_Visits${suffix}_${new Date().toISOString().split('T')[0]}.csv`;
         a.click();
       }
-
       function exportPDF() { window.print(); }
       function logout() { if (confirm('End administrator session?')) window.location.href = 'index.html'; }
 
