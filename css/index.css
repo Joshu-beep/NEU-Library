@@ -15,7 +15,7 @@
 }
 
 body {
-  background-image: url("/img/backgroundimg.jpg");
+  background-image: url("../img/backgroundimg.jpg");
   background-color: var(--bg-fallback);
   background-size: cover;
   background-position: center;
@@ -26,7 +26,7 @@ body {
   align-items: stretch;
   min-height: 100vh;
   padding: 0;
-  overflow: hidden;
+  overflow-y: auto;
 }
 
 .login-wrapper {
@@ -39,11 +39,6 @@ body {
   z-index: 10;
   min-height: 100vh;
   overflow-y: auto;
-}
-
-@media (max-width: 900px) {
-  .login-wrapper { max-width: 100%; box-shadow: none; }
-  body { overflow: auto; }
 }
 
 .login-card {
@@ -256,10 +251,7 @@ select#regProgramFaculty:focus { border-color: var(--primary-blue); }
   justify-content: space-between; gap: 8px; width: 100%;
   transition: border-radius 0.2s;
 }
-.announce-panel.open .announce-toggle {
-  border-radius: 10px 10px 0 0;
-  border-bottom: 2px solid var(--accent-gold);
-}
+.announce-panel.open .announce-toggle { border-radius: 10px 10px 0 0; border-bottom: 2px solid var(--accent-gold); }
 .announce-toggle span { display: flex; align-items: center; gap: 7px; }
 .announce-chevron { transition: transform 0.2s; }
 .announce-panel.open .announce-chevron { transform: rotate(180deg); }
@@ -267,8 +259,7 @@ select#regProgramFaculty:focus { border-color: var(--primary-blue); }
 .announce-body {
   background: white; border-radius: 0 0 12px 12px;
   border: 2px solid #f59e0b; border-top: none;
-  max-height: 360px; overflow-y: auto;
-  display: none;
+  max-height: 360px; overflow-y: auto; display: none;
 }
 .announce-panel.open .announce-body { display: block; }
 
@@ -277,26 +268,30 @@ select#regProgramFaculty:focus { border-color: var(--primary-blue); }
   color: #94a3b8; padding: 10px 14px 4px; border-bottom: 1px solid #f1f5f9;
   display: flex; align-items: center; gap: 5px;
 }
-
 .announce-item {
   padding: 10px 14px; border-bottom: 1px solid #f1f5f9;
   display: flex; gap: 10px; align-items: flex-start;
 }
 .announce-item:last-child { border-bottom: none; }
-
 .announce-dot-event { width: 8px; height: 8px; border-radius: 50%; background: #3b82f6; flex-shrink: 0; margin-top: 5px; }
 .announce-dot-reminder { width: 8px; height: 8px; border-radius: 50%; background: #f59e0b; flex-shrink: 0; margin-top: 5px; }
-
 .announce-msg { font-size: 13px; color: #1e293b; line-height: 1.45; font-weight: 500; }
 .announce-date { font-size: 11px; color: #64748b; margin-top: 2px; }
-
 .announce-empty { padding: 14px; font-size: 13px; color: #94a3b8; text-align: center; }
 
 /* ── Responsive ── */
 @media (max-width: 899px) {
   .login-wrapper { max-width: 100%; box-shadow: none; }
-  body { overflow: auto; }
-  .announce-panel { width: min(300px, calc(100vw - 24px)); right: 12px; top: 12px; }
+  /* On tablet/mobile: announcement moves inside the login panel, not floating */
+  .announce-panel {
+    position: static;
+    width: 100%;
+    filter: none;
+    order: -1;
+  }
+  .announce-toggle { border-radius: 0; }
+  .announce-panel.open .announce-toggle { border-radius: 0; }
+  .announce-body { border-radius: 0; border-left: none; border-right: none; }
 }
 @media (max-width: 599px) {
   .login-wrapper { max-width: 100%; }
@@ -305,7 +300,6 @@ select#regProgramFaculty:focus { border-color: var(--primary-blue); }
   .card-header h2 { font-size: clamp(10px, 2.5vw, 12px); }
   .icon-container { width: 56px; height: 56px; }
   .card-body { padding: 20px 18px; }
-  .announce-panel { width: calc(100vw - 24px); }
   .btn { padding: 13px; font-size: 14px; }
 }
 @media (max-width: 399px) {
