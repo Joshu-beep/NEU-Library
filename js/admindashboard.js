@@ -488,14 +488,21 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
         const from = document.getElementById('dateFrom').value;
         const to   = document.getElementById('dateTo').value;
         if (!from && !to) { renderLogs(allLogs); return; }
-        renderLogs(allLogs.filter(l => { const d = l.time_in.split('T')[0]; return (!from || d >= from) && (!to || d <= to); }));
+        renderLogs(allLogs.filter(l => {
+          const d = new Date(l.time_in).toLocaleDateString('en-CA', { timeZone: 'Asia/Manila' });
+          return (!from || d >= from) && (!to || d <= to);
+        }));
       }
 
       function getFilteredLogs() {
         const from = document.getElementById('dateFrom').value;
         const to   = document.getElementById('dateTo').value;
         if (!from && !to) return allLogs;
-        return allLogs.filter(l => { const d = l.time_in.split('T')[0]; return (!from || d >= from) && (!to || d <= to); });
+        return allLogs.filter(l => {
+          // Convert UTC time_in to PH date string for accurate comparison
+          const d = new Date(l.time_in).toLocaleDateString('en-CA', { timeZone: 'Asia/Manila' }); // en-CA = YYYY-MM-DD
+          return (!from || d >= from) && (!to || d <= to);
+        });
       }
 
       function exportCSV() {
