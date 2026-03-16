@@ -34,19 +34,22 @@
         <img src="img/neulogo.png" alt="NEU" class="nav-logo" onerror="this.style.display='none'" />
         <span class="nav-title">NEU Library Visitor Log</span>
       </div>
-      <span class="nav-clock" id="navClock">—</span>
-      <button class="dark-toggle" id="darkToggleBtn" title="Toggle dark mode">
-        <svg id="darkIcon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
-      </button>
+      <div class="nav-center">
+        <span class="nav-clock" id="navClock">—</span>
+      </div>
+      <div class="nav-right-controls">
+        <button class="dark-toggle" id="darkToggleBtn" title="Toggle dark mode">
+          <svg id="darkIcon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        </button>
+      </div>
     </nav>
 
-    <!-- Landscape workspace -->
+    <!-- 3-column workspace -->
     <div class="workspace">
 
-      <!-- LEFT PANEL -->
+      <!-- LEFT PANEL — Profile + Notices + Session/Streak -->
       <div class="left-panel">
 
-        <!-- Profile -->
         <div class="profile-card">
           <div style="position:relative;flex-shrink:0;">
             <div class="avatar" id="userAvatar">?</div>
@@ -67,20 +70,17 @@
           </div>
         </div>
 
-        <!-- Upcoming notices -->
         <div class="notices-card" id="noticesCard" style="display:none;">
           <div class="history-title">Library Notices</div>
           <div id="noticesList"></div>
         </div>
 
-        <!-- Session timer (shown if already inside) -->
         <div class="session-card" id="sessionCard">
           <div class="session-label">✓ Currently inside the library</div>
           <div class="session-timer" id="sessionTimer">0m 0s</div>
           <div class="session-since" id="sessionSince">—</div>
         </div>
 
-        <!-- Streak -->
         <div class="streak-card" id="streakCard">
           <span class="streak-fire">🔥</span>
           <div>
@@ -89,7 +89,68 @@
           </div>
         </div>
 
-        <!-- Visit history -->
+      </div>
+
+      <!-- CENTER PANEL — Check-in card -->
+      <div class="center-panel">
+        <div class="right-panel">
+
+          <div class="right-header">
+            <h2>Check In to the Library</h2>
+            <p>Select your reason for visiting today</p>
+          </div>
+
+          <div class="inside-overlay" id="insideOverlay">
+            <div class="inside-overlay-title">✓ You are currently inside</div>
+            <div class="inside-overlay-sub" id="insideOverlaySub">—</div>
+          </div>
+
+          <div class="reason-wrap">
+            <div class="reason-label">What will you be doing today?</div>
+            <div class="reason-grid" id="reasonGrid">
+              <div class="reason-option icon-reading" data-reason="Reading">
+                <span class="kbd-hint">1</span>
+                <svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+                <span class="reason-name">Reading</span>
+              </div>
+              <div class="reason-option icon-researching" data-reason="Researching">
+                <span class="kbd-hint">2</span>
+                <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path><path d="M10 2v8l3-3 3 3V2"></path></svg>
+                <span class="reason-name">Researching</span>
+              </div>
+              <div class="reason-option icon-computer" data-reason="Use of Computer">
+                <span class="kbd-hint">3</span>
+                <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                <span class="reason-name">Use of Computer</span>
+              </div>
+              <div class="reason-option icon-meeting" data-reason="Meeting">
+                <span class="kbd-hint">4</span>
+                <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                <span class="reason-name">Meeting</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button id="submitLogBtn" class="btn-submit" disabled>Log Visit</button>
+            <div class="btn-row">
+              <button id="showQrBtn" class="btn-qr">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect><path d="M14 14h3v3h-3zM17 17h3v3h-3zM14 20h3"></path></svg>
+                My QR Code
+              </button>
+              <button id="logoutBtn" class="btn-logout">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                Log Out
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- RIGHT PANEL — History + Chart -->
+      <div class="right-side-panel">
+
         <div class="history-card">
           <div class="history-title">Recent Visits</div>
           <div class="history-list" id="visitHistoryList">
@@ -101,71 +162,13 @@
           </div>
         </div>
 
-        <!-- Visit analytics chart -->
         <div class="analytics-card">
           <div class="history-title">My Visits — Last 3 Months</div>
-          <canvas id="analyticsChart" style="width:100%;height:90px;"></canvas>
+          <canvas id="analyticsChart" style="width:100%;height:110px;"></canvas>
         </div>
 
       </div>
 
-      <!-- RIGHT PANEL -->
-      <div class="right-panel">
-
-        <div class="right-header">
-          <h2>Check In to the Library</h2>
-          <p>Select your reason for visiting today</p>
-        </div>
-
-        <!-- Already inside overlay -->
-        <div class="inside-overlay" id="insideOverlay">
-          <div class="inside-overlay-title">✓ You are currently inside</div>
-          <div class="inside-overlay-sub" id="insideOverlaySub">—</div>
-        </div>
-
-        <!-- Reason grid -->
-        <div class="reason-wrap">
-          <div class="reason-label">What will you be doing today?</div>
-          <div class="reason-grid" id="reasonGrid">
-            <div class="reason-option icon-reading" data-reason="Reading">
-              <span class="kbd-hint">1</span>
-              <svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
-              <span class="reason-name">Reading</span>
-            </div>
-            <div class="reason-option icon-researching" data-reason="Researching">
-              <span class="kbd-hint">2</span>
-              <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path><path d="M10 2v8l3-3 3 3V2"></path></svg>
-              <span class="reason-name">Researching</span>
-            </div>
-            <div class="reason-option icon-computer" data-reason="Use of Computer">
-              <span class="kbd-hint">3</span>
-              <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
-              <span class="reason-name">Use of Computer</span>
-            </div>
-            <div class="reason-option icon-meeting" data-reason="Meeting">
-              <span class="kbd-hint">4</span>
-              <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-              <span class="reason-name">Meeting</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Action buttons -->
-        <div class="actions">
-          <button id="submitLogBtn" class="btn-submit" disabled>Log Visit</button>
-<div class="btn-row">
-            <button id="showQrBtn" class="btn-qr">
-              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect><path d="M14 14h3v3h-3zM17 17h3v3h-3zM14 20h3"></path></svg>
-              My QR Code
-            </button>
-            <button id="logoutBtn" class="btn-logout">
-              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
-              Log Out
-            </button>
-          </div>
-        </div>
-
-      </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
