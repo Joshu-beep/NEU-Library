@@ -143,18 +143,18 @@
         <div class="card-body" id="adminView" style="display: none">
           <div style="text-align: center; margin-bottom: 20px">
             <h3 style="color: var(--admin-red); font-weight: 700">Admin Authentication</h3>
-            <p style="font-size: 13px; color: var(--text-gray)">Restricted access to database</p>
+            <p style="font-size: 13px; color: var(--text-gray)">Sign in with your assigned admin account</p>
           </div>
           <form id="adminLoginForm">
             <div class="input-group">
-              <label>Admin Username</label>
-              <input type="text" id="adminUser" placeholder="Admin username..." required />
+              <label>Institutional Email</label>
+              <input type="email" id="adminEmail" placeholder="yourname@neu.edu.ph" required />
             </div>
             <div class="input-group">
-              <label>Secret Key</label>
+              <label>Password</label>
               <input type="password" id="adminPass" placeholder="••••••••" required />
             </div>
-            <button type="submit" class="btn btn-admin">Access Database</button>
+            <button type="submit" class="btn btn-admin" id="adminLoginBtn">Access Dashboard</button>
           </form>
           <div style="text-align: center; margin-top: 20px">
             <a href="#" id="backFromAdmin" style="font-size: 14px; color: var(--text-gray)">Back to Visitor Access</a>
@@ -174,6 +174,33 @@
       </div>
       </div><!-- end login-card -->
     </div><!-- end login-wrapper -->
+ 
+    <script src="js/index.js" type="module"></script>
+ 
+    <!-- Welcome popup -->
+    <div id="welcomePopup" style="
+      display:none; position:fixed; inset:0; background:rgba(0,0,0,0.55);
+      backdrop-filter:blur(3px); z-index:3000; align-items:center; justify-content:center;
+    ">
+      <div style="
+        background:white; border-radius:20px; padding:40px 48px; text-align:center;
+        box-shadow:0 20px 60px rgba(0,0,0,0.25); max-width:360px; width:90%;
+        animation: popIn 0.35s cubic-bezier(0.34,1.56,0.64,1);
+      ">
+        <div style="width:64px;height:64px;background:#f0fdf4;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+          <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        </div>
+        <h2 style="font-size:22px;font-weight:800;color:#001f54;margin-bottom:8px;">Welcome to NEU Library!</h2>
+        <p style="font-size:14px;color:#64748b;margin-bottom:20px;">Have a productive visit today.</p>
+        <div style="height:4px;background:#e2e8f0;border-radius:4px;overflow:hidden;">
+          <div id="welcomeBar" style="height:100%;background:#001f54;border-radius:4px;width:100%;transition:width 3s linear;"></div>
+        </div>
+        <p style="font-size:12px;color:#94a3b8;margin-top:8px;">Redirecting in <span id="welcomeCount">3</span>s...</p>
+      </div>
+    </div>
+    <style>
+      @keyframes popIn { from { transform:scale(0.8); opacity:0; } to { transform:scale(1); opacity:1; } }
+    </style>
 
     <script src="js/index.js" type="module"></script>
   </body>
