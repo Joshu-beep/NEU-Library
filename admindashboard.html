@@ -26,6 +26,7 @@
       </div>
     </div>
 
+    <!-- Navbar -->
     <nav class="navbar">
       <div class="nav-logo">
         <img src="img/neulogo.png" alt="NEU" onerror="this.style.display='none'" />
@@ -50,209 +51,205 @@
     </nav>
 
     <div class="container">
+      <div class="main-layout">
 
-      <!-- Stats — 4 cards -->
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-icon icon-red">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
-              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-            </svg>
-          </div>
-          <div class="stat-info"><h3>Live Occupancy</h3><p id="live-stat">—</p></div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon icon-blue">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
-            </svg>
-          </div>
-          <div class="stat-info"><h3>Visits Today</h3><p id="today-stat">—</p></div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon icon-green">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
-            </svg>
-          </div>
-          <div class="stat-info"><h3>This Week</h3><p id="week-stat">—</p></div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon icon-orange">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
-            </svg>
-          </div>
-          <div class="stat-info"><h3>Total Registered</h3><p id="total-stat">—</p></div>
-        </div>
-      </div>
+        <!-- LEFT COLUMN: 2x2 stats + content tabs -->
+        <div class="col-left">
 
-      <!-- Chart + Currently Inside -->
-      <div class="dashboard-row">
-        <div class="panel">
-          <div class="panel-header">
-            <h3>Daily Visits — Last 7 Days</h3>
-            <span id="chart-subtitle">Loading...</span>
-          </div>
-          <div class="panel-body">
-            <div class="chart-container"><canvas id="visitChart"></canvas></div>
-          </div>
-        </div>
-
-        <div class="panel">
-          <div class="panel-header">
-            <h3>Currently Inside</h3>
-            <span id="inside-count">0 people</span>
-          </div>
-          <div style="max-height:280px;overflow-y:auto;">
-            <table class="inside-table">
-              <thead>
-                <tr><th>Name</th><th>Program</th><th>Time In</th><th>Action</th></tr>
-              </thead>
-              <tbody id="insideTableBody">
-                <tr><td colspan="4" style="text-align:center;padding:30px;color:var(--muted)">No one inside yet.</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
-      <!-- Tabs + content -->
-      <div class="content-card">
-        <div class="toolbar">
-          <div class="tab-group">
-            <button class="tab active" onclick="changeView('log', this)">Visits Log</button>
-            <button class="tab" onclick="changeView('users', this)">Manage Users</button>
-            <button class="tab" onclick="changeView('notices', this)">Notices</button>
-            <button class="tab" id="adminsTabBtn" onclick="changeView('admins', this)" style="display:none;">Manage Admins</button>
-          </div>
-          <button class="btn-action btn-reset" onclick="triggerResetAll()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
-              <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
-            </svg>
-            Reset DB
-          </button>
-          <div class="date-filter" id="dateFilterSection">
-            <input type="date" class="date-input" id="dateFrom" onchange="filterByDate()" />
-            <span>to</span>
-            <input type="date" class="date-input" id="dateTo" onchange="filterByDate()" />
-          </div>
-          <div class="search-box">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-            </svg>
-            <input type="text" id="filterInput" placeholder="Filter by keyword..." onkeyup="runFilter()" />
-          </div>
-          <button class="btn-action btn-export-csv" onclick="exportCSV()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-              <polyline points="14 2 14 8 20 8"/>
-            </svg>
-            Export CSV
-          </button>
-          <button class="btn-action btn-export-pdf" onclick="exportPDF()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-              <polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
-            </svg>
-            Export PDF
-          </button>
-        </div>
-
-        <div id="log-view">
-          <table id="logTable">
-            <thead>
-              <tr><th>Date &amp; Time In</th><th>Name</th><th>Program</th><th>Reason</th><th>Duration</th><th>Status</th></tr>
-            </thead>
-            <tbody id="logTableBody">
-              <tr class="loading-row"><td colspan="6">Loading visit records...</td></tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div id="users-view" class="hidden">
-          <table id="usersTable">
-            <thead>
-              <tr><th>Name</th><th>Email</th><th>Program</th><th>Role</th><th>Status</th><th>Actions</th></tr>
-            </thead>
-            <tbody id="usersTableBody">
-              <tr class="loading-row"><td colspan="6">Loading user records...</td></tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div id="notices-view" class="hidden" style="padding:24px;">
-          <h3 style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px;">Library Announcements &amp; Reminders</h3>
-          <p style="font-size:13px;color:var(--muted);margin-bottom:20px;">These appear on the login page. Events are sorted by date.</p>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start;">
-            <div>
-              <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#3b82f6;margin-bottom:10px;display:flex;align-items:center;gap:6px;">
-                <span style="width:8px;height:8px;border-radius:50%;background:#3b82f6;display:inline-block;"></span>Announcements / Events
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon icon-red">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                </svg>
               </div>
-              <div style="background:#f8fafc;border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:12px;">
-                <div style="display:flex;flex-direction:column;gap:10px;">
-                  <div>
-                    <label style="font-size:12px;font-weight:600;color:var(--text);display:block;margin-bottom:4px;">Message</label>
-                    <textarea id="eventInput" placeholder="e.g. Book Fair 2026 — Visit our collection..." rows="2" style="width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;resize:none;outline:none;font-family:inherit;"></textarea>
+              <div class="stat-info"><h3>Live Occupancy</h3><p id="live-stat">—</p></div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon icon-blue">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                </svg>
+              </div>
+              <div class="stat-info"><h3>Visits Today</h3><p id="today-stat">—</p></div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon icon-green">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                </svg>
+              </div>
+              <div class="stat-info"><h3>This Week</h3><p id="week-stat">—</p></div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon icon-orange">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+                </svg>
+              </div>
+              <div class="stat-info"><h3>Total Registered</h3><p id="total-stat">—</p></div>
+            </div>
+          </div>
+
+          <!-- Tabs + content -->
+          <div class="content-card">
+            <div class="toolbar">
+              <div class="tab-group">
+                <button class="tab active" onclick="changeView('log', this)">Visits Log</button>
+                <button class="tab" onclick="changeView('users', this)">Manage Users</button>
+                <button class="tab" onclick="changeView('notices', this)">Notices</button>
+                <button class="tab" id="adminsTabBtn" onclick="changeView('admins', this)" style="display:none;">Manage Admins</button>
+              </div>
+              <button class="btn-action btn-reset" onclick="triggerResetAll()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                  <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+                </svg>
+                Reset DB
+              </button>
+              <div class="date-filter" id="dateFilterSection">
+                <input type="date" class="date-input" id="dateFrom" onchange="filterByDate()" />
+                <span>to</span>
+                <input type="date" class="date-input" id="dateTo" onchange="filterByDate()" />
+              </div>
+              <div class="search-box">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                </svg>
+                <input type="text" id="filterInput" placeholder="Filter by keyword..." onkeyup="runFilter()" />
+              </div>
+              <button class="btn-action btn-export-csv" onclick="exportCSV()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
+                </svg>
+                Export CSV
+              </button>
+              <button class="btn-action btn-export-pdf" onclick="exportPDF()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                Export PDF
+              </button>
+            </div>
+
+            <div id="log-view">
+              <table id="logTable">
+                <thead>
+                  <tr><th>Date &amp; Time In</th><th>Name</th><th>Program</th><th>Reason</th><th>Duration</th><th>Status</th></tr>
+                </thead>
+                <tbody id="logTableBody">
+                  <tr class="loading-row"><td colspan="6">Loading visit records...</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div id="users-view" class="hidden">
+              <table id="usersTable">
+                <thead>
+                  <tr><th>Name</th><th>Email</th><th>Program</th><th>Role</th><th>Status</th><th>Actions</th></tr>
+                </thead>
+                <tbody id="usersTableBody">
+                  <tr class="loading-row"><td colspan="6">Loading user records...</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div id="notices-view" class="hidden" style="padding:20px;">
+              <h3 style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px;">Library Announcements &amp; Reminders</h3>
+              <p style="font-size:12px;color:var(--muted);margin-bottom:16px;">These appear on the login page.</p>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start;">
+                <div>
+                  <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#3b82f6;margin-bottom:8px;display:flex;align-items:center;gap:6px;">
+                    <span style="width:7px;height:7px;border-radius:50%;background:#3b82f6;display:inline-block;"></span>Announcements / Events
                   </div>
-                  <div>
-                    <label style="font-size:12px;font-weight:600;color:var(--text);display:block;margin-bottom:4px;">Event Date</label>
-                    <input type="date" id="eventDateInput" style="width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;outline:none;" />
+                  <div style="background:#f8fafc;border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px;">
+                    <div style="display:flex;flex-direction:column;gap:8px;">
+                      <div><label style="font-size:11px;font-weight:600;color:var(--text);display:block;margin-bottom:3px;">Message</label>
+                        <textarea id="eventInput" placeholder="e.g. Book Fair 2026..." rows="2" style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:7px;font-size:12px;resize:none;outline:none;font-family:inherit;"></textarea></div>
+                      <div><label style="font-size:11px;font-weight:600;color:var(--text);display:block;margin-bottom:3px;">Event Date</label>
+                        <input type="date" id="eventDateInput" style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:7px;font-size:12px;outline:none;" /></div>
+                      <div><label style="font-size:11px;font-weight:600;color:var(--text);display:block;margin-bottom:3px;">Show From (optional)</label>
+                        <input type="date" id="eventStartInput" style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:7px;font-size:12px;outline:none;" />
+                        <p style="font-size:10px;color:var(--muted);margin-top:2px;">Leave blank to show immediately</p></div>
+                      <button onclick="addAnnouncement()" style="padding:8px;background:#3b82f6;color:white;border:none;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;width:100%;">Post Announcement</button>
+                    </div>
                   </div>
-                  <div>
-                    <label style="font-size:12px;font-weight:600;color:var(--text);display:block;margin-bottom:4px;">Show From (optional)</label>
-                    <input type="date" id="eventStartInput" style="width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;outline:none;" />
-                    <p style="font-size:10px;color:var(--muted);margin-top:3px;">Leave blank to show immediately</p>
+                  <div id="eventsAdminList"><div style="text-align:center;padding:16px;color:var(--muted);font-size:12px;">Loading...</div></div>
+                </div>
+                <div>
+                  <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#f59e0b;margin-bottom:8px;display:flex;align-items:center;gap:6px;">
+                    <span style="width:7px;height:7px;border-radius:50%;background:#f59e0b;display:inline-block;"></span>Reminders
                   </div>
-                  <button onclick="addAnnouncement()" style="padding:9px 16px;background:#3b82f6;color:white;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;width:100%;">Post Announcement</button>
+                  <div style="background:#f8fafc;border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px;">
+                    <div style="display:flex;flex-direction:column;gap:8px;">
+                      <div><label style="font-size:11px;font-weight:600;color:var(--text);display:block;margin-bottom:3px;">Message</label>
+                        <textarea id="reminderInput" placeholder="e.g. Please observe silence..." rows="2" style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:7px;font-size:12px;resize:none;outline:none;font-family:inherit;"></textarea></div>
+                      <div><label style="font-size:11px;font-weight:600;color:var(--text);display:block;margin-bottom:3px;">Show From (optional)</label>
+                        <input type="date" id="reminderStartInput" style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:7px;font-size:12px;outline:none;" />
+                        <p style="font-size:10px;color:var(--muted);margin-top:2px;">Leave blank to show immediately</p></div>
+                      <button onclick="addReminder()" style="padding:8px;background:#f59e0b;color:#001f54;border:none;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;width:100%;">Post Reminder</button>
+                    </div>
+                  </div>
+                  <div id="remindersAdminList"><div style="text-align:center;padding:16px;color:var(--muted);font-size:12px;">Loading...</div></div>
                 </div>
               </div>
-              <div id="eventsAdminList"><div style="text-align:center;padding:20px;color:var(--muted);font-size:13px;">Loading...</div></div>
             </div>
-            <div>
-              <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#f59e0b;margin-bottom:10px;display:flex;align-items:center;gap:6px;">
-                <span style="width:8px;height:8px;border-radius:50%;background:#f59e0b;display:inline-block;"></span>Reminders
-              </div>
-              <div style="background:#f8fafc;border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:12px;">
-                <div style="display:flex;flex-direction:column;gap:10px;">
-                  <div>
-                    <label style="font-size:12px;font-weight:600;color:var(--text);display:block;margin-bottom:4px;">Message</label>
-                    <textarea id="reminderInput" placeholder="e.g. Please observe silence in reading areas..." rows="2" style="width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;resize:none;outline:none;font-family:inherit;"></textarea>
-                  </div>
-                  <div>
-                    <label style="font-size:12px;font-weight:600;color:var(--text);display:block;margin-bottom:4px;">Show From (optional)</label>
-                    <input type="date" id="reminderStartInput" style="width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;outline:none;" />
-                    <p style="font-size:10px;color:var(--muted);margin-top:3px;">Leave blank to show immediately</p>
-                  </div>
-                  <button onclick="addReminder()" style="padding:9px 16px;background:#f59e0b;color:#001f54;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;width:100%;">Post Reminder</button>
+
+            <div id="admins-view" class="hidden" style="padding:20px;">
+              <h3 style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px;">Manage Admins</h3>
+              <p style="font-size:12px;color:var(--muted);margin-bottom:16px;">Assign or remove admin access for <strong>@neu.edu.ph</strong> accounts.</p>
+              <div style="background:#f8fafc;border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:16px;max-width:480px;">
+                <label style="font-size:11px;font-weight:700;color:var(--text);display:block;margin-bottom:5px;">Assign Admin by Email</label>
+                <div style="display:flex;gap:8px;">
+                  <input type="email" id="assignAdminEmail" placeholder="username@neu.edu.ph" style="flex:1;padding:8px 12px;border:1px solid var(--border);border-radius:7px;font-size:12px;outline:none;" />
+                  <button onclick="assignAdmin()" style="padding:8px 16px;background:#001f54;color:white;border:none;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;">+ Assign</button>
                 </div>
+                <p id="assignMsg" style="font-size:11px;margin-top:6px;display:none;"></p>
               </div>
-              <div id="remindersAdminList"><div style="text-align:center;padding:20px;color:var(--muted);font-size:13px;">Loading...</div></div>
+              <div style="max-width:480px;">
+                <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;margin-bottom:8px;">Current Admins</div>
+                <div id="adminsList"><div style="text-align:center;padding:16px;color:var(--muted);font-size:12px;">Loading...</div></div>
+              </div>
+            </div>
+
+          </div><!-- /content-card -->
+        </div><!-- /col-left -->
+
+        <!-- RIGHT COLUMN: Chart + Currently Inside -->
+        <div class="col-right">
+
+          <div class="panel">
+            <div class="panel-header">
+              <h3>Daily Visits — Last 7 Days</h3>
+              <span id="chart-subtitle">Loading...</span>
+            </div>
+            <div class="panel-body">
+              <div class="chart-container"><canvas id="visitChart"></canvas></div>
             </div>
           </div>
-        </div>
 
-        <div id="admins-view" class="hidden" style="padding:24px;">
-          <h3 style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px;">Manage Admins</h3>
-          <p style="font-size:13px;color:var(--muted);margin-bottom:20px;">Assign or remove admin access. Users must have a registered <strong>@neu.edu.ph</strong> account.</p>
-          <div style="background:#f8fafc;border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:20px;max-width:520px;">
-            <label style="font-size:12px;font-weight:700;color:var(--text);display:block;margin-bottom:6px;">Assign Admin by Email</label>
-            <div style="display:flex;gap:10px;">
-              <input type="email" id="assignAdminEmail" placeholder="username@neu.edu.ph" style="flex:1;padding:9px 14px;border:1px solid var(--border);border-radius:8px;font-size:13px;outline:none;" />
-              <button onclick="assignAdmin()" style="padding:9px 20px;background:#001f54;color:white;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;">+ Assign</button>
+          <div class="panel">
+            <div class="panel-header">
+              <h3>Currently Inside</h3>
+              <span id="inside-count">0 people</span>
             </div>
-            <p id="assignMsg" style="font-size:12px;margin-top:8px;display:none;"></p>
+            <div style="overflow-y:auto;max-height:340px;">
+              <table class="inside-table">
+                <thead>
+                  <tr><th>Name</th><th>Program</th><th>Time In</th><th>Action</th></tr>
+                </thead>
+                <tbody id="insideTableBody">
+                  <tr><td colspan="4" style="text-align:center;padding:24px;color:var(--muted)">No one inside yet.</td></tr>
+                </tbody>
+              </table>
+            </div>
           </div>
-          <div style="max-width:520px;">
-            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;margin-bottom:10px;">Current Admins</div>
-            <div id="adminsList"><div style="text-align:center;padding:20px;color:var(--muted);font-size:13px;">Loading...</div></div>
-          </div>
-        </div>
 
-      </div>
-    </div>
+        </div><!-- /col-right -->
+      </div><!-- /main-layout -->
+    </div><!-- /container -->
 
     <script src="js/admindashboard.js" type="module"></script>
   </body>
