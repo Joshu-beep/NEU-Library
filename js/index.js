@@ -93,7 +93,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
           // 4. Check if blocked
           if (profile.is_blocked) {
             clearTimeout(safetyTimer);
-            showMessage("Your account has been blocked. Please contact the library admin.", "#991b1b");
+            showMessage("Your account has been blocked. Please visit the library and contact the librarian for assistance.", "#991b1b");
             resetBtn();
             return;
           }
