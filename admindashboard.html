@@ -15,10 +15,7 @@
     <div class="detail-modal-overlay" id="detailModal">
       <div class="detail-modal">
         <div class="detail-modal-header">
-          <div>
-            <h2 id="modalName">—</h2>
-            <p id="modalEmail">—</p>
-          </div>
+          <div><h2 id="modalName">—</h2><p id="modalEmail">—</p></div>
           <button class="detail-modal-close" onclick="closeDetailModal()">✕</button>
         </div>
         <div class="detail-modal-body" id="modalBody"></div>
@@ -52,73 +49,79 @@
 
     <div class="container">
 
-      <!-- Stats — 4 in a row -->
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-icon icon-red">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
-              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-            </svg>
-          </div>
-          <div class="stat-info"><h3>Live Occupancy</h3><p id="live-stat">—</p></div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon icon-blue">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
-            </svg>
-          </div>
-          <div class="stat-info"><h3>Visits Today</h3><p id="today-stat">—</p></div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon icon-green">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
-            </svg>
-          </div>
-          <div class="stat-info"><h3>This Week</h3><p id="week-stat">—</p></div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon icon-orange">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
-            </svg>
-          </div>
-          <div class="stat-info"><h3>Total Registered</h3><p id="total-stat">—</p></div>
-        </div>
-      </div>
+      <!-- TOP ROW: 2x2 stats LEFT + chart/inside RIGHT -->
+      <div class="top-row">
 
-      <!-- Chart + Currently Inside -->
-      <div class="dashboard-row">
-        <div class="panel">
-          <div class="panel-header">
-            <h3>Daily Visits — Last 7 Days</h3>
-            <span id="chart-subtitle">Loading...</span>
+        <!-- LEFT: 2x2 stat cards -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon icon-red">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+              </svg>
+            </div>
+            <div class="stat-info"><h3>Live Occupancy</h3><p id="live-stat">—</p></div>
           </div>
-          <div class="panel-body">
-            <div class="chart-container"><canvas id="visitChart"></canvas></div>
+          <div class="stat-card">
+            <div class="stat-icon icon-blue">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+              </svg>
+            </div>
+            <div class="stat-info"><h3>Visits Today</h3><p id="today-stat">—</p></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon icon-green">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+              </svg>
+            </div>
+            <div class="stat-info"><h3>This Week</h3><p id="week-stat">—</p></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon icon-orange">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+              </svg>
+            </div>
+            <div class="stat-info"><h3>Total Registered</h3><p id="total-stat">—</p></div>
           </div>
         </div>
-        <div class="panel">
-          <div class="panel-header">
-            <h3>Currently Inside</h3>
-            <span id="inside-count">0 people</span>
-          </div>
-          <div style="overflow-y:auto;max-height:280px;">
-            <table class="inside-table">
-              <thead>
-                <tr><th>Name</th><th>Program</th><th>Time In</th><th>Action</th></tr>
-              </thead>
-              <tbody id="insideTableBody">
-                <tr><td colspan="4" style="text-align:center;padding:28px;color:var(--muted)">No one inside yet.</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
 
-      <!-- Tabs + content — full width -->
+        <!-- RIGHT: chart + currently inside stacked -->
+        <div class="right-panels">
+          <div class="panel">
+            <div class="panel-header">
+              <h3>Daily Visits — Last 7 Days</h3>
+              <span id="chart-subtitle">Loading...</span>
+            </div>
+            <div class="panel-body">
+              <div class="chart-container"><canvas id="visitChart"></canvas></div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-header">
+              <h3>Currently Inside</h3>
+              <span id="inside-count">0 people</span>
+            </div>
+            <div style="overflow-y:auto;max-height:220px;">
+              <table class="inside-table">
+                <thead>
+                  <tr><th>Name</th><th>Program</th><th>Time In</th><th>Action</th></tr>
+                </thead>
+                <tbody id="insideTableBody">
+                  <tr><td colspan="4" style="text-align:center;padding:24px;color:var(--muted)">No one inside yet.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /top-row -->
+
+      <!-- BOTTOM: full-width content card -->
       <div class="content-card">
         <div class="toolbar">
           <div class="tab-group">
@@ -240,8 +243,8 @@
           </div>
         </div>
 
-      </div>
-    </div>
+      </div><!-- /content-card -->
+    </div><!-- /container -->
 
     <script src="js/admindashboard.js" type="module"></script>
   </body>
