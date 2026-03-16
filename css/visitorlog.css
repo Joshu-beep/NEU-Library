@@ -34,27 +34,24 @@ body {
 .nav-title { font-size: clamp(13px, 1.2vw, 17px); font-weight: 700; }
 .nav-clock { font-size: clamp(11px, 0.9vw, 13px); opacity: 0.85; font-variant-numeric: tabular-nums; }
 
-/* ── Workspace — left panel + centered right card ── */
+/* ── Workspace — centered both axes ── */
 .workspace {
   flex: 1;
   display: flex;
   flex-direction: row;
   gap: clamp(10px, 1.2vw, 18px);
   padding: clamp(10px, 1.2vw, 18px) clamp(12px, 1.5vw, 24px);
-  overflow: hidden;
-  min-height: 0;
+  overflow: auto;
   align-items: flex-start;
   justify-content: center;
 }
 
-/* ── Left panel — fixed narrow width ── */
+/* ── Left panel — fixed narrow width, sized to content ── */
 .left-panel {
   display: flex; flex-direction: column;
   gap: clamp(6px, 0.7vw, 10px);
   width: clamp(180px, 17vw, 240px);
   flex-shrink: 0;
-  overflow: hidden;
-  height: 100%;
 }
 
 /* Profile card */
@@ -112,7 +109,8 @@ body {
 .history-card {
   background: rgba(255,255,255,0.93); border-radius: 10px;
   padding: clamp(8px, 1vw, 12px) clamp(10px, 1.1vw, 14px);
-  flex: 1; min-height: 0; overflow: hidden; display: flex; flex-direction: column;
+  max-height: clamp(160px, 22vh, 260px);
+  overflow: hidden; display: flex; flex-direction: column;
   border: 1px solid var(--border); box-shadow: 0 1px 4px rgba(0,0,0,0.04);
 }
 .history-title { font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 7px; flex-shrink: 0; }
