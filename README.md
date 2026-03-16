@@ -1,3 +1,6 @@
+# user: jcesperanza@neu.edu.ph
+# pass: jcesperanza
+
 # NEU Library Visitor Management System
 
 A web-based visitor management system for the **New Era University Library**. Students and faculty check in using their institutional email, log their reason for visiting, and check out when they leave. Admins monitor live occupancy, view visit logs, manage users, and post announcements — all in real time.
