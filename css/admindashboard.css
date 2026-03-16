@@ -130,3 +130,18 @@ td { padding: clamp(10px, 1.1vw, 15px) clamp(12px, 1.4vw, 22px); border-bottom: 
   .btn-action { padding: 6px 8px; font-size: 11px; }
   th, td { padding: 8px 10px; }
 }
+
+/* ── Background image ── */
+body {
+  background-image: url("../img/admindashboard-bg.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-color: var(--bg-light);
+}
+.container { position: relative; z-index: 1; }
+.stat-card, .panel, .content-card {
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(2px);
+}
