@@ -16,7 +16,7 @@
 html, body { height: 100%; overflow: hidden; }
 body {
   background-color: var(--bg);
-  background-image: url("/img/library.png");
+  background-image: url("../img/visitorlog-bg.jpg");
   background-size: cover; background-position: center;
   background-repeat: no-repeat; background-attachment: fixed;
   display: flex; flex-direction: column;
@@ -317,16 +317,6 @@ body {
   padding: clamp(8px, 1vw, 12px) clamp(10px, 1.1vw, 14px);
   border: 1px solid var(--border); box-shadow: 0 1px 4px rgba(0,0,0,0.04);
 }
-
-/* ── Checkout button ── */
-.btn-checkout {
-  width: 100%; padding: clamp(10px, 1.1vw, 13px); border-radius: 9px; border: none;
-  font-size: clamp(12px, 1.1vw, 14px); font-weight: 700; color: #fff;
-  background: #16a34a; cursor: pointer; transition: all 0.2s;
-  display: flex; align-items: center; justify-content: center; gap: 7px;
-}
-.btn-checkout:hover:not(:disabled) { background: #15803d; transform: translateY(-1px); }
-.btn-checkout:disabled { opacity: 0.7; cursor: not-allowed; }
 
 /* ── Profile badge wrapping ── */
 .profile-badge {
