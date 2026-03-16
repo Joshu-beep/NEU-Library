@@ -1,5 +1,4 @@
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
-      import { initDarkMode } from './darkmode.js';
       const SUPABASE_URL = 'https://ruajjuxabwfqpawpjosl.supabase.co';
       const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ1YWpqdXhhYndmcXBhd3Bqb3NsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0NTg0MjksImV4cCI6MjA4OTAzNDQyOX0.O1ZbG4vC6q4DxQKTq664i3e4xwUYcvgVDOsuNMDNK4I';
       const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -558,7 +557,6 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
       window.toggleNotice = toggleNotice; window.deleteNotice = deleteNotice;
 
       // ── Init ──
-      initDarkMode("darkToggleBtn", "darkIcon");
       autoLogoutMidnight().catch(e => console.warn('autoLogout:', e));
       loadStats().catch(e => console.error('loadStats:', e));
       loadInsideNow().catch(e => console.error('loadInsideNow:', e));
