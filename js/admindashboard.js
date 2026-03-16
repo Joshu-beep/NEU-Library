@@ -219,14 +219,19 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
         renderLogs(allLogs);
       }
 
+      // ── Data stores for modal lookup ──
+      const logStore = {};
+      const userStore = {};
+
       function renderLogs(logs) {
         const tbody = document.getElementById('logTableBody');
         if (!logs.length) { tbody.innerHTML = `<tr class="loading-row"><td colspan="6">No visit records found.</td></tr>`; return; }
         tbody.innerHTML = logs.map(log => {
+          logStore[log.id] = log;
           const sc = log.status === 'inside' ? 'badge-inside' : log.status === 'logged_out' ? 'badge-logged-out' : 'badge-checkout';
           const sl = log.status === 'inside' ? 'Inside' : log.status === 'logged_out' ? 'Logged Out' : 'Checked Out';
           return `
-            <tr data-log-id="${log.id}">
+            <tr class="clickable-row" onclick="showLogDetail('${log.id}')">
               <td><div class="name-stack"><span class="name">${phDate(log.time_in)}</span><span class="sub-text">${phTime(log.time_in)}</span></div></td>
               <td><div class="name-stack"><span class="name">${log.users?.name || 'Unknown'}</span><span class="sub-text">${log.users?.email || '—'}</span></div></td>
               <td><span class="badge badge-program">${log.users?.program || '—'}</span></td>
@@ -249,23 +254,24 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
         const tbody = document.getElementById('usersTableBody');
         if (!users.length) { tbody.innerHTML = `<tr class="loading-row"><td colspan="6">No user records found.</td></tr>`; return; }
         tbody.innerHTML = users.map(u => {
-          const rc = u.role === 'faculty' ? 'badge-faculty' : 'badge-student';
+          userStore[u.id] = u;
+          const rc = u.role === 'faculty' ? 'badge-faculty' : u.role === 'admin' ? 'badge-admin' : u.role === 'owner' ? 'badge-owner' : 'badge-student';
           const rl = u.role ? u.role.charAt(0).toUpperCase() + u.role.slice(1) : 'Student';
           return `
-            <tr data-user-id="${u.id}">
+            <tr class="clickable-row" onclick="showUserDetail('${u.id}')">
               <td><div class="name-stack"><span class="name">${u.name || '—'}</span></div></td>
               <td>${u.email}</td>
               <td><span class="badge badge-program">${u.program || '—'}</span></td>
               <td><span class="badge ${rc}">${rl}</span></td>
-              <td id="status-${u.id}" style="color:${u.is_blocked ? 'var(--danger-red)' : '#16a34a'};font-weight:600;font-size:13px;">${u.is_blocked ? 'Blocked' : 'Active'}</td>
+              <td style="color:${u.is_blocked ? 'var(--danger)' : '#16a34a'};font-weight:600;">${u.is_blocked ? 'Blocked' : 'Active'}</td>
               <td>
-                <div class="action-flex">
-                  <button class="action-text-btn" id="block-btn-${u.id}" style="color:${u.is_blocked ? '#16a34a' : 'var(--danger-red)'}" onclick="toggleBlock('${u.id}', this)">${u.is_blocked ? 'Unblock' : 'Block'}</button>
+                <div class="action-flex" onclick="event.stopPropagation()">
+                  <button class="action-text-btn" id="block-btn-${u.id}" style="color:${u.is_blocked ? '#16a34a' : 'var(--danger)'}" onclick="toggleBlock('${u.id}', this)">${u.is_blocked ? 'Unblock' : 'Block'}</button>
                   <button class="action-icon-btn" onclick="removeUser('${u.id}')">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <polyline points="3 6 5 6 21 6"></polyline>
-                      <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path>
-                      <path d="M10 11v6"></path><path d="M14 11v6"></path><path d="M9 6V4h6v2"></path>
+                      <polyline points="3 6 5 6 21 6"/>
+                      <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                      <path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/>
                     </svg>
                   </button>
                 </div>
@@ -558,7 +564,94 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
       function exportPDF() { window.print(); }
       function logout() { if (confirm('End administrator session?')) window.location.href = 'index.html'; }
 
-      window.changeView = changeView; window.runFilter = runFilter; window.filterByDate = filterByDate;
+      // ── Detail modal ──
+      function closeDetailModal() {
+        document.getElementById('detailModal').classList.remove('show');
+      }
+
+      document.getElementById('detailModal').addEventListener('click', (e) => {
+        if (e.target === document.getElementById('detailModal')) closeDetailModal();
+      });
+
+      function showLogDetail(logId) {
+        const log = logStore[logId];
+        if (!log) return;
+        const isInside = log.status === 'inside';
+        document.getElementById('modalName').textContent = log.users?.name || 'Unknown';
+        document.getElementById('modalEmail').textContent = log.users?.email || '—';
+
+        document.getElementById('modalBody').innerHTML = `
+          <div class="detail-row"><span class="detail-label">Program</span><span class="detail-value">${log.users?.program || '—'}</span></div>
+          <div class="detail-row"><span class="detail-label">Reason</span><span class="detail-value">${log.reason}</span></div>
+          <div class="detail-row"><span class="detail-label">Date</span><span class="detail-value">${phDate(log.time_in)}</span></div>
+          <div class="detail-row"><span class="detail-label">Time In</span><span class="detail-value">${phTime(log.time_in)}</span></div>
+          <div class="detail-row"><span class="detail-label">Time Out</span><span class="detail-value">${log.time_out ? phTime(log.time_out) : '—'}</span></div>
+          <div class="detail-row"><span class="detail-label">Duration</span><span class="detail-value">${calcDuration(log.time_in, log.time_out)}</span></div>
+          <div class="detail-row"><span class="detail-label">Status</span><span class="detail-value"><span class="badge ${isInside ? 'badge-inside' : 'badge-logged-out'}">${isInside ? 'Inside' : 'Logged Out'}</span></span></div>
+        `;
+
+        const actions = document.getElementById('modalActions');
+        if (isInside) {
+          actions.innerHTML = `
+            <button class="btn-modal-force" id="modalForceBtn">Force Logout</button>
+            <button class="btn-modal-close" onclick="closeDetailModal()">Close</button>`;
+          document.getElementById('modalForceBtn').onclick = async () => {
+            await forceLogoutUser(log.id, log.users?.name || 'User');
+            closeDetailModal();
+          };
+        } else {
+          actions.innerHTML = `<button class="btn-modal-close" style="width:100%" onclick="closeDetailModal()">Close</button>`;
+        }
+        document.getElementById('detailModal').classList.add('show');
+      }
+
+      async function showUserDetail(userId) {
+        const user = userStore[userId];
+        if (!user) return;
+
+        document.getElementById('modalName').textContent = user.name || '—';
+        document.getElementById('modalEmail').textContent = user.email;
+        document.getElementById('modalBody').innerHTML = `<div class="detail-row"><span class="detail-label">Loading...</span></div>`;
+        document.getElementById('modalActions').innerHTML = '';
+        document.getElementById('detailModal').classList.add('show');
+
+        const [{ data: lastVisit }, { count: totalVisits }, { data: activeLog }] = await Promise.all([
+          supabase.from('visit_logs').select('time_in, reason, status').eq('user_id', userId).order('time_in', { ascending: false }).limit(1).maybeSingle(),
+          supabase.from('visit_logs').select('*', { count: 'exact', head: true }).eq('user_id', userId),
+          supabase.from('visit_logs').select('id').eq('user_id', userId).eq('status', 'inside').order('time_in', { ascending: false }).limit(1).maybeSingle()
+        ]);
+
+        const isInside = !!activeLog;
+        const rl = user.role ? user.role.charAt(0).toUpperCase() + user.role.slice(1) : 'Student';
+        const rc = user.role === 'faculty' ? 'badge-faculty' : user.role === 'admin' ? 'badge-admin' : user.role === 'owner' ? 'badge-owner' : 'badge-student';
+
+        document.getElementById('modalBody').innerHTML = `
+          <div class="detail-row"><span class="detail-label">Program</span><span class="detail-value">${user.program || '—'}</span></div>
+          <div class="detail-row"><span class="detail-label">Role</span><span class="detail-value"><span class="badge ${rc}">${rl}</span></span></div>
+          <div class="detail-row"><span class="detail-label">Account</span><span class="detail-value" style="color:${user.is_blocked ? 'var(--danger)' : '#16a34a'};font-weight:600;">${user.is_blocked ? 'Blocked' : 'Active'}</span></div>
+          <div class="detail-row"><span class="detail-label">Total Visits</span><span class="detail-value">${totalVisits ?? 0}</span></div>
+          <div class="detail-row"><span class="detail-label">Currently</span><span class="detail-value"><span class="badge ${isInside ? 'badge-inside' : 'badge-checkout'}">${isInside ? '● Inside' : 'Outside'}</span></span></div>
+          ${lastVisit ? `<div class="detail-row"><span class="detail-label">Last Visit</span><span class="detail-value">${phDate(lastVisit.time_in)} · ${lastVisit.reason}</span></div>` : ''}
+          <div class="detail-row"><span class="detail-label">Registered</span><span class="detail-value">${phDate(user.created_at)}</span></div>
+        `;
+
+        const actions = document.getElementById('modalActions');
+        let btns = `<button class="btn-modal-close" onclick="closeDetailModal()">${isInside ? 'Close' : 'Close'}</button>`;
+        if (isInside && activeLog) {
+          btns = `<button class="btn-modal-force" id="modalForceBtn">Force Logout</button>` + btns;
+        }
+        actions.innerHTML = btns;
+        if (isInside && activeLog) {
+          document.getElementById('modalForceBtn').onclick = async () => {
+            await forceLogoutUser(activeLog.id, user.name || 'User');
+            closeDetailModal();
+          };
+        }
+      }
+
+      window.showLogDetail = showLogDetail;
+      window.showUserDetail = showUserDetail;
+      window.closeDetailModal = closeDetailModal; window.runFilter = runFilter; window.filterByDate = filterByDate;
       window.triggerResetAll = triggerResetAll; window.toggleBlock = toggleBlock; window.removeUser = removeUser;
       window.exportCSV = exportCSV; window.exportPDF = exportPDF; window.logout = logout;
       window.addAnnouncement = addAnnouncement; window.addReminder = addReminder;
