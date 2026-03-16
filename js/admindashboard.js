@@ -1,4 +1,5 @@
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+      import { initDarkMode } from './darkmode.js';
       const SUPABASE_URL = 'https://ruajjuxabwfqpawpjosl.supabase.co';
       const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ1YWpqdXhhYndmcXBhd3Bqb3NsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0NTg0MjksImV4cCI6MjA4OTAzNDQyOX0.O1ZbG4vC6q4DxQKTq664i3e4xwUYcvgVDOsuNMDNK4I';
       const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -37,13 +38,37 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
       }
 
       // ── Auto-logout stale inside records from previous days ──
+      const LIBRARY_SCHEDULE = {
+        0: null,
+        1: { open: 7, close: 21 }, 2: { open: 7, close: 21 },
+        3: { open: 7, close: 21 }, 4: { open: 7, close: 21 },
+        5: { open: 7, close: 21 }, 6: { open: 8, close: 17 },
+      };
+
       async function autoLogoutMidnight() {
+        // 1. Clear any records from previous days (still uses midnight cutoff)
         const todayStart = todayPHStartISO();
         await supabase
           .from('visit_logs')
           .update({ status: 'logged_out', time_out: todayStart })
           .eq('status', 'inside')
           .lt('time_in', todayStart);
+
+        // 2. Close out records past today's closing time
+        const nowPH = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Manila' }));
+        const hrs = LIBRARY_SCHEDULE[nowPH.getDay()];
+        if (hrs && nowPH.getHours() >= hrs.close) {
+          // Build closing time ISO for today
+          const closing = new Date(nowPH);
+          closing.setHours(hrs.close, 0, 0, 0);
+          // Convert PH local time to UTC ISO
+          const closingUTC = new Date(closing.getTime() - (8 * 60 * 60 * 1000)).toISOString();
+          await supabase
+            .from('visit_logs')
+            .update({ status: 'logged_out', time_out: closingUTC })
+            .eq('status', 'inside')
+            .lt('time_in', closingUTC);
+        }
       }
 
       // ── Stats ──
@@ -533,6 +558,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
       window.toggleNotice = toggleNotice; window.deleteNotice = deleteNotice;
 
       // ── Init ──
+      initDarkMode("darkToggleBtn", "darkIcon");
       autoLogoutMidnight().catch(e => console.warn('autoLogout:', e));
       loadStats().catch(e => console.error('loadStats:', e));
       loadInsideNow().catch(e => console.error('loadInsideNow:', e));
