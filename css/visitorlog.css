@@ -26,16 +26,16 @@ body::before {
 /* ── Navbar ── */
 .navbar {
   background: var(--blue); border-bottom: 4px solid var(--gold);
-  padding: 0 clamp(14px, 2vw, 28px); height: 50px;
+  padding: 0 clamp(14px, 2vw, 28px); height: clamp(58px, 7vh, 72px);
   display: flex; align-items: center; justify-content: space-between;
   color: #fff; flex-shrink: 0; position: relative; z-index: 10;
 }
-.nav-left { display: flex; align-items: center; gap: 10px; }
-.nav-logo { width: 32px; height: 32px; object-fit: contain; border-radius: 4px; }
-.nav-title { font-size: clamp(13px, 1.2vw, 16px); font-weight: 700; }
+.nav-left { display: flex; align-items: center; gap: 12px; }
+.nav-logo { width: clamp(36px, 3.5vw, 46px); height: clamp(36px, 3.5vw, 46px); object-fit: contain; border-radius: 4px; }
+.nav-title { font-size: clamp(14px, 1.4vw, 19px); font-weight: 700; }
 .nav-center { display: none; }
 .nav-right-controls { display: flex; align-items: center; }
-.nav-clock { font-size: clamp(12px, 1vw, 14px); font-weight: 600; font-variant-numeric: tabular-nums; opacity: 0.9; white-space: nowrap; }
+.nav-clock { font-size: clamp(13px, 1.1vw, 15px); font-weight: 600; font-variant-numeric: tabular-nums; opacity: 0.9; white-space: nowrap; }
 
 /* ── Workspace — page fills height, card centered top ── */
 .workspace {
