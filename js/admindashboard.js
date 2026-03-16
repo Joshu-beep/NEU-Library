@@ -7,6 +7,12 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
       const PH_OFFSET_MS = 8 * 60 * 60 * 1000;
       let allLogs = [], allUsers = [], visitChart = null;
 
+      // ── Set welcome message ──
+      const adminName = localStorage.getItem('adminName') || 'Admin';
+      const adminRole = (localStorage.getItem('adminRole') || 'admin').toLowerCase();
+      const roleLabel = adminRole === 'owner' ? 'Owner' : 'Admin';
+      document.getElementById('adminWelcome').textContent = `Welcome, ${adminName} — ${roleLabel}`;
+
       function phDate(iso) { return new Date(iso).toLocaleDateString('en-PH', { timeZone: PH, year: 'numeric', month: 'short', day: 'numeric' }); }
       function phTime(iso) { return new Date(iso).toLocaleTimeString('en-PH', { timeZone: PH, hour: '2-digit', minute: '2-digit' }); }
 
