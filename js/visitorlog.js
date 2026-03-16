@@ -11,8 +11,6 @@
  
       const reasonOptions = document.querySelectorAll(".reason-option");
       const submitLogBtn  = document.getElementById("submitLogBtn");
-      const welcomeModal  = document.getElementById("welcomeModal");
-      const countdownEl   = document.getElementById("countdown");
       let selectedReason  = null;
       let alreadyLoggedId = null;
  
@@ -278,34 +276,12 @@
         setTimeout(() => { box.style.display = "none"; }, 3000);
       }
  
-      // ── Confirm modal ──
-      const confirmModal = document.getElementById("confirmModal");
-      document.getElementById("confirmCancelBtn").addEventListener("click", () => {
-        confirmModal.classList.remove("active");
-        submitLogBtn.disabled = false;
-        submitLogBtn.textContent = "Log Visit";
-        reasonOptions.forEach(o => { o.style.pointerEvents = ""; });
-      });
- 
-      submitLogBtn.addEventListener("click", () => {
+      // ── Submit — direct, no confirm popup ──
+      submitLogBtn.addEventListener("click", async () => {
         if (!selectedReason || alreadyLoggedId) return;
- 
-        // Show confirm modal first
-        const now = new Date().toLocaleTimeString("en-PH", {
-          timeZone: "Asia/Manila", hour: "2-digit", minute: "2-digit"
-        });
-        document.getElementById("confirmReason").textContent = selectedReason;
-        document.getElementById("confirmTime").textContent = now;
-        confirmModal.classList.add("active");
- 
         submitLogBtn.disabled = true;
-        submitLogBtn.textContent = "Confirming...";
-        reasonOptions.forEach(o => { o.style.pointerEvents = "none"; });
-      });
- 
-      document.getElementById("confirmOkBtn").addEventListener("click", async () => {
-        confirmModal.classList.remove("active");
         submitLogBtn.textContent = "Logging visit...";
+        reasonOptions.forEach(o => { o.style.pointerEvents = "none"; });
  
         const { data: logData, error } = await supabase
           .from("visit_logs")
@@ -321,29 +297,13 @@
         if (logData?.id) localStorage.setItem("currentLogId", logData.id);
         localStorage.setItem("lastReason", selectedReason);
  
-        // Show animated check-in modal
-        generateQR("qrContainer", 140);
-        const modal = document.getElementById("welcomeModal");
-        modal.classList.add("active");
- 
-        // Trigger checkmark animation
+        // Show success toast then redirect
+        showMessage("Checked in for " + selectedReason + "! Have a productive visit.");
         setTimeout(() => {
-          const circle = modal.querySelector(".checkmark-circle");
-          const tick   = modal.querySelector(".checkmark-tick");
-          if (circle) circle.classList.add("animate");
-          if (tick)   tick.classList.add("animate");
-        }, 100);
- 
-        let t = 3; countdownEl.textContent = t;
-        const timer = setInterval(() => {
-          t--; countdownEl.textContent = t;
-          if (t <= 0) {
-            clearInterval(timer);
-            localStorage.removeItem("currentLogId");
-            localStorage.clear();
-            window.location.href = "index.html";
-          }
-        }, 1000);
+          localStorage.removeItem("currentLogId");
+          localStorage.clear();
+          window.location.href = "index.html";
+        }, 2000);
       });
  
       // ── Log out ──
