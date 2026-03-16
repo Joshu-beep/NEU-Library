@@ -17,24 +17,6 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
         setTimeout(() => { msgBox.style.display = "none"; }, 4000);
       }
 
-      function showWelcomePopup() {
-        const popup = document.getElementById("welcomePopup");
-        const bar   = document.getElementById("welcomeBar");
-        const count = document.getElementById("welcomeCount");
-        popup.style.display = "flex";
-        // Shrink progress bar over 3s
-        setTimeout(() => { bar.style.width = "0%"; }, 50);
-        let t = 3;
-        const tick = setInterval(() => {
-          t--;
-          if (count) count.textContent = t;
-          if (t <= 0) {
-            clearInterval(tick);
-            window.location.href = "visitorlog.html";
-          }
-        }, 1000);
-      }
-
       // ── Navigation ──
       document.getElementById("showRegisterBtn").onclick = () => {
         loginView.style.display = "none";
@@ -135,13 +117,14 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
             return;
           }
 
-          // 6. Success — save to localStorage then show welcome popup
+          // 6. Success — save to localStorage and redirect
           localStorage.setItem("userName", profile.name);
           localStorage.setItem("userEmail", profile.email);
           localStorage.setItem("userProgram", profile.program);
           localStorage.setItem("userId", profile.id);
 
-          showWelcomePopup();
+          showMessage("Login successful!", "#16a34a");
+          setTimeout(() => { window.location.href = "visitorlog.html"; }, 1000);
 
         } catch (err) {
           clearTimeout(safetyTimer);
@@ -265,13 +248,14 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
             return;
           }
 
-          // 8. Save to localStorage and show welcome popup
+          // 8. Save to localStorage and redirect
           localStorage.setItem("userName", name);
           localStorage.setItem("userEmail", email);
           localStorage.setItem("userProgram", program);
           localStorage.setItem("userId", signInData.user.id);
 
-          showWelcomePopup();
+          showMessage("Registration successful!", "#16a34a");
+          setTimeout(() => { window.location.href = "visitorlog.html"; }, 1000);
 
         } catch (err) {
           clearTimeout(safetyTimer);
