@@ -73,6 +73,14 @@
           </div>
           <div class="stat-info"><h3>Total Registered</h3><p id="total-stat">—</p></div>
         </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="color:#8b5cf6;background:#f5f3ff;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+          </div>
+          <div class="stat-info"><h3>Avg Visit Duration</h3><p id="avg-stat">—</p></div>
+        </div>
       </div>
 
       <div class="dashboard-row">
@@ -199,6 +207,12 @@
                     <input type="date" id="eventDateInput"
                       style="width:100%;padding:8px 12px;border:1px solid var(--border-color);border-radius:8px;font-size:13px;outline:none;" />
                   </div>
+                  <div>
+                    <label style="font-size:12px;font-weight:600;color:var(--text-dark);display:block;margin-bottom:4px;">Show From (optional)</label>
+                    <input type="date" id="eventStartInput"
+                      style="width:100%;padding:8px 12px;border:1px solid var(--border-color);border-radius:8px;font-size:13px;outline:none;" />
+                    <p style="font-size:10px;color:var(--text-muted);margin-top:3px;">Leave blank to show immediately</p>
+                  </div>
                   <button onclick="addAnnouncement()"
                     style="padding:9px 16px;background:#3b82f6;color:white;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;width:100%;">
                     Post Announcement
@@ -220,6 +234,12 @@
                     <label style="font-size:12px;font-weight:600;color:var(--text-dark);display:block;margin-bottom:4px;">Message</label>
                     <textarea id="reminderInput" placeholder="e.g. Please observe silence in reading areas..." rows="2"
                       style="width:100%;padding:8px 12px;border:1px solid var(--border-color);border-radius:8px;font-size:13px;resize:none;outline:none;font-family:inherit;"></textarea>
+                  </div>
+                  <div>
+                    <label style="font-size:12px;font-weight:600;color:var(--text-dark);display:block;margin-bottom:4px;">Show From (optional)</label>
+                    <input type="date" id="reminderStartInput"
+                      style="width:100%;padding:8px 12px;border:1px solid var(--border-color);border-radius:8px;font-size:13px;outline:none;" />
+                    <p style="font-size:10px;color:var(--text-muted);margin-top:3px;">Leave blank to show immediately</p>
                   </div>
                   <button onclick="addReminder()"
                     style="padding:9px 16px;background:#f59e0b;color:#001f54;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;width:100%;">
