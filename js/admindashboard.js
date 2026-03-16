@@ -151,9 +151,13 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
             <td><span class="badge badge-program" style="font-size:10px">${(r.users?.program || '—').substring(0,30)}</span></td>
             <td>${phTime(r.time_in)}</td>
             <td>
-              <button class="btn-force-logout" onclick="forceLogoutUser('${r.id}', '${(r.users?.name || 'User').replace(/'/g, '\\'')}')">Force Logout</button>
+              <button class="btn-force-logout" data-id="${r.id}" data-name="${(r.users?.name || 'User').replace(/"/g,'&quot;')}">Force Logout</button>
             </td>
           </tr>`).join('');
+        // Attach click handlers after rendering
+        tbody.querySelectorAll('.btn-force-logout').forEach(btn => {
+          btn.addEventListener('click', () => forceLogoutUser(btn.dataset.id, btn.dataset.name));
+        });
       }
 
       // ── Force logout a user from admin ──
@@ -285,8 +289,8 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
         const { error } = await supabase.from('users').update({ is_blocked: blocking }).eq('id', userId);
         if (error) { showToast('Error: ' + error.message); return; }
         const el = document.getElementById(`status-${userId}`);
-        if (blocking) { el.textContent = 'Blocked'; el.style.color = 'var(--danger-red)'; btn.textContent = 'Unblock'; btn.style.color = '#16a34a'; showToast('User blocked.'); }
-        else { el.textContent = 'Active'; el.style.color = '#16a34a'; btn.textContent = 'Block'; btn.style.color = 'var(--danger-red)'; showToast('User unblocked.'); }
+        if (blocking) { el.textContent = 'Blocked'; el.style.color = 'var(--danger)'; btn.textContent = 'Unblock'; btn.style.color = '#16a34a'; showToast('User blocked.'); }
+        else { el.textContent = 'Active'; el.style.color = '#16a34a'; btn.textContent = 'Block'; btn.style.color = 'var(--danger)'; showToast('User unblocked.'); }
       }
 
       async function removeUser(userId) {
@@ -649,13 +653,22 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
         }
       }
 
+      window.changeView = changeView;
       window.showLogDetail = showLogDetail;
       window.showUserDetail = showUserDetail;
-      window.closeDetailModal = closeDetailModal; window.runFilter = runFilter; window.filterByDate = filterByDate;
-      window.triggerResetAll = triggerResetAll; window.toggleBlock = toggleBlock; window.removeUser = removeUser;
-      window.exportCSV = exportCSV; window.exportPDF = exportPDF; window.logout = logout;
-      window.addAnnouncement = addAnnouncement; window.addReminder = addReminder;
-      window.toggleNotice = toggleNotice; window.deleteNotice = deleteNotice;
+      window.closeDetailModal = closeDetailModal;
+      window.runFilter = runFilter;
+      window.filterByDate = filterByDate;
+      window.triggerResetAll = triggerResetAll;
+      window.toggleBlock = toggleBlock;
+      window.removeUser = removeUser;
+      window.exportCSV = exportCSV;
+      window.exportPDF = exportPDF;
+      window.logout = logout;
+      window.addAnnouncement = addAnnouncement;
+      window.addReminder = addReminder;
+      window.toggleNotice = toggleNotice;
+      window.deleteNotice = deleteNotice;
       window.forceLogoutUser = forceLogoutUser;
 
       // ── Init ──
