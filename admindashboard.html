@@ -7,6 +7,7 @@
     <link rel="icon" type="image/x-icon" href="img/neulogo.png" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <link rel="stylesheet" href="css/admindashboard.css" />
+    <script>if(localStorage.getItem("neu_dark")==="1")document.documentElement.classList.add("dark");</script>
   </head>
   <body>
     <div id="toast">Message</div>
@@ -18,6 +19,9 @@
       </div>
       <div class="nav-right">
         <span class="welcome-text" id="adminWelcome">Welcome, System Admin</span>
+        <button id="darkToggleBtn" style="background:none;border:none;color:white;cursor:pointer;opacity:0.8;padding:4px;display:flex;align-items:center;" title="Toggle dark mode">
+          <svg id="darkIcon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
         <a href="qrscan.html" onclick="sessionStorage.setItem('adminQR','1')" style="display:flex;align-items:center;gap:6px;background:#f59e0b;color:#001f54;padding:6px 14px;border-radius:6px;font-weight:700;font-size:13px;text-decoration:none;transition:all 0.2s;" onmouseover="this.style.background='#d97706'" onmouseout="this.style.background='#f59e0b'">
           <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect>
@@ -102,7 +106,7 @@
           <div style="max-height:280px;overflow-y:auto;">
             <table class="inside-table">
               <thead>
-                <tr><th>Name</th><th>Program</th><th>Time In</th></tr>
+                <tr><th>Name</th><th>Program</th><th>Time In</th><th>Action</th></tr>
               </thead>
               <tbody id="insideTableBody">
                 <tr><td colspan="3" style="text-align:center;padding:30px;color:var(--text-muted)">No one inside yet.</td></tr>
