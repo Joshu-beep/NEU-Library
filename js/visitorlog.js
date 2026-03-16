@@ -297,13 +297,8 @@
         if (logData?.id) localStorage.setItem("currentLogId", logData.id);
         localStorage.setItem("lastReason", selectedReason);
  
-        // Show success toast then redirect
-        showMessage("Checked in for " + selectedReason + "! Have a productive visit.");
-        setTimeout(() => {
-          localStorage.removeItem("currentLogId");
-          localStorage.clear();
-          window.location.href = "index.html";
-        }, 2000);
+        // Show welcome popup then redirect after 3s
+        showWelcomePopup();
       });
  
       // ── Log out ──
@@ -364,3 +359,21 @@
       loadVisitHistory();
       loadStreak();
       loadLastReason();
+ 
+      function showWelcomePopup() {
+        const popup = document.getElementById("welcomePopup");
+        const bar   = document.getElementById("welcomeBar");
+        const count = document.getElementById("welcomeCount");
+        popup.style.display = "flex";
+        setTimeout(() => { bar.style.width = "0%"; }, 50);
+        let t = 3;
+        const tick = setInterval(() => {
+          t--; count.textContent = t;
+          if (t <= 0) {
+            clearInterval(tick);
+            localStorage.removeItem("currentLogId");
+            localStorage.clear();
+            window.location.href = "index.html";
+          }
+        }, 1000);
+      }
