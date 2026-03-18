@@ -273,14 +273,14 @@ body::before {
 @media (max-width: 950px) {
   html, body { height: auto; overflow: auto; }
 
-  /* Workspace becomes a CSS grid: check-in top full-width, then 2-col below */
+  /* Grid: profile+stats top-left, history+chart top-right, check-in bottom full-width */
   .workspace {
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-template-rows: auto auto;
     grid-template-areas:
-      "center center"
-      "left   right";
+      "left  right"
+      "center center";
     gap: 10px;
     padding: 10px 12px;
     overflow: visible;
@@ -298,9 +298,9 @@ body::before {
   .workspace {
     grid-template-columns: 1fr;
     grid-template-areas:
-      "center"
       "left"
-      "right";
+      "right"
+      "center";
     padding: 10px;
   }
   .reason-grid { grid-auto-rows: clamp(80px,20vw,105px); }
