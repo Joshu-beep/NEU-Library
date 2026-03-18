@@ -6,8 +6,7 @@
 }
 * { box-sizing: border-box; margin: 0; padding: 0; font-family: "Segoe UI", Tahoma, sans-serif; }
 body {
-  background: var(--bg);
-  background-image: url("../img/qrscan-bg.jpg");
+  background: #0f1e3d url("../img/library.png");
   background-size: cover; background-position: center;
   background-attachment: fixed; background-repeat: no-repeat;
   min-height: 100vh; display: flex; flex-direction: column;
@@ -126,8 +125,25 @@ main { flex: 1; display: flex; align-items: center; justify-content: center; pad
 
 canvas { display: none; }
 
-@media (max-width: 480px) {
-  .card { max-width: 100%; border-radius: 0; }
-  main { padding: 0; }
-  .card-body { padding: 16px; }
+
+/* ── Responsive ── */
+@media (max-width: 600px) {
+  .card { max-width: 100%; border-radius: 0; min-height: 100vh; }
+  main { padding: 0; align-items: flex-start; }
+  .card-body { padding: clamp(14px,4vw,20px); }
+  .card-head h2 { font-size: clamp(15px,4vw,18px); }
+  .card-head p { font-size: 11px; }
+  #startCamBtn { font-size: 14px; padding: 13px; }
+  .rbtn { font-size: 12px; padding: 10px 6px; }
+  #checkinBtn { font-size: 14px; padding: 13px; }
+  .uinfo strong { font-size: 13px; }
+  nav { padding: 10px 14px; }
+  .nav-left { font-size: 14px; }
+  .btn-back { font-size: 12px; padding: 5px 10px; }
+}
+@media (max-width: 380px) {
+  .reasons { grid-template-columns: 1fr 1fr; gap: 6px; }
+  .rbtn { font-size: 11px; padding: 9px 4px; }
+  .nav-left { font-size: 13px; }
+  .card-head h2 { font-size: 14px; }
 }
