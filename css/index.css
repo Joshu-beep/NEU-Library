@@ -224,125 +224,50 @@ select#regProgram:focus, select#regProgramFaculty:focus { border-color: var(--pr
 
 /* ── Responsive ── */
 
-/* Tablet and smaller — announcement goes inline at top of login panel */
-@media (max-width: 768px) {
-  .login-wrapper { width: 100%; max-width: 100%; box-shadow: none; }
-  .card-body { padding: 20px 20px; }
-  .announce-panel {
-    position: static; width: 100%; filter: none; z-index: auto;
-    border-bottom: 2px solid var(--accent-gold);
-  }
-  .announce-toggle { border-radius: 0; font-size: 12px; padding: 9px 14px; }
-  .announce-panel.open .announce-toggle { border-radius: 0; border-bottom: 2px solid var(--accent-gold); }
-  .announce-body { border-radius: 0; border-left: none; border-right: none; border-bottom: none; max-height: 160px; }
-}
-
-/* Small mobile */
-@media (max-width: 420px) {
-  .card-header { padding: 18px 14px 16px; }
-  .icon-container { width: 52px; height: 52px; }
-  .card-header h1 { font-size: 16px; }
-  .card-body { padding: 16px; }
-  .role-card { padding: 8px 4px; font-size: 11px; }
-  .btn { padding: 11px; font-size: 13px; }
-}
-
-/* Large desktop — wider panel */
-@media (min-width: 1600px) {
-  .login-wrapper { width: clamp(420px, 28vw, 560px); }
-  .announce-panel { width: 320px; top: 28px; right: 28px; }
-}
-
-/* ── Larger card header banner ── */
-.card-header {
-  padding: clamp(28px, 4vh, 52px) clamp(16px, 2vw, 28px) clamp(22px, 3vh, 40px);
-}
-
-/* ── Site-wide dark mode ── */
-html.dark .login-wrapper { background: #0f172a; }
-html.dark .card-header { background-color: #0a1628; }
-html.dark .login-card { background: transparent; }
-html.dark .card-body { background: #0f172a; color: #f1f5f9; }
-html.dark .input-group label { color: #94a3b8; }
-html.dark .input-group input { background: #1e293b; border-color: #334155; color: #f1f5f9; }
-html.dark .input-group input::placeholder { color: #475569; }
-html.dark .divider-container p { background: #0f172a; color: #475569; }
-html.dark .divider-container::before { background: #1e293b; }
-html.dark .btn-secondary { background: #1e293b; color: #93c5fd; border-color: #334155; }
-html.dark .btn-secondary:hover { background: #1e3a5f; }
-html.dark .footer-links { background: #0a1628; border-color: #1e293b; color: #475569; }
-html.dark .admin-link { color: #64748b; }
-html.dark .role-card { border-color: #334155; color: #94a3b8; }
-html.dark .role-card.active { background: #1e293b; color: #93c5fd; border-color: #3b82f6; }
-html.dark select#regProgram, html.dark select#regProgramFaculty { background: #1e293b; border-color: #334155; color: #f1f5f9; }
-html.dark .announce-body { background: #1e293b; border-color: #334155; }
-html.dark .announce-toggle { background: #0a1628; }
-html.dark .announce-msg { color: #f1f5f9; }
-html.dark .announce-date { color: #64748b; }
-html.dark .announce-section-label { color: #475569; border-color: #1e293b; }
-html.dark .announce-item { border-color: #1e293b; }
-html.dark #msgBox { background: #1e293b; }
-
 /* ── Bible verse card ── */
 .bible-verse {
-  position: fixed; bottom: clamp(12px,2vh,24px); right: clamp(12px,2vw,28px);
+  position: fixed; bottom: clamp(14px,2vh,24px); right: clamp(14px,2vw,28px);
   z-index: 5; pointer-events: none;
-  max-width: clamp(220px, 22vw, 290px);
-  width: clamp(220px, 22vw, 290px);
+  width: clamp(210px, 18vw, 270px);
 }
 .bible-card {
-  background: rgba(0,20,60,0.85);
+  background: rgba(0,20,60,0.88);
   backdrop-filter: blur(12px);
   border-radius: 12px;
-  padding: clamp(10px,1.4vh,16px) clamp(12px,1.4vw,18px);
+  padding: clamp(10px,1.3vh,16px) clamp(12px,1.3vw,18px);
   border-left: 3px solid #f59e0b;
-  box-shadow: 0 8px 28px rgba(0,0,0,0.4);
+  box-shadow: 0 8px 28px rgba(0,0,0,0.45);
 }
-.bible-header {
-  display: flex; align-items: center; gap: 6px; margin-bottom: 8px;
-}
+.bible-header { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; }
+.bible-header svg { flex-shrink: 0; }
 .bible-header span {
-  font-size: clamp(8px,0.65vw,10px); font-weight: 800;
+  font-size: clamp(8px,0.62vw,10px); font-weight: 800;
   letter-spacing: 1.6px; color: #f59e0b; text-transform: uppercase;
 }
 .bible-text {
-  font-size: clamp(11px,0.9vw,13px); color: rgba(255,255,255,0.95);
-  font-style: italic; line-height: 1.6; margin-bottom: 8px;
+  font-size: clamp(11px,0.88vw,13px); color: rgba(255,255,255,0.95);
+  font-style: italic; line-height: 1.6; margin-bottom: 9px;
 }
-.bible-ref {
-  display: flex; align-items: center; gap: 8px;
-}
+.bible-ref { display: flex; align-items: center; gap: 8px; }
 .bible-line { flex: 1; height: 1px; background: rgba(245,158,11,0.35); }
 .bible-ref span {
-  font-size: clamp(10px,0.8vw,12px); color: #f59e0b; font-weight: 700; letter-spacing: 0.3px; white-space: nowrap;
+  font-size: clamp(10px,0.78vw,12px); color: #f59e0b;
+  font-weight: 700; letter-spacing: 0.3px; white-space: nowrap;
 }
 
-/* Hide bible verse on small screens where it would overlap the login card */
-@media (max-width: 768px) {
-  .bible-verse { display: none; }
+/* ── Responsive ── */
+@media (max-width: 1100px) {
+  .login-wrapper { width: clamp(300px, 44vw, 460px); }
+  .bible-verse { width: clamp(190px,16vw,240px); }
 }
-
-/* ── Full responsiveness pass ── */
-
-/* Fluid body on all sizes */
-@media (max-width: 1024px) {
-  .login-wrapper { width: clamp(300px, 42vw, 460px); }
-  .bible-verse { max-width: clamp(200px,20vw,260px); width: clamp(200px,20vw,260px); }
-}
-
 @media (max-width: 900px) {
-  .login-wrapper { width: clamp(300px, 52vw, 400px); }
-  .announce-panel { width: clamp(200px,28vw,260px); }
+  .login-wrapper { width: clamp(300px, 54vw, 400px); }
+  .announce-panel { width: clamp(200px,30vw,260px); }
   .bible-verse { display: none; }
 }
-
-/* Full-width on tablet/mobile */
 @media (max-width: 768px) {
-  body { flex-direction: column; background-position: center top; background-size: cover; }
-  .login-wrapper {
-    width: 100%; max-width: 100%; min-height: auto;
-    box-shadow: 0 4px 24px rgba(0,0,0,0.1);
-  }
+  body { flex-direction: column; }
+  .login-wrapper { width: 100%; max-width: 100%; min-height: auto; box-shadow: none; }
   .card-header { padding: clamp(20px,4vw,32px) clamp(14px,4vw,24px) clamp(16px,3vw,24px); }
   .card-header h1 { font-size: clamp(16px,4vw,22px); }
   .card-header h2 { font-size: clamp(9px,2vw,12px); }
@@ -353,25 +278,32 @@ html.dark #msgBox { background: #1e293b; }
   .btn { font-size: clamp(13px,3.5vw,15px); padding: clamp(11px,3vw,14px); }
   .footer-links { padding: clamp(12px,3vw,18px); }
   select#regProgram, select#regProgramFaculty { font-size: clamp(12px,3vw,14px); }
+  .announce-panel { position: static; width: 100%; z-index: auto; border-bottom: 2px solid var(--accent-gold); }
+  .announce-toggle { border-radius: 0; font-size: 12px; padding: 9px 14px; }
+  .announce-panel.open .announce-toggle { border-radius: 0; border-bottom: 2px solid var(--accent-gold); }
+  .announce-body { border-radius: 0; border-left: none; border-right: none; border-bottom: none; max-height: 160px; }
+  .bible-verse { display: none; }
 }
-
 @media (max-width: 420px) {
   .card-header h1 { font-size: 15px; }
   .card-header h2 { font-size: 9px; }
   .card-header { padding: 18px 12px 14px; }
   .icon-container { width: 48px; height: 48px; }
-  .card-body { padding: 14px 14px; }
+  .card-body { padding: 14px; }
   .input-group { margin-bottom: 12px; }
   .btn { padding: 11px; font-size: 13px; }
   .role-card { padding: 7px 3px; font-size: 11px; }
   .role-selector { gap: 8px; }
-  .footer-links { padding: 10px 12px; font-size: 10px; }
-  .copyright { font-size: 10px; }
+  .footer-links { padding: 10px 12px; }
   select#regProgram, select#regProgramFaculty { padding: 10px 12px; font-size: 12px; }
 }
-
 @media (max-width: 320px) {
   .card-header h1 { font-size: 13px; }
   .icon-container { width: 42px; height: 42px; }
   .input-group input { padding: 9px 10px; }
 }
+@media (min-width: 1600px) {
+  .login-wrapper { width: clamp(420px, 28vw, 560px); }
+  .announce-panel { width: 320px; top: 28px; right: 28px; }
+  .bible-verse { width: 290px; }
+}s
