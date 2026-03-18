@@ -17,6 +17,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
         setTimeout(() => { msgBox.style.display = "none"; }, 4000);
       }
 
+
       // ── Navigation ──
       document.getElementById("showRegisterBtn").onclick = () => {
         loginView.style.display = "none";
