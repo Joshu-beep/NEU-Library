@@ -52,20 +52,25 @@
           <div class="status info" id="statusMsg">Press the button above to allow camera access.</div>
 
           <div class="user-card" id="userCard">
-            <div class="avatar" id="uInitial">?</div>
+            <div class="user-avatar-wrap" id="uAvatar">
+              <img id="uAvatarImg" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;border-radius:50%;" />
+              <div id="uInitial" style="display:flex;width:100%;height:100%;align-items:center;justify-content:center;">?</div>
+            </div>
             <div class="uinfo">
+              <div class="u-welcome" id="uWelcome">Hello!</div>
+              <div class="u-subtitle" id="uSubtitle">Welcome to NEU Library</div>
               <strong id="uName">—</strong>
               <span id="uProgram">—</span><br>
               <span id="uEmail" style="font-size:11px;opacity:0.7">—</span>
             </div>
           </div>
 
-          <span class="reason-label">Reason for visit:</span>
+          <span class="reason-label">Reason for visit: <span class="kbd-hint-label">(press 1–4, then Enter)</span></span>
           <div class="reasons" id="reasonSection">
-            <button class="rbtn" data-r="Reading">📖 Reading</button>
-            <button class="rbtn" data-r="Researching">🔬 Researching</button>
-            <button class="rbtn" data-r="Use of Computer">💻 Computer</button>
-            <button class="rbtn" data-r="Meeting">👥 Meeting</button>
+            <button class="rbtn" data-r="Reading"><span class="kbd-num">1</span>📖 Reading</button>
+            <button class="rbtn" data-r="Researching"><span class="kbd-num">2</span>🔬 Researching</button>
+            <button class="rbtn" data-r="Use of Computer"><span class="kbd-num">3</span>💻 Computer</button>
+            <button class="rbtn" data-r="Meeting"><span class="kbd-num">4</span>👥 Meeting</button>
           </div>
 
           <button id="checkinBtn" disabled>Scan QR code first</button>
