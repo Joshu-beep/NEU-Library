@@ -565,7 +565,17 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
         a.download = `NEU_Visits${suffix}_${new Date().toISOString().split('T')[0]}.csv`;
         a.click();
       }
-      function exportPDF() { window.print(); }
+      function exportPDF() {
+        // Ensure log-view is visible and table is expanded for print
+        const logView = document.getElementById('log-view');
+        const wasHidden = logView.classList.contains('hidden');
+        if (wasHidden) logView.classList.remove('hidden');
+        // Brief delay so layout reflows before print dialog
+        setTimeout(() => {
+          window.print();
+          if (wasHidden) logView.classList.add('hidden');
+        }, 150);
+      }
       function logout() { if (confirm('End administrator session?')) window.location.href = 'index.html'; }
 
       // ── Detail modal ──
