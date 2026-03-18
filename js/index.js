@@ -419,3 +419,32 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
           console.warn("Announcements unavailable:", e);
         }
       })();
+      // ── Realtime auto-reload for announcements ──
+      supabase
+        .channel('idx_notices_changes')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'notices' }, () => {
+          // Re-run the announcement loader
+          (async () => {
+            try {
+              const { data } = await supabase.from("notices").select("*").eq("active", true).order("created_at", { ascending: false });
+              const body = document.getElementById("announceBody");
+              if (!data?.length) { body.innerHTML = `<div class="announce-empty">No announcements at this time.</div>`; return; }
+              const events = data.filter(n => n.type === "event" || n.event_date).sort((a,b) => new Date(a.event_date||0) - new Date(b.event_date||0));
+              const reminders = data.filter(n => n.type !== "event" && !n.event_date);
+              let html = "";
+              if (events.length) {
+                html += `<div class="announce-section-label">📅 Announcements</div>`;
+                events.forEach(n => {
+                  const d = n.event_date ? new Date(n.event_date+'T00:00:00').toLocaleDateString('en-PH',{month:'short',day:'numeric',year:'numeric'}) : '';
+                  html += `<div class="announce-item"><div class="announce-dot-event"></div><div><div class="announce-msg">${n.message}</div>${d?`<div class="announce-date">📅 ${d}</div>`:''}</div></div>`;
+                });
+              }
+              if (reminders.length) {
+                html += `<div class="announce-section-label">🔔 Reminders</div>`;
+                reminders.forEach(n => { html += `<div class="announce-item"><div class="announce-dot-reminder"></div><div class="announce-msg">${n.message}</div></div>`; });
+              }
+              body.innerHTML = html || `<div class="announce-empty">No announcements at this time.</div>`;
+            } catch(e) {}
+          })();
+        })
+        .subscribe();
