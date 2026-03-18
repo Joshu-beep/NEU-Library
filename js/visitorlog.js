@@ -441,6 +441,28 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
       initKeyboardShortcuts();
       startClosingTimeWatcher();
 
+      // ── Realtime auto-reload ──
+      // Reload history, streak, count when any visit log changes for this user
+      supabase
+        .channel('vl_user_changes')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'visit_logs',
+          filter: `user_id=eq.${userId}` }, () => {
+          loadVisitHistory();
+          loadStreak();
+          loadVisitCount();
+          loadAnalyticsChart();
+          checkAlreadyInside();
+        })
+        .subscribe();
+
+      // Reload notices when they change
+      supabase
+        .channel('vl_notices_changes')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'notices' }, () => {
+          loadUpcomingNotices();
+        })
+        .subscribe();
+
       // ── Visit count badge ──
       async function loadVisitCount() {
         const { count } = await supabase
