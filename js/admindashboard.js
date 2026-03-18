@@ -625,6 +625,26 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 
         document.getElementById('modalName').textContent = user.name || '—';
         document.getElementById('modalEmail').textContent = user.email;
+
+        // Reset avatar to initial
+        const initial = (user.name || '?')[0].toUpperCase();
+        document.getElementById('modalAvatarInitial').textContent = initial;
+        document.getElementById('modalAvatarInitial').style.display = 'flex';
+        document.getElementById('modalAvatarImg').style.display = 'none';
+
+        // Try loading profile photo
+        const { data: photoData } = supabase.storage.from('avatars').getPublicUrl(`${userId}/avatar`);
+        if (photoData?.publicUrl) {
+          const testImg = new Image();
+          testImg.onload = () => {
+            document.getElementById('modalAvatarImg').src = photoData.publicUrl + '?t=' + Date.now();
+            document.getElementById('modalAvatarImg').style.display = 'block';
+            document.getElementById('modalAvatarInitial').style.display = 'none';
+          };
+          testImg.onerror = () => {};
+          testImg.src = photoData.publicUrl + '?t=' + Date.now();
+        }
+
         document.getElementById('modalBody').innerHTML = `<div class="detail-row"><span class="detail-label">Loading...</span></div>`;
         document.getElementById('modalActions').innerHTML = '';
         document.getElementById('detailModal').classList.add('show');
@@ -650,7 +670,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
         `;
 
         const actions = document.getElementById('modalActions');
-        let btns = `<button class="btn-modal-close" onclick="closeDetailModal()">${isInside ? 'Close' : 'Close'}</button>`;
+        let btns = `<button class="btn-modal-close" onclick="closeDetailModal()">Close</button>`;
         if (isInside && activeLog) {
           btns = `<button class="btn-modal-force" id="modalForceBtn">Force Logout</button>` + btns;
         }
