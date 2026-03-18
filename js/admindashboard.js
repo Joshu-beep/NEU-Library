@@ -689,7 +689,6 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
       loadLogs().catch(e => console.error('loadLogs:', e));
 
       // ── Real-time auto-update ──
-      // Subscribe to visit_logs changes — fires instantly when anyone checks in or out
       supabase
         .channel('visit_logs_changes')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'visit_logs' }, () => {
@@ -700,27 +699,23 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
         })
         .subscribe();
 
-      // Subscribe to users table changes — fires when a new user registers or is blocked/deleted
       supabase
         .channel('users_changes')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'users' }, () => {
           loadStats().catch(() => {});
-          // If Manage Users tab is active, reload it too
           if (document.getElementById('users-view') && !document.getElementById('users-view').classList.contains('hidden')) {
             loadUsers().catch(() => {});
           }
         })
         .subscribe();
 
-      // ── Fallback polling every 30 seconds ──
-      // Catches any changes that Realtime might miss (e.g. if websocket drops)
+      // ── Fallback polling — every 1s for critical stats, 3s for logs ──
       setInterval(() => {
         loadStats().catch(() => {});
         loadInsideNow().catch(() => {});
-      }, 30000);
+      }, 1000);
 
-      // Poll logs and chart every 2 minutes
       setInterval(() => {
         loadLogs().catch(() => {});
         loadChart().catch(() => {});
-      }, 120000);
+      }, 3000);
