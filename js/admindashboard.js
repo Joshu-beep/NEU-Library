@@ -626,23 +626,30 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
         document.getElementById('modalName').textContent = user.name || '—';
         document.getElementById('modalEmail').textContent = user.email;
 
-        // Reset avatar to initial
+        // Reset avatar
         const initial = (user.name || '?')[0].toUpperCase();
-        document.getElementById('modalAvatarInitial').textContent = initial;
-        document.getElementById('modalAvatarInitial').style.display = 'flex';
-        document.getElementById('modalAvatarImg').style.display = 'none';
+        const modalAvatarInitial = document.getElementById('modalAvatarInitial');
+        const modalAvatarImg = document.getElementById('modalAvatarImg');
+        modalAvatarInitial.textContent = initial;
+        modalAvatarInitial.style.display = '';
+        modalAvatarImg.style.display = 'none';
+        modalAvatarImg.src = '';
 
-        // Try loading profile photo
+        // Load profile photo — getPublicUrl always returns a URL so we test with Image.onload
         const { data: photoData } = supabase.storage.from('avatars').getPublicUrl(`${userId}/avatar`);
-        if (photoData?.publicUrl) {
+        const photoUrl = photoData?.publicUrl ? photoData.publicUrl + '?t=' + Date.now() : null;
+        if (photoUrl) {
           const testImg = new Image();
           testImg.onload = () => {
-            document.getElementById('modalAvatarImg').src = photoData.publicUrl + '?t=' + Date.now();
-            document.getElementById('modalAvatarImg').style.display = 'block';
-            document.getElementById('modalAvatarInitial').style.display = 'none';
+            modalAvatarImg.src = photoUrl;
+            modalAvatarImg.style.display = 'block';
+            modalAvatarInitial.style.display = 'none';
           };
-          testImg.onerror = () => {};
-          testImg.src = photoData.publicUrl + '?t=' + Date.now();
+          testImg.onerror = () => {
+            modalAvatarImg.style.display = 'none';
+            modalAvatarInitial.style.display = '';
+          };
+          testImg.src = photoUrl;
         }
 
         document.getElementById('modalBody').innerHTML = `<div class="detail-row"><span class="detail-label">Loading...</span></div>`;
