@@ -5,7 +5,7 @@
 
 A web-based visitor management system for the **New Era University Library**. Students and faculty check in using their institutional email, log their reason for visiting, and check out when they leave. Admins monitor live occupancy, view visit logs, manage users, post announcements, and scan QR codes — all in real time.
 
-**Live site:** https://neu-library-visitor-log-zeta.vercel.app/
+**Live site:** https://neu-library.vercel.app/
 
 ---
 
