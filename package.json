@@ -1,0 +1,23 @@
+{
+  "name": "primary",
+  "version": "1.0.0",
+  "description": "A web-based visitor management system for the **New Era University Library**. Students and faculty check in using their institutional email, log their reason for visiting, and check out when they leave. Admins monitor live occupancy, view visit logs, manage users, post announcements, and scan QR codes — all in real time.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Joshu-beep/NEU-Library.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Joshu-beep/NEU-Library/issues"
+  },
+  "homepage": "https://github.com/Joshu-beep/NEU-Library#readme",
+  "dependencies": {
+    "@vercel/speed-insights": "^2.0.0"
+  }
+}
