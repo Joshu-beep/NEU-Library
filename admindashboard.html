@@ -1,251 +1,264 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0" />
-    <title>NEU Admin Dashboard</title>
-    <link rel="icon" type="image/x-icon" href="img/neulogo.png" />
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    <link rel="stylesheet" href="css/admindashboard.css" />
-  </head>
-  <body>
-    <div id="toast">Message</div>
+:root {
+  --blue: #001f54;
+  --gold: #f59e0b;
+  --text: #1e293b;
+  --muted: #64748b;
+  --border: #e2e8f0;
+  --success: #16a34a;
+  --danger: #ef4444;
+  --card: rgba(255,255,255,0.96);
+}
 
-    <!-- Detail Modal -->
-    <div class="detail-modal-overlay" id="detailModal">
-      <div class="detail-modal">
-        <div class="detail-modal-header">
-          <div><h2 id="modalName">—</h2><p id="modalEmail">—</p></div>
-          <button class="detail-modal-close" onclick="closeDetailModal()">✕</button>
-        </div>
-        <div class="detail-modal-body" id="modalBody"></div>
-        <div class="detail-modal-actions" id="modalActions"></div>
-      </div>
-    </div>
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: "Segoe UI", Roboto, Arial, sans-serif; }
 
-    <!-- Navbar -->
-    <nav class="navbar">
-      <div class="nav-logo">
-        <img src="img/neulogo.png" alt="NEU" onerror="this.style.display='none'" />
-        NEU Admin Dashboard
-      </div>
-      <div class="nav-right">
-        <span class="welcome-text" id="adminWelcome">Welcome, Admin</span>
-        <a href="qrscan.html" class="btn-qr-nav" onclick="sessionStorage.setItem('adminQR','1')">
-          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
-            <rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3zM17 17h3v3h-3zM14 20h3"/>
-          </svg>
-          QR Scanner
-        </a>
-        <button class="logout-btn" onclick="logout()">
-          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
-          </svg>
-          Logout
-        </button>
-      </div>
-    </nav>
+/* ── Full-height locked layout ── */
+html, body { height: 100%; overflow: hidden; }
+body {
+  background: #0f1e3d url("../img/library.png") center/cover no-repeat fixed;
+  color: var(--text);
+  display: flex; flex-direction: column;
+}
+body::before {
+  content: ""; position: fixed; inset: 0;
+  background: rgba(0,10,30,0.55);
+  pointer-events: none; z-index: 0;
+}
 
-    <div class="container">
+/* ── Navbar ── */
+.navbar {
+  background: var(--blue); border-bottom: 4px solid var(--gold);
+  padding: 0 clamp(16px,2vw,32px); height: clamp(54px,6.5vh,68px);
+  display: flex; justify-content: space-between; align-items: center;
+  color: white; flex-shrink: 0; position: relative; z-index: 100; width: 100%;
+}
+.nav-logo { display: flex; align-items: center; gap: 10px; font-size: clamp(14px,1.3vw,18px); font-weight: 700; }
+.nav-logo img { width: clamp(30px,2.8vw,38px); height: clamp(30px,2.8vw,38px); object-fit: contain; border-radius: 50%; background: white; padding: 2px; }
+.nav-right { display: flex; align-items: center; gap: clamp(8px,1vw,14px); }
+.welcome-text { font-size: clamp(12px,1vw,13px); font-weight: 500; opacity: 0.9; }
+.logout-btn { background: transparent; border: 1px solid rgba(255,255,255,0.3); color: white; padding: 5px 12px; border-radius: 7px; cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 6px; font-size: 12px; transition: all 0.2s; }
+.logout-btn:hover { background: rgba(255,255,255,0.12); border-color: white; }
+.btn-qr-nav { display: flex; align-items: center; gap: 6px; background: var(--gold); color: var(--blue); padding: 5px 12px; border-radius: 7px; font-weight: 700; font-size: 12px; text-decoration: none; transition: all 0.2s; }
+.btn-qr-nav:hover { background: #d97706; }
 
-      <!-- TOP ROW: 2x2 stats LEFT + chart/inside RIGHT -->
-      <div class="top-row">
+/* ── Container — fills remaining height, no scroll ── */
+.container {
+  flex: 1; min-height: 0;
+  max-width: 1280px; width: 100%; margin: 0 auto;
+  padding: clamp(8px,1vh,12px) clamp(12px,1.4vw,20px);
+  position: relative; z-index: 1;
+  display: flex; flex-direction: column;
+  gap: clamp(6px,0.8vh,10px);
+}
 
-        <!-- LEFT: 2x2 stat cards -->
-        <div class="stats-grid">
-          <div class="stat-card">
-            <div class="stat-icon icon-red">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
-                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-              </svg>
-            </div>
-            <div class="stat-info"><h3>Live Occupancy</h3><p id="live-stat">—</p></div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon icon-blue">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
-              </svg>
-            </div>
-            <div class="stat-info"><h3>Visits Today</h3><p id="today-stat">—</p></div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon icon-green">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
-              </svg>
-            </div>
-            <div class="stat-info"><h3>This Week</h3><p id="week-stat">—</p></div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon icon-orange">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
-              </svg>
-            </div>
-            <div class="stat-info"><h3>Total Registered</h3><p id="total-stat">—</p></div>
-          </div>
-        </div>
+/* ── Top row: stats LEFT (2x2) + chart + inside RIGHT (side by side) ── */
+.top-row {
+  display: grid;
+  grid-template-columns: clamp(290px,31vw,420px) 1fr;
+  gap: clamp(6px,0.8vw,12px);
+  flex-shrink: 0;
+  align-items: stretch;
+}
 
-        <!-- RIGHT: chart + currently inside SIDE BY SIDE -->
-        <div class="right-panels">
-          <div class="panel">
-            <div class="panel-header">
-              <h3>Daily Visits — Last 7 Days</h3>
-              <span id="chart-subtitle">Loading...</span>
-            </div>
-            <div class="panel-body">
-              <div class="chart-container"><canvas id="visitChart"></canvas></div>
-            </div>
-          </div>
+/* 2x2 stats — fills left column */
+.stats-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: clamp(5px,0.6vw,8px);
+  height: 100%;
+}
+.stat-card {
+  background: var(--card); backdrop-filter: blur(8px);
+  padding: clamp(16px,1.6vw,24px) clamp(18px,1.7vw,26px); border-radius: 14px;
+  display: flex; align-items: center; gap: clamp(14px,1.3vw,20px);
+  border: 1px solid rgba(255,255,255,0.8);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+}
+.stat-icon { width: clamp(44px,4.2vw,58px); height: clamp(44px,4.2vw,58px); border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.stat-icon svg { width: clamp(22px,2.1vw,28px); height: clamp(22px,2.1vw,28px); }
+.icon-red { color: #ef4444; background: #fef2f2; }
+.icon-blue { color: #3b82f6; background: #eff6ff; }
+.icon-green { color: #22c55e; background: #f0fdf4; }
+.icon-orange { color: #f97316; background: #fff7ed; }
+.stat-info h3 { font-size: clamp(11px,0.9vw,13px); font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; }
+.stat-info p { font-size: clamp(26px,2.4vw,36px); font-weight: 600; color: var(--text); line-height: 1; }
 
-          <div class="panel">
-            <div class="panel-header">
-              <h3>Currently Inside</h3>
-              <span id="inside-count">0 people</span>
-            </div>
-            <div class="inside-scroll">
-              <table class="inside-table">
-                <thead>
-                  <tr><th>Name</th><th>Program</th><th>Time In</th><th>Action</th></tr>
-                </thead>
-                <tbody id="insideTableBody">
-                  <tr><td colspan="4" style="text-align:center;padding:20px;color:var(--muted)">No one inside yet.</td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
+/* Right side: chart + currently inside side by side */
+.right-panels {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(6px,0.8vw,12px);
+}
+.panel { background: var(--card); backdrop-filter: blur(8px); border-radius: 12px; border: 1px solid rgba(255,255,255,0.8); box-shadow: 0 2px 12px rgba(0,0,0,0.08); overflow: hidden; display: flex; flex-direction: column; }
+.panel-header { padding: clamp(7px,0.7vw,10px) clamp(10px,1vw,14px); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+.panel-header h3 { font-size: clamp(12px,1vw,14px); font-weight: 700; color: var(--text); }
+.panel-header span { font-size: clamp(10px,0.85vw,12px); color: var(--muted); font-weight: 600; }
+.panel-body { padding: clamp(7px,0.7vw,10px); flex: 1; min-height: 0; }
+.chart-container { position: relative; height: 100%; min-height: clamp(100px,12vh,150px); }
 
-      </div><!-- /top-row -->
+/* Currently Inside table inside panel */
+.inside-scroll { flex: 1; min-height: 0; overflow-y: auto; }
+.inside-table { width: 100%; border-collapse: collapse; }
+.inside-table th { padding: 7px 10px; font-size: 10px; font-weight: 700; color: var(--muted); border-bottom: 1px solid var(--border); text-align: left; text-transform: uppercase; letter-spacing: 0.4px; }
+.inside-table td { padding: 7px 10px; font-size: 11px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+.inside-table tr:last-child td { border-bottom: none; }
+.pulse { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #22c55e; margin-right: 6px; animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.85)} }
+.btn-force-logout { padding: 3px 8px; background: #fef2f2; color: #ef4444; border: 1px solid #fecaca; border-radius: 5px; font-size: 10px; font-weight: 700; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+.btn-force-logout:hover { background: #fee2e2; }
 
-      <!-- BOTTOM: full-width content card -->
-      <div class="content-card">
-        <div class="toolbar">
-          <div class="tab-group">
-            <button class="tab active" onclick="changeView('log', this)">Visits Log</button>
-            <button class="tab" onclick="changeView('users', this)">Manage Users</button>
-            <button class="tab" onclick="changeView('notices', this)">Notices</button>
-            <button class="tab" id="adminsTabBtn" onclick="changeView('admins', this)" style="display:none;">Manage Admins</button>
-          </div>
-          <button class="btn-action btn-reset" onclick="triggerResetAll()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
-              <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
-            </svg>
-            Reset DB
-          </button>
-          <div class="date-filter" id="dateFilterSection">
-            <input type="date" class="date-input" id="dateFrom" onchange="filterByDate()" />
-            <span>to</span>
-            <input type="date" class="date-input" id="dateTo" onchange="filterByDate()" />
-          </div>
-          <div class="search-box">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-            </svg>
-            <input type="text" id="filterInput" placeholder="Filter by keyword..." onkeyup="runFilter()" />
-          </div>
-          <button class="btn-action btn-export-csv" onclick="exportCSV()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
-            </svg>
-            Export CSV
-          </button>
-          <button class="btn-action btn-export-pdf" onclick="exportPDF()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-              <polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
-            </svg>
-            Export PDF
-          </button>
-        </div>
+/* ── Content card — fills remaining height, only table scrolls ── */
+.content-card {
+  flex: 1; min-height: 0;
+  background: var(--card); backdrop-filter: blur(8px);
+  border-radius: 12px; border: 1px solid rgba(255,255,255,0.8);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.toolbar { padding: clamp(6px,0.7vw,9px) clamp(10px,1.2vw,16px); background: rgba(255,255,255,0.6); border-bottom: 1px solid var(--border); display: flex; flex-wrap: wrap; gap: clamp(4px,0.5vw,7px); align-items: center; flex-shrink: 0; }
+.tab-group { display: flex; gap: 4px; margin-right: auto; }
+.tab { padding: 6px 13px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; border: 1px solid var(--border); background: white; color: var(--muted); transition: 0.2s; }
+.tab:hover { background: #f8fafc; color: var(--text); }
+.tab.active { background: var(--blue); color: white; border-color: var(--blue); }
+.date-filter { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--muted); }
+.date-input { padding: 5px 8px; border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-size: 11px; outline: none; background: white; }
+.search-box { position: relative; width: clamp(140px,13vw,200px); }
+.search-box input { width: 100%; padding: 6px 10px 6px 28px; border: 1px solid var(--border); border-radius: 6px; outline: none; font-size: 11px; background: white; }
+.search-box svg { position: absolute; left: 8px; top: 50%; transform: translateY(-50%); color: #94a3b8; width: 13px; height: 13px; }
+.btn-action { padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer; border: 1px solid transparent; display: flex; align-items: center; gap: 4px; transition: 0.2s; }
+.btn-action svg { width: 12px; height: 12px; }
+.btn-reset { color: var(--danger); border-color: #fecaca; background: #fef2f2; }
+.btn-reset:hover { background: #fee2e2; }
+.btn-export-csv { background: #16a34a; color: white; }
+.btn-export-csv:hover { background: #15803d; }
+.btn-export-pdf { background: #1e3a8a; color: white; }
+.btn-export-pdf:hover { background: #1e40af; }
 
-        <div id="log-view">
-          <table id="logTable">
-            <thead>
-              <tr><th>Date &amp; Time In</th><th>Name</th><th>Program</th><th>Reason</th><th>Duration</th><th>Status</th></tr>
-            </thead>
-            <tbody id="logTableBody">
-              <tr class="loading-row"><td colspan="6">Loading visit records...</td></tr>
-            </tbody>
-          </table>
-        </div>
+/* ── Table views — only the tbody scrolls ── */
+#log-view, #users-view { flex: 1; min-height: 0; overflow: hidden; display: flex; flex-direction: column; }
+#log-view table, #users-view table { display: flex; flex-direction: column; height: 100%; }
+#log-view thead, #users-view thead { flex-shrink: 0; display: table; width: 100%; table-layout: fixed; }
+#log-view tbody, #users-view tbody { flex: 1; overflow-y: auto; display: block; }
+#log-view tbody tr, #users-view tbody tr { display: table; width: 100%; table-layout: fixed; }
+#notices-view, #admins-view { flex: 1; overflow-y: auto; }
 
-        <div id="users-view" class="hidden">
-          <table id="usersTable">
-            <thead>
-              <tr><th>Name</th><th>Email</th><th>Program</th><th>Role</th><th>Status</th><th>Actions</th></tr>
-            </thead>
-            <tbody id="usersTableBody">
-              <tr class="loading-row"><td colspan="6">Loading user records...</td></tr>
-            </tbody>
-          </table>
-        </div>
+th { padding: clamp(5px,0.5vw,7px) clamp(10px,1vw,14px); font-size: 12px; font-weight: 700; color: var(--muted); border-bottom: 2px solid var(--border); background: #fafafa; text-transform: uppercase; letter-spacing: 0.4px; }
+td { padding: clamp(5px,0.5vw,7px) clamp(10px,1vw,14px); border-bottom: 1px solid var(--border); font-size: 13px; color: var(--text); vertical-align: middle; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: #f8fafc; }
+.name-stack { display: flex; flex-direction: column; gap: 1px; }
+.name-stack .name { font-weight: 600; font-size: 13px; }
+.name-stack .sub-text { font-size: 11px; color: #94a3b8; }
 
-        <div id="notices-view" class="hidden" style="padding:20px;">
-          <h3 style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px;">Library Announcements &amp; Reminders</h3>
-          <p style="font-size:12px;color:var(--muted);margin-bottom:16px;">These appear on the login page.</p>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start;">
-            <div>
-              <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#3b82f6;margin-bottom:8px;display:flex;align-items:center;gap:6px;">
-                <span style="width:7px;height:7px;border-radius:50%;background:#3b82f6;display:inline-block;"></span>Announcements / Events
-              </div>
-              <div style="background:#f8fafc;border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px;">
-                <div style="display:flex;flex-direction:column;gap:8px;">
-                  <div><label style="font-size:11px;font-weight:600;color:var(--text);display:block;margin-bottom:3px;">Message</label>
-                    <textarea id="eventInput" placeholder="e.g. Book Fair 2026..." rows="2" style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:7px;font-size:12px;resize:none;outline:none;font-family:inherit;"></textarea></div>
-                  <div><label style="font-size:11px;font-weight:600;color:var(--text);display:block;margin-bottom:3px;">Event Date</label>
-                    <input type="date" id="eventDateInput" style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:7px;font-size:12px;outline:none;" /></div>
-                  <div><label style="font-size:11px;font-weight:600;color:var(--text);display:block;margin-bottom:3px;">Show From (optional)</label>
-                    <input type="date" id="eventStartInput" style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:7px;font-size:12px;outline:none;" />
-                    <p style="font-size:10px;color:var(--muted);margin-top:2px;">Leave blank to show immediately</p></div>
-                  <button onclick="addAnnouncement()" style="padding:8px;background:#3b82f6;color:white;border:none;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;width:100%;">Post Announcement</button>
-                </div>
-              </div>
-              <div id="eventsAdminList"><div style="text-align:center;padding:16px;color:var(--muted);font-size:12px;">Loading...</div></div>
-            </div>
-            <div>
-              <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#f59e0b;margin-bottom:8px;display:flex;align-items:center;gap:6px;">
-                <span style="width:7px;height:7px;border-radius:50%;background:#f59e0b;display:inline-block;"></span>Reminders
-              </div>
-              <div style="background:#f8fafc;border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px;">
-                <div style="display:flex;flex-direction:column;gap:8px;">
-                  <div><label style="font-size:11px;font-weight:600;color:var(--text);display:block;margin-bottom:3px;">Message</label>
-                    <textarea id="reminderInput" placeholder="e.g. Please observe silence..." rows="2" style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:7px;font-size:12px;resize:none;outline:none;font-family:inherit;"></textarea></div>
-                  <div><label style="font-size:11px;font-weight:600;color:var(--text);display:block;margin-bottom:3px;">Show From (optional)</label>
-                    <input type="date" id="reminderStartInput" style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:7px;font-size:12px;outline:none;" />
-                    <p style="font-size:10px;color:var(--muted);margin-top:2px;">Leave blank to show immediately</p></div>
-                  <button onclick="addReminder()" style="padding:8px;background:#f59e0b;color:#001f54;border:none;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;width:100%;">Post Reminder</button>
-                </div>
-              </div>
-              <div id="remindersAdminList"><div style="text-align:center;padding:16px;color:var(--muted);font-size:12px;">Loading...</div></div>
-            </div>
-          </div>
-        </div>
+.badge { padding: 2px 7px; border-radius: 5px; font-size: 10px; font-weight: 700; display: inline-flex; align-items: center; gap: 3px; }
+.badge-program { background: #f1f5f9; color: #64748b; }
+.badge-student { background: #eff6ff; color: #3b82f6; }
+.badge-faculty { background: #faf5ff; color: #a855f7; }
+.badge-admin { background: #fff7ed; color: #c2410c; }
+.badge-owner { background: #fef9c3; color: #854d0e; }
+.badge-inside { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
+.badge-logged-out { background: #fef2f2; color: #ef4444; border: 1px solid #fecaca; }
+.badge-checkout { background: #f1f5f9; color: #64748b; }
+.duration-chip { font-size: 11px; color: #64748b; background: #f8fafc; border: 1px solid #e2e8f0; padding: 2px 8px; border-radius: 20px; white-space: nowrap; }
+.action-flex { display: flex; align-items: center; gap: 6px; }
+.action-text-btn { font-size: 11px; cursor: pointer; background: none; border: none; font-weight: 600; padding: 3px 7px; border-radius: 5px; }
+.action-icon-btn { color: var(--danger); background: white; border: 1px solid #fecaca; width: 24px; height: 24px; border-radius: 5px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; }
+.action-icon-btn svg { width: 11px; height: 11px; }
+.action-icon-btn:hover { background: #fef2f2; }
+.hidden { display: none !important; }
+.loading-row td { text-align: center; padding: 30px; color: var(--muted); }
+.clickable-row { cursor: pointer; transition: background 0.15s; }
+.clickable-row:hover td { background: #eff6ff; }
 
-        <div id="admins-view" class="hidden" style="padding:20px;">
-          <h3 style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px;">Manage Admins</h3>
-          <p style="font-size:12px;color:var(--muted);margin-bottom:16px;">Assign or remove admin access for <strong>@neu.edu.ph</strong> accounts.</p>
-          <div style="background:#f8fafc;border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:16px;max-width:480px;">
-            <label style="font-size:11px;font-weight:700;color:var(--text);display:block;margin-bottom:5px;">Assign Admin by Email</label>
-            <div style="display:flex;gap:8px;">
-              <input type="email" id="assignAdminEmail" placeholder="username@neu.edu.ph" style="flex:1;padding:8px 12px;border:1px solid var(--border);border-radius:7px;font-size:12px;outline:none;" />
-              <button onclick="assignAdmin()" style="padding:8px 16px;background:#001f54;color:white;border:none;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;">+ Assign</button>
-            </div>
-            <p id="assignMsg" style="font-size:11px;margin-top:6px;display:none;"></p>
-          </div>
-          <div style="max-width:480px;">
-            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;margin-bottom:8px;">Current Admins</div>
-            <div id="adminsList"><div style="text-align:center;padding:16px;color:var(--muted);font-size:12px;">Loading...</div></div>
-          </div>
-        </div>
+/* ── Toast ── */
+#toast { visibility: hidden; min-width: 200px; background: var(--text); color: white; text-align: center; border-radius: 8px; padding: 10px 18px; position: fixed; z-index: 3000; left: 50%; transform: translateX(-50%); bottom: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); font-size: 12px; font-weight: 600; }
+#toast.show { visibility: visible; animation: toastIn 0.3s, toastOut 0.3s 2.7s; }
+@keyframes toastIn { from{bottom:0;opacity:0} to{bottom:24px;opacity:1} }
+@keyframes toastOut { from{bottom:24px;opacity:1} to{bottom:0;opacity:0} }
 
-      </div><!-- /content-card -->
-    </div><!-- /container -->
+/* ── Detail modal ── */
+.detail-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 2000; align-items: center; justify-content: center; }
+.detail-modal-overlay.show { display: flex; }
+.detail-modal { background: white; border-radius: 16px; width: 92%; max-width: 480px; max-height: 85vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.25); animation: modalIn 0.2s ease-out; }
+@keyframes modalIn { from{transform:scale(0.95);opacity:0} to{transform:scale(1);opacity:1} }
+.detail-modal-header { background: var(--blue); color: white; padding: 18px 20px 14px; border-radius: 16px 16px 0 0; border-bottom: 3px solid var(--gold); display: flex; align-items: flex-start; justify-content: space-between; }
+.detail-modal-header h2 { font-size: 16px; font-weight: 700; margin-bottom: 2px; }
+.detail-modal-header p { font-size: 11px; opacity: 0.7; }
+.detail-modal-close { background: rgba(255,255,255,0.15); border: none; color: white; width: 26px; height: 26px; border-radius: 50%; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.2s; }
+.detail-modal-close:hover { background: rgba(255,255,255,0.25); }
+.detail-modal-body { padding: 16px 20px; }
+.detail-row { display: flex; justify-content: space-between; align-items: flex-start; padding: 8px 0; border-bottom: 1px solid var(--border); }
+.detail-row:last-child { border-bottom: none; }
+.detail-label { font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.4px; flex-shrink: 0; width: 120px; }
+.detail-value { font-size: 12px; font-weight: 600; color: var(--text); text-align: right; }
+.detail-modal-actions { padding: 0 20px 18px; display: flex; gap: 8px; }
+.btn-modal-force { flex: 1; padding: 9px; background: #fef2f2; color: #ef4444; border: 1.5px solid #fecaca; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+.btn-modal-force:hover { background: #fee2e2; }
+.btn-modal-close { flex: 1; padding: 9px; background: #f1f5f9; color: var(--muted); border: 1px solid var(--border); border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; }
+.btn-modal-close:hover { background: #e2e8f0; }
 
-    <script src="js/admindashboard.js" type="module"></script>
-  </body>
-</html>
+/* ── Responsive ── */
+@media (max-width: 1200px) {
+  .top-row { grid-template-columns: clamp(200px,26vw,300px) 1fr; }
+}
+@media (max-width: 1100px) {
+  .top-row { grid-template-columns: 1fr; }
+  .right-panels { grid-template-columns: 1fr 1fr; }
+  html, body { overflow: auto; height: auto; }
+  .container { flex: none; min-height: auto; }
+  .content-card { min-height: 50vh; }
+  #log-view, #users-view { overflow: visible; min-height: auto; }
+  #log-view table, #users-view table { display: table; height: auto; }
+  #log-view thead, #users-view thead { display: table-header-group; }
+  #log-view tbody, #users-view tbody { display: table-row-group; overflow: visible; max-height: none; }
+  #log-view tbody tr, #users-view tbody tr { display: table-row; }
+  .stats-grid { grid-template-columns: repeat(4,1fr); }
+}
+@media (max-width: 900px) {
+  .right-panels { grid-template-columns: 1fr; }
+  .stats-grid { grid-template-columns: repeat(2,1fr); }
+  .navbar { padding: 0 16px; }
+}
+@media (max-width: 767px) {
+  .welcome-text { display: none; }
+  .navbar { height: clamp(48px,7vh,58px); }
+  .nav-logo { font-size: 13px; }
+  .container { padding: 10px 10px; gap: 8px; }
+  .toolbar { gap: 5px; padding: 8px 10px; flex-wrap: wrap; }
+  .tab { padding: 5px 10px; font-size: 11px; }
+  .search-box { width: 100%; }
+  .tab-group { flex-wrap: wrap; }
+  .chart-container { height: clamp(120px,20vw,160px); }
+  th, td { padding: 7px 8px; font-size: 11px; }
+  .stat-card { padding: 8px 10px; gap: 8px; }
+  .stat-info p { font-size: 16px; }
+}
+@media (max-width: 480px) {
+  .stats-grid { grid-template-columns: 1fr 1fr; gap: 6px; }
+  .stat-card { padding: 8px; }
+  .btn-action { padding: 5px 8px; font-size: 10px; }
+  th { font-size: 10px; padding: 6px 7px; }
+  td { font-size: 11px; padding: 6px 7px; }
+  .name-stack .name { font-size: 11px; }
+  .name-stack .sub-text { font-size: 9px; }
+  .detail-modal { width: 96%; }
+  .detail-modal-header h2 { font-size: 14px; }
+}
+
+/* ── Print styles (PDF export) ── */
+@media print {
+  html, body { height: auto !important; overflow: visible !important; background: white !important; }
+  body::before { display: none !important; }
+  .navbar, .toolbar, .detail-modal-overlay, #toast { display: none !important; }
+  .container { padding: 0 !important; gap: 8px !important; flex: none !important; max-width: 100% !important; }
+  .top-row { display: none !important; }
+  .content-card { box-shadow: none !important; border: none !important; background: white !important; overflow: visible !important; flex: none !important; }
+  #log-view, #users-view { overflow: visible !important; display: block !important; flex: none !important; }
+  #log-view table, #users-view table { display: table !important; height: auto !important; }
+  #log-view thead, #users-view thead { display: table-header-group !important; }
+  #log-view tbody, #users-view tbody { display: table-row-group !important; overflow: visible !important; }
+  #log-view tbody tr, #users-view tbody tr { display: table-row !important; }
+  .hidden { display: none !important; }
+  th { background: #f1f5f9 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .badge { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  * { color-adjust: exact; }
+}
