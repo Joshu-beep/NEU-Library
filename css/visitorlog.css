@@ -263,83 +263,55 @@ body::before {
 .modal-content { background: white; padding: 28px; border-radius: 16px; text-align: center; max-width: 360px; width: 92%; transform: translateY(16px); transition: all 0.3s; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
 .modal-overlay.active .modal-content { transform: translateY(0); }
 
-/* ── Responsive ── */
-@media (max-width: 1000px) {
-  .workspace { flex-wrap: wrap; }
-  .left-panel, .right-side-panel { width: 100%; flex-direction: row; flex-wrap: wrap; gap: 10px; }
-  .left-panel .profile-card { flex: 1 1 100%; }
-  .left-panel .session-card, .left-panel .streak-card, .left-panel .notices-card { flex: 1 1 calc(50% - 5px); }
-  .center-panel { width: 100%; order: -1; }
-  .right-side-panel .history-card, .right-side-panel .analytics-card { flex: 1 1 calc(50% - 5px); }
-  html, body { overflow: auto; height: auto; }
-  .workspace { align-items: flex-start; }
-}
-@media (max-width: 600px) {
-  .left-panel .session-card, .left-panel .streak-card, .left-panel .notices-card,
-  .right-side-panel .history-card, .right-side-panel .analytics-card { flex: 1 1 100%; }
-  .center-panel { width: 100%; }
-  .reason-grid { grid-auto-rows: 82px; }
-}
-
-/* ── Extended responsive ── */
-@media (max-width: 480px) {
-  .navbar { padding: 0 10px; }
-  .nav-title { font-size: 13px; }
-  .workspace { padding: 8px 8px; gap: 8px; }
-  .profile-card { padding: 9px 10px; gap: 8px; }
-  .profile-name { font-size: 13px; }
-  .profile-email { font-size: 9px; }
-  .reason-grid { grid-auto-rows: 75px; gap: 6px; }
-  .reason-option .reason-name { font-size: 11px; }
-  .right-header h2 { font-size: 14px; }
-  .right-header { padding: 9px 12px 7px; }
-  .reason-wrap { padding: 8px 12px; }
-  .actions { padding: 0 12px 12px; gap: 7px; }
-  .btn-submit { font-size: 13px; padding: 10px; }
-  .btn-qr, .btn-logout { font-size: 11px; padding: 8px; }
-}
-@media (max-width: 360px) {
-  .reason-grid { grid-auto-rows: 68px; }
-  .profile-name { font-size: 12px; }
-  .nav-clock { font-size: 10px; }
-}
-
-/* ── Responsive ── */
+/* ── Responsive — mobile first ── */
 @media (max-width: 1200px) {
   .workspace { gap: clamp(8px,1vw,14px); padding: clamp(8px,1vw,14px) clamp(10px,1.2vw,16px); }
   .center-panel { width: clamp(380px,40vw,520px); }
   .left-panel, .right-side-panel { width: clamp(170px,15vw,210px); }
 }
+
 @media (max-width: 950px) {
-  .workspace { flex-direction: column; align-items: center; overflow: auto; }
   html, body { height: auto; overflow: auto; }
-  .left-panel { flex-direction: row; flex-wrap: wrap; width: 100%; max-width: 680px; }
-  .left-panel .profile-card { flex: 1 1 100%; }
-  .left-panel .session-card,
-  .left-panel .streak-card,
-  .left-panel .notices-card { flex: 1 1 calc(50% - 5px); }
-  .center-panel { width: 100%; max-width: 680px; }
-  .right-side-panel { width: 100%; max-width: 680px; flex-direction: row; flex-wrap: wrap; gap: 10px; }
-  .right-side-panel .history-card,
-  .right-side-panel .analytics-card { flex: 1 1 calc(50% - 5px); }
-  .reason-grid { grid-auto-rows: clamp(90px,12vw,130px); }
+
+  /* Workspace becomes a CSS grid: check-in top full-width, then 2-col below */
+  .workspace {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+    grid-template-areas:
+      "center center"
+      "left   right";
+    gap: 10px;
+    padding: 10px 12px;
+    overflow: visible;
+    align-items: start;
+    justify-content: unset;
+  }
+  .center-panel { grid-area: center; width: 100%; }
+  .left-panel   { grid-area: left;   width: 100%; flex-direction: column; gap: 8px; }
+  .right-side-panel { grid-area: right; width: 100%; flex-direction: column; gap: 8px; }
+
+  .reason-grid { grid-auto-rows: clamp(85px,11vw,120px); }
 }
-@media (max-width: 640px) {
-  .workspace { padding: 10px; gap: 10px; }
-  .left-panel .session-card,
-  .left-panel .streak-card,
-  .left-panel .notices-card { flex: 1 1 100%; }
-  .right-side-panel .history-card,
-  .right-side-panel .analytics-card { flex: 1 1 100%; }
-  .center-panel { max-width: 100%; }
-  .reason-grid { grid-auto-rows: clamp(80px,20vw,110px); }
+
+@media (max-width: 600px) {
+  .workspace {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "center"
+      "left"
+      "right";
+    padding: 10px;
+  }
+  .reason-grid { grid-auto-rows: clamp(80px,20vw,105px); }
   .right-header h2 { font-size: 15px; }
   .btn-submit { padding: 11px; font-size: 13px; }
-  .navbar { padding: 0 12px; }
-  .nav-title { font-size: 13px; }
 }
+
 @media (max-width: 400px) {
-  .reason-grid { grid-auto-rows: 72px; gap: 6px; }
+  .workspace { padding: 8px; gap: 8px; }
+  .reason-grid { grid-auto-rows: 70px; gap: 6px; }
   .reason-option svg { width: 18px; height: 18px; }
-  .nav-clock { display: none; }
+  .nav-clock { font-size: 11px; }
+  .navbar { padding: 0 10px; }
 }
