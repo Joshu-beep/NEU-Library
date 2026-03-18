@@ -424,9 +424,34 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
       document.getElementById("avatarInput")?.addEventListener("change", async (e) => {
         const file = e.target.files[0];
         if (!file) return;
-        const { error } = await supabase.storage.from("avatars").upload(`${userId}/avatar`, file, { upsert: true });
-        if (!error) { await loadProfilePhoto(); showMessage("Photo updated!"); }
-        else showMessage("Upload failed: " + error.message);
+        // Resize to max 400x400 before upload to save storage
+        const canvas = document.createElement("canvas");
+        const img = new Image();
+        img.onload = async () => {
+          const size = Math.min(img.width, img.height, 400);
+          canvas.width = size; canvas.height = size;
+          const ctx = canvas.getContext("2d");
+          // Center-crop
+          const sx = (img.width - size) / 2, sy = (img.height - size) / 2;
+          ctx.drawImage(img, sx, sy, size, size, 0, 0, size, size);
+          canvas.toBlob(async (blob) => {
+            const { error } = await supabase.storage
+              .from("avatars")
+              .upload(`${userId}/avatar`, blob, { upsert: true, contentType: "image/jpeg" });
+            if (!error) {
+              await loadProfilePhoto();
+              showMessage("Photo updated!");
+            } else {
+              // RLS policy error — guide user to fix
+              if (error.message?.includes("row-level security")) {
+                showMessage("Upload blocked. Ask admin to run the storage policy SQL in Supabase.");
+              } else {
+                showMessage("Upload failed: " + error.message);
+              }
+            }
+          }, "image/jpeg", 0.85);
+        };
+        img.src = URL.createObjectURL(file);
       });
 
       // ── Init ──
