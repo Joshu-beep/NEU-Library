@@ -6,10 +6,11 @@
     <title>New Era University Library</title>
     <link rel="icon" type="image/x-icon" href="img/neulogo.png" />
     <link rel="stylesheet" href="css/index.css" />
+    <script>if(localStorage.getItem("neu_dark")==="1")document.documentElement.classList.add("dark");</script>
   </head>
   <body>
     <div id="msgBox"></div>
- 
+
     <!-- Announcement panel — fixed top-right on desktop, hidden on mobile -->
     <div class="announce-panel open" id="announcePanel">
       <button class="announce-toggle" onclick="document.getElementById('announcePanel').classList.toggle('open')">
@@ -23,7 +24,7 @@
         <div class="announce-empty">Loading...</div>
       </div>
     </div>
- 
+
     <div class="login-wrapper">
       <div class="login-card">
         <div class="card-header" id="mainHeader">
@@ -33,7 +34,7 @@
           <h1 id="headerTitle">New Era University Library</h1>
           <h2 id="headerSubtitle">Visitor Management System</h2>
         </div>
- 
+
         <!-- LOGIN VIEW -->
         <div class="card-body" id="loginView">
           <form id="loginForm">
@@ -50,7 +51,7 @@
           <div class="divider-container"><p>Don't have account yet?</p></div>
           <button type="button" class="btn btn-secondary" id="showRegisterBtn">Register Here</button>
         </div>
- 
+
         <!-- REGISTRATION VIEW -->
         <div class="card-body" id="registerView" style="display: none">
           <div style="text-align: center; margin-bottom: 20px">
@@ -108,7 +109,7 @@
                 </optgroup>
               </select>
             </div>
- 
+
             <!-- Faculty Department Dropdown (hidden by default) -->
             <div class="input-group text-left" id="facultyProgramGroup" style="display:none">
               <label>Faculty Department</label>
@@ -138,7 +139,7 @@
             <a href="#" id="showLoginLink" style="font-size: 14px; color: var(--text-gray)">Back to Login</a>
           </div>
         </div>
- 
+
         <!-- ADMIN LOGIN VIEW -->
         <div class="card-body" id="adminView" style="display: none">
           <div style="text-align: center; margin-bottom: 20px">
@@ -161,7 +162,7 @@
           </div>
         </div>
       </div>
- 
+
       <div class="footer-links">
         <a class="admin-link" id="adminBtn">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -170,11 +171,25 @@
           </svg>
           Admin Access
         </a>
+        <button id="darkToggleBtn" style="background:none;border:none;cursor:pointer;color:#64748b;display:inline-flex;align-items:center;gap:5px;font-size:12px;padding:4px 8px;border-radius:6px;" title="Toggle dark mode">
+          <svg id="darkIcon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          Dark mode
+        </button>
         <p class="copyright">© 2026 New Era University Library</p>
       </div>
       </div><!-- end login-card -->
     </div><!-- end login-wrapper -->
- 
+
+    <!-- Bible verse — fixed bottom right -->
+    <div style="position:fixed;bottom:18px;right:24px;z-index:5;text-align:right;pointer-events:none;">
+      <p style="font-size:12px;color:rgba(255,255,255,0.75);font-style:italic;line-height:1.5;text-shadow:0 1px 4px rgba(0,0,0,0.4);">
+        "The fear of the Lord is the beginning of wisdom."
+      </p>
+      <p style="font-size:11px;color:rgba(255,255,255,0.5);margin-top:2px;font-weight:600;letter-spacing:0.3px;">
+        — Proverbs 9:10
+      </p>
+    </div>
+
     <script src="js/index.js" type="module"></script>
   </body>
 </html>
