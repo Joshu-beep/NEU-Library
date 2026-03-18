@@ -197,22 +197,49 @@ tr:hover td { background: #f8fafc; }
 .btn-modal-close:hover { background: #e2e8f0; }
 
 /* ── Responsive ── */
+@media (max-width: 1200px) {
+  .top-row { grid-template-columns: clamp(200px,26vw,300px) 1fr; }
+}
 @media (max-width: 1100px) {
   .top-row { grid-template-columns: 1fr; }
   .right-panels { grid-template-columns: 1fr 1fr; }
   html, body { overflow: auto; height: auto; }
-  .container { flex: none; }
+  .container { flex: none; min-height: auto; }
   .content-card { min-height: 50vh; }
-  #log-view, #users-view { overflow: visible; }
+  #log-view, #users-view { overflow: visible; min-height: auto; }
   #log-view table, #users-view table { display: table; height: auto; }
   #log-view thead, #users-view thead { display: table-header-group; }
-  #log-view tbody, #users-view tbody { display: table-row-group; overflow: visible; }
+  #log-view tbody, #users-view tbody { display: table-row-group; overflow: visible; max-height: none; }
   #log-view tbody tr, #users-view tbody tr { display: table-row; }
+  .stats-grid { grid-template-columns: repeat(4,1fr); }
+}
+@media (max-width: 900px) {
+  .right-panels { grid-template-columns: 1fr; }
+  .stats-grid { grid-template-columns: repeat(2,1fr); }
+  .navbar { padding: 0 16px; }
 }
 @media (max-width: 767px) {
   .welcome-text { display: none; }
-  .right-panels { grid-template-columns: 1fr; }
-  .toolbar { gap: 5px; padding: 8px 10px; }
+  .navbar { height: clamp(48px,7vh,58px); }
+  .nav-logo { font-size: 13px; }
+  .container { padding: 10px 10px; gap: 8px; }
+  .toolbar { gap: 5px; padding: 8px 10px; flex-wrap: wrap; }
+  .tab { padding: 5px 10px; font-size: 11px; }
   .search-box { width: 100%; }
   .tab-group { flex-wrap: wrap; }
+  .chart-container { height: clamp(120px,20vw,160px); }
+  th, td { padding: 7px 8px; font-size: 11px; }
+  .stat-card { padding: 8px 10px; gap: 8px; }
+  .stat-info p { font-size: 16px; }
+}
+@media (max-width: 480px) {
+  .stats-grid { grid-template-columns: 1fr 1fr; gap: 6px; }
+  .stat-card { padding: 8px; }
+  .btn-action { padding: 5px 8px; font-size: 10px; }
+  th { font-size: 10px; padding: 6px 7px; }
+  td { font-size: 11px; padding: 6px 7px; }
+  .name-stack .name { font-size: 11px; }
+  .name-stack .sub-text { font-size: 9px; }
+  .detail-modal { width: 96%; }
+  .detail-modal-header h2 { font-size: 14px; }
 }
