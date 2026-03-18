@@ -226,39 +226,39 @@ select#regProgram:focus, select#regProgramFaculty:focus { border-color: var(--pr
 
 /* ── Bible verse card ── */
 .bible-verse {
-  position: fixed; bottom: clamp(14px,2vh,24px); right: clamp(14px,2vw,28px);
+  position: fixed; bottom: clamp(16px,2vh,28px); right: clamp(16px,2vw,32px);
   z-index: 5; pointer-events: none;
-  width: clamp(210px, 18vw, 270px);
+  width: clamp(260px, 22vw, 340px);
 }
 .bible-card {
   background: rgba(0,20,60,0.88);
   backdrop-filter: blur(12px);
-  border-radius: 12px;
-  padding: clamp(10px,1.3vh,16px) clamp(12px,1.3vw,18px);
-  border-left: 3px solid #f59e0b;
+  border-radius: 14px;
+  padding: clamp(14px,1.6vh,20px) clamp(16px,1.6vw,22px);
+  border-left: 4px solid #f59e0b;
   box-shadow: 0 8px 28px rgba(0,0,0,0.45);
 }
-.bible-header { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; }
-.bible-header svg { flex-shrink: 0; }
+.bible-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.bible-header svg { flex-shrink: 0; width: 16px; height: 16px; }
 .bible-header span {
-  font-size: clamp(8px,0.62vw,10px); font-weight: 800;
-  letter-spacing: 1.6px; color: #f59e0b; text-transform: uppercase;
+  font-size: clamp(9px,0.72vw,11px); font-weight: 800;
+  letter-spacing: 1.8px; color: #f59e0b; text-transform: uppercase;
 }
 .bible-text {
-  font-size: clamp(11px,0.88vw,13px); color: rgba(255,255,255,0.95);
-  font-style: italic; line-height: 1.6; margin-bottom: 9px;
+  font-size: clamp(13px,1.05vw,16px); color: rgba(255,255,255,0.95);
+  font-style: italic; line-height: 1.65; margin-bottom: 12px;
 }
 .bible-ref { display: flex; align-items: center; gap: 8px; }
 .bible-line { flex: 1; height: 1px; background: rgba(245,158,11,0.35); }
 .bible-ref span {
-  font-size: clamp(10px,0.78vw,12px); color: #f59e0b;
+  font-size: clamp(11px,0.88vw,13px); color: #f59e0b;
   font-weight: 700; letter-spacing: 0.3px; white-space: nowrap;
 }
 
 /* ── Responsive ── */
 @media (max-width: 1100px) {
   .login-wrapper { width: clamp(300px, 44vw, 460px); }
-  .bible-verse { width: clamp(190px,16vw,240px); }
+  .bible-verse { width: clamp(240px,20vw,300px); }
 }
 @media (max-width: 900px) {
   .login-wrapper { width: clamp(300px, 54vw, 400px); }
@@ -305,5 +305,5 @@ select#regProgram:focus, select#regProgramFaculty:focus { border-color: var(--pr
 @media (min-width: 1600px) {
   .login-wrapper { width: clamp(420px, 28vw, 560px); }
   .announce-panel { width: 320px; top: 28px; right: 28px; }
-  .bible-verse { width: 290px; }
+  .bible-verse { width: 340px; }
 }
