@@ -325,12 +325,25 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
         document.getElementById('notices-view').classList.toggle('hidden', view !== 'notices');
         document.getElementById('admins-view').classList.toggle('hidden', view !== 'admins');
         document.getElementById('dateFilterSection').classList.toggle('hidden', view !== 'log');
-        document.querySelector('.search-box').classList.toggle('hidden', view === 'notices' || view === 'admins');
-        document.getElementById('filterInput').value = '';
-        if (view !== 'notices' && view !== 'admins') runFilter();
-        if (view === 'users') loadUsers();
+
+        // Show/hide filters per view
+        const isLog   = view === 'log';
+        const isUsers = view === 'users';
+        const showFilters = isLog || isUsers;
+        document.querySelector('.search-box').classList.toggle('hidden', !showFilters);
+        document.getElementById('filterReason').style.display  = isLog   ? '' : 'none';
+        document.getElementById('filterRole').style.display    = isUsers ? '' : 'none';
+        document.getElementById('filterCollege').style.display = showFilters ? '' : 'none';
+
+        document.getElementById('filterInput').value   = '';
+        document.getElementById('filterCollege').value = '';
+        document.getElementById('filterReason').value  = '';
+        document.getElementById('filterRole').value    = '';
+        document.getElementById('clearFiltersBtn').style.display = 'none';
+
+        if (view === 'users')   loadUsers();
         if (view === 'notices') loadNoticesAdmin();
-        if (view === 'admins') loadAdminsList();
+        if (view === 'admins')  loadAdminsList();
       }
 
       // ── Admin Management (owner only) ──
@@ -507,43 +520,89 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
         loadNoticesAdmin();
       }
 
-      function runFilter() {
-        const f = document.getElementById('filterInput').value.toUpperCase();
-        const isUsers = !document.getElementById('users-view').classList.contains('hidden');
+      function applyAllFilters() {
+        const keyword   = (document.getElementById('filterInput').value || '').toUpperCase();
+        const college   = document.getElementById('filterCollege').value;
+        const reason    = document.getElementById('filterReason').value;
+        const role      = document.getElementById('filterRole').value;
+        const from      = document.getElementById('dateFrom').value;
+        const to        = document.getElementById('dateTo').value;
+        const isUsers   = !document.getElementById('users-view').classList.contains('hidden');
+
+        // Show/hide clear button if any filter is active
+        const hasFilter = keyword || college || reason || role || from || to;
+        document.getElementById('clearFiltersBtn').style.display = hasFilter ? '' : 'none';
+
         if (isUsers) {
-          // Live user search — filter allUsers
-          const filtered = allUsers.filter(u =>
-            (u.name || '').toUpperCase().includes(f) ||
-            (u.email || '').toUpperCase().includes(f) ||
-            (u.program || '').toUpperCase().includes(f)
-          );
+          const filtered = allUsers.filter(u => {
+            if (college && !(u.program || '').includes(college)) return false;
+            if (role    && (u.role || 'student').toLowerCase() !== role) return false;
+            if (keyword && !(
+              (u.name    || '').toUpperCase().includes(keyword) ||
+              (u.email   || '').toUpperCase().includes(keyword) ||
+              (u.program || '').toUpperCase().includes(keyword)
+            )) return false;
+            return true;
+          });
           renderUsers(filtered);
         } else {
-          const tbl = 'logTable';
-          Array.from(document.getElementById(tbl).getElementsByTagName('tr')).slice(1).forEach(r => {
-            r.style.display = r.textContent.toUpperCase().includes(f) ? '' : 'none';
+          const filtered = allLogs.filter(l => {
+            if (reason  && l.reason !== reason) return false;
+            if (college && !(l.users?.program || '').includes(college)) return false;
+            if (from || to) {
+              const d = new Date(l.time_in).toLocaleDateString('en-CA', { timeZone: 'Asia/Manila' });
+              if (from && d < from) return false;
+              if (to   && d > to)   return false;
+            }
+            if (keyword && !(
+              (l.users?.name    || '').toUpperCase().includes(keyword) ||
+              (l.users?.email   || '').toUpperCase().includes(keyword) ||
+              (l.users?.program || '').toUpperCase().includes(keyword) ||
+              (l.reason         || '').toUpperCase().includes(keyword)
+            )) return false;
+            return true;
           });
+          renderLogs(filtered);
         }
       }
 
-      function filterByDate() {
-        const from = document.getElementById('dateFrom').value;
-        const to   = document.getElementById('dateTo').value;
-        if (!from && !to) { renderLogs(allLogs); return; }
-        renderLogs(allLogs.filter(l => {
-          const d = new Date(l.time_in).toLocaleDateString('en-CA', { timeZone: 'Asia/Manila' });
-          return (!from || d >= from) && (!to || d <= to);
-        }));
+      function clearAllFilters() {
+        document.getElementById('filterInput').value   = '';
+        document.getElementById('filterCollege').value = '';
+        document.getElementById('filterReason').value  = '';
+        document.getElementById('filterRole').value    = '';
+        document.getElementById('dateFrom').value      = '';
+        document.getElementById('dateTo').value        = '';
+        document.getElementById('clearFiltersBtn').style.display = 'none';
+        const isUsers = !document.getElementById('users-view').classList.contains('hidden');
+        if (isUsers) renderUsers(allUsers); else renderLogs(allLogs);
       }
+
+      // Keep old names as aliases so existing calls still work
+      function runFilter() { applyAllFilters(); }
+      function filterByDate() { applyAllFilters(); }
 
       function getFilteredLogs() {
         const from = document.getElementById('dateFrom').value;
         const to   = document.getElementById('dateTo').value;
-        if (!from && !to) return allLogs;
+        const reason  = document.getElementById('filterReason').value;
+        const college = document.getElementById('filterCollege').value;
+        const keyword = (document.getElementById('filterInput').value || '').toUpperCase();
         return allLogs.filter(l => {
-          // Convert UTC time_in to PH date string for accurate comparison
-          const d = new Date(l.time_in).toLocaleDateString('en-CA', { timeZone: 'Asia/Manila' }); // en-CA = YYYY-MM-DD
-          return (!from || d >= from) && (!to || d <= to);
+          if (reason  && l.reason !== reason) return false;
+          if (college && !(l.users?.program || '').includes(college)) return false;
+          if (from || to) {
+            const d = new Date(l.time_in).toLocaleDateString('en-CA', { timeZone: 'Asia/Manila' });
+            if (from && d < from) return false;
+            if (to   && d > to)   return false;
+          }
+          if (keyword && !(
+            (l.users?.name    || '').toUpperCase().includes(keyword) ||
+            (l.users?.email   || '').toUpperCase().includes(keyword) ||
+            (l.users?.program || '').toUpperCase().includes(keyword) ||
+            (l.reason         || '').toUpperCase().includes(keyword)
+          )) return false;
+          return true;
         });
       }
 
@@ -696,6 +755,8 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
       window.closeDetailModal = closeDetailModal;
       window.runFilter = runFilter;
       window.filterByDate = filterByDate;
+      window.applyAllFilters = applyAllFilters;
+      window.clearAllFilters = clearAllFilters;
       window.triggerResetAll = triggerResetAll;
       window.toggleBlock = toggleBlock;
       window.removeUser = removeUser;
